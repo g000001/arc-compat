@@ -103,14 +103,15 @@ whilet is used to loop until nil is obtained."
 (mac drain (expr &optional eof)
   "Repeatedly executes expr until it returns eof (default nil). 
 A list of the expr values is returned."
-  (w/uniq (var acc =>)
+  (w/uniq (var acc => ans)
     `(block nil
-       (with (,var nil ,acc nil)
-	 (tagbody
-	,=> (setq ,var ,expr)
-	    (when (eql ,var ,eof) (return (cl:reverse ,acc)))
-	    (push ,var ,acc)
-	    (go ,=>))))))
+       (let ,ans (list () )
+         (with (,var nil ,acc ,ans)
+           (tagbody
+             ,=> (setq ,var ,expr)
+                 (when (eql ,var ,eof) (return (cdr ,ans)))
+                 (rplacd ,acc (setq ,acc (list ,var)))
+                 (go ,=>)))))))
 
 #|(with-input-from-string (s "(1 2) (3 4)")
   (drain (read s nil)))|#
