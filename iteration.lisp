@@ -1,4 +1,4 @@
-(in-package :arc)
+(in-package :arc-compat.internal)
 
 ;;; Iteration
 

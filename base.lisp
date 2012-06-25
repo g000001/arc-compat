@@ -1,4 +1,11 @@
-(in-package :arc)
+(in-package :arc-compat.internal)
+
+(defmacro if (&rest args)
+  (cond ((null args) ''nil)
+        ((null (cdr args)) (car args))
+        (T `(cl:if (not (null ,(car args)))
+                   ,(cadr args)
+                   (if ,@(cddr args))))))
 
 (defun +INTERNAL-FLATTEN (lis)
   (cond ((atom lis) lis)
@@ -11,8 +18,11 @@
 ;    (DECLARE (IGNORABLE ,@(+internal-flatten args)))
 ;    ,@body))
 
-(defmacro FN ((&rest args) &body body)
-  (cl:let ((g (gensym)))
+(defmacro FN (args &body body)
+  (cl:let ((g (gensym))
+           (args (if (consp args)
+                     args
+                     `(&rest ,args))))
     `(LAMBDA (&rest ,g)
        (DESTRUCTURING-BIND ,args ,g
          (DECLARE (IGNORABLE ,@(+internal-flatten args)))
@@ -36,7 +46,7 @@ binding."
 are computed before any of the assignments are done (like
 Scheme's let, rather than let*). If the last variable doesn't
 have a value, it is assigned nil."
-  (cl:loop :for x :on binds :by #'cddr 
+  (cl:loop :for x :on binds :by #'cddr
            :collect (first x) :into vars
            :collect (second x) :into vals
            :finally (return
@@ -52,7 +62,7 @@ let). If the last variable doesn't have a value, it is assigned
 nil."
 
 (defmacro withs (binds &body body)
-  (cl:let ((binds (loop :for vv :on binds :by #'cddr  
+  (cl:let ((binds (cl:loop :for vv :on binds :by #'cddr
                         :collect `(,(car vv) ,(cadr vv)))))
     (cl:reduce (lambda (vv res) `(arc::let ,@vv ,res))
                binds

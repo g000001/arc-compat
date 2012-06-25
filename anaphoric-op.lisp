@@ -1,4 +1,4 @@
-(in-package :arc)
+(in-package :arc-compat.internal)
 
 ;;; '(w/uniq)
 ;;; Copyright 1995 by Paul Graham.

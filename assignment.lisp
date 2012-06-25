@@ -1,4 +1,4 @@
-(in-package :arc)
+(in-package :arc-compat.internal)
 
 ;  [code] [Foundation] [Destructive] set symbol expr
 (defmacro set (&rest args)
@@ -157,7 +157,7 @@ assigning place1 to the last place.")
   "Remove elements satisfying test from the list starting at place."
   (multiple-value-bind (vars forms var set access)
                        (get-setf-expansion place)
-    `(let* (,@(mapcar #'list vars forms)
+    `(let* (,@(mapcar #'cl:list vars forms)
               (,(car var) (delete-if ,test ,access)))
          ,set)))
 

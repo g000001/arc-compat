@@ -1,4 +1,4 @@
-(in-package :arc)
+(in-package :arc-compat.internal)
 
 ;; car list
 
@@ -38,7 +38,7 @@
 ;Returns the first n elements of list.
 (defun firstn (n list)
   "Returns first 'n' elements of list."
-  (loop :repeat n :for x :in list :collect x))
+  (cl:loop :repeat n :for x :in list :collect x))
 ;
 ;>(firstn 3 '(1 2))
 ;(1 2)
@@ -47,11 +47,11 @@
 ;(a b c)
 
 ;; nthcdr n list <- *cl*
-(defun nthcdr (n list)
+#|(defun nthcdr (n list)
   "Returns list after skipping the first n elements."
   (if (> 1 n)
       list
-      (cl:nthcdr n list)))
+      (cl:nthcdr n list)))|#
 
 ;> (nthcdr -88 '(1 2 3))
 ;>(nthcdr 0 '(1 2 3))
@@ -231,11 +231,11 @@ last number is <= end."
 ;(#\a #\b #\c #\d #\e)
 
 ;; adjoin elt list [test]
-(defun adjoin (elt list &optional (test #'eql))
+#|(defun adjoin (elt list &optional (test #'eql))
   "Cons elt onto list unless (test elt y) is true for some y in
 list. By default, test is iso, so elt will be joined if it is not
 present in list."
-  (cl:adjoin elt list :test test))
+  (cl:adjoin elt list :test test))|#
 
 ;>(adjoin 2 '(1 2 3))
 ;(1 2 3)
@@ -309,7 +309,7 @@ the previous element of list."
 (defun firstn-that (n f xs)
   "Returns the first n elements of list for which predicate f is
 true."
-  (cl:cond ((or (<= n 0) (no xs)) 
+  (cl:cond ((or (cl:<= n 0) (no xs)) 
 	    nil)
 	   ((funcall f (car xs))
 	    (cons (car xs) (firstn-that (- n 1) f (cdr xs))))
@@ -325,11 +325,11 @@ true."
 (defun most (f seq) 
   "Returns the element of list for which rating function f
 returns the largest value."
-  (unless (no seq)
+  (cl:unless (no seq)
     (withs (wins (car seq) topscore (funcall f wins))
       (cl:dolist (elt (cdr seq))
         (let score (funcall f elt)
-          (if (> score topscore) (= wins elt topscore score))))
+          (if (cl:> score topscore) (= wins elt topscore score))))
       wins)))
 
 ;>(most #'len '("cat" "bird" "dog"))
@@ -369,7 +369,7 @@ must return a list. nil results are omitted."
 (defun reclist (f xs)
   "Recursively applies f to tail subsequences of list and returns
 the first true result. Returns nil if none."
-  (and xs (or (funcall f xs) (reclist f (cdr xs)))))
+  (cl:and xs (cl:or (funcall f xs) (reclist f (cdr xs)))))
 
 ;>(reclist (fn (x) (print x) nil) '(a b c))
 ;(a b c)
@@ -396,7 +396,7 @@ element or a predicate.")
 ;[code] [Procedure] trues f list
 ;Maps function f onto list and returns only the true (non-nil) values.
 (defun trues (f seq) 
-  (rem nil (map f seq)))
+  (rem nil (cl:mapcar f seq)))
 ;
 ;>(trues #'cdr '((1 2) (3) (4 5)))
 ;((2) (5))
@@ -690,7 +690,7 @@ element or a predicate.")
   "Removes elements from seq that satisfy test. test is either a
 function or an object. seq is either a list or string.")
 
-(defun rem (test seq)
+#|(defun rem (test seq)
   (let f (testify test)
     (if (alist seq)
         (funcall (afn (s)
@@ -698,7 +698,7 @@ function or an object. seq is either a list or string.")
 			    ((funcall f (car s)) (self (cdr s)))
                             ('T (cons (car s) (self (cdr s)))))
 		   seq)
-        (coerce (rem test (coerce seq 'cons)) 'string)))))
+        (coerce (rem test (coerce seq 'cons)) 'string)))))|#
 
 
 ;>(rem #'oddp '(1 2 3 4 5))

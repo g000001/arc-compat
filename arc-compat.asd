@@ -2,14 +2,13 @@
 (in-package #:cl-user)
 
 (defpackage #:arc-compat-asd
-  (:use #:cl #:asdf))
+  (:use #:cl #:asdf)
+  (:export :*arc-compat-version-string*))
 
 (in-package #:arc-compat-asd)
 
 (defvar *arc-compat-version-string* "0.0.1"
   "arc-compat's version number as a string.")
-(export '*arc-compat-version-string*)
-
 
 (in-package #:cl-user)
 
@@ -19,17 +18,18 @@
   :author "CHIBA Masaomi <chiba.masaomi@gmail.com>"
   :maintainer "CHIBA Masaomi <chiba.masaomi@gmail.com>"
   :version "0.0.1"
+  :serial T
   :components ((:file "package")
 	       (:file "utils")
-	       (:file "base")
-	       (:file "macro" :depends-on ("utils"))
-	       (:file "anaphoric-op" :depends-on ("base" "macro"))
-	       (:file "assignment" :depends-on ("base" "macro"))
-	       (:file "boolean" :depends-on ("macro"))
-	       (:file "variables" :depends-on ("base" "macro"))
-	       (:file "iteration" :depends-on ("base" "macro"))
-	       (:file "predicates" :depends-on ("base" "macro"))
-	       (:file "list" :depends-on ("base" "macro" "iteration"))
+               (:file "base")
+	       (:file "macro")
+	       (:file "anaphoric-op")
+	       (:file "assignment")
+	       (:file "boolean")
+	       (:file "variables")
+	       (:file "iteration")
+	       (:file "predicates")
+	       (:file "list")
 	       )
 ;	       (:file "y" :depends-on ("package" "x"))
 ;	       )

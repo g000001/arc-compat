@@ -1,4 +1,4 @@
-(in-package :arc)
+(in-package :arc-compat.internal)
 
 ;; '(w/uniq)
 ;; Copyright 1995 by Paul Graham.
@@ -8,11 +8,16 @@
 ;;
 ;; Documentation String
 ;; http://arcfn.com/doc/
-;; Copyright 2008 Ken Shirriff. 
+;; Copyright 2008 Ken Shirriff.
 
 ;[code] [Macro] mac name args [body ...]
-(defalias mac cl:defmacro
-  "Creates a macro.")
+(defmacro mac (name args &body body)
+  "Creates a macro."
+  `(defmacro ,name ,(if (consp args)
+                        args
+                        `(&rest ,args))
+     #|(arnesi:with-lisp1 ,@body)|#
+     ,@body))
 
 ;[code] [Foundation] macex macro
 (defalias macex cl:macroexpand
@@ -28,7 +33,7 @@
 
 ;; *onlisp*
 (defmacro w/uniq (syms &body body)
-  "Assigns a unique symbol to each name in names and executes body. 
+  "Assigns a unique symbol to each name in names and executes body.
 names can either be a single symbol or a list of symbols."
   `(cl:let ,(mapcar (lambda (s)
 		   `(,s (uniq)))
@@ -40,4 +45,4 @@ names can either be a single symbol or a list of symbols."
 
 ;[code] [Foundation] quote arg
 ;The single quote ' is shorthand for quote, e.g. 'x is the same as (quote x)
-;<- cl	
+;<- cl
