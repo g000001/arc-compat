@@ -7,7 +7,7 @@
 
 (in-package #:arc-compat-asd)
 
-(defvar *arc-compat-version-string* "0.0.1"
+(defvar *arc-compat-version-string* "0.0.2"
   "arc-compat's version number as a string.")
 
 (in-package #:cl-user)
@@ -17,7 +17,7 @@
   :description "Arc compatible package for CL"
   :author "CHIBA Masaomi <chiba.masaomi@gmail.com>"
   :maintainer "CHIBA Masaomi <chiba.masaomi@gmail.com>"
-  :version "0.0.1"
+  :version "0.0.2"
   :serial T
   :components ((:file "package")
 	       (:file "utils")
@@ -30,8 +30,4 @@
 	       (:file "iteration")
 	       (:file "predicates")
 	       (:file "list")
-	       )
-;	       (:file "y" :depends-on ("package" "x"))
-;	       )
-  ;:depends-on (#:x)
-  )
+	       ))
