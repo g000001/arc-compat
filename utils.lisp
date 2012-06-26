@@ -16,13 +16,6 @@
      (arnesi:with-lisp1
        ,@body)))|#
 
-(defmacro def (name args &body body)
-  `(defun ,name (,@(if (consp args)
-                       args
-                         `(&rest ,args)))
-     ,@body))
-
-
 (defun type (x)
   (cond ;((ar-tagged? x)     (vector-ref x 1))
         ((consp x)          'cons)

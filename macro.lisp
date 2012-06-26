@@ -10,14 +10,7 @@
 ;; http://arcfn.com/doc/
 ;; Copyright 2008 Ken Shirriff.
 
-;[code] [Macro] mac name args [body ...]
-(defmacro mac (name args &body body)
-  "Creates a macro."
-  `(defmacro ,name ,(if (consp args)
-                        args
-                        `(&rest ,args))
-     #|(arnesi:with-lisp1 ,@body)|#
-     ,@body))
+
 
 ;[code] [Foundation] macex macro
 (defalias macex cl:macroexpand

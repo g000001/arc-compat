@@ -1,11 +1,49 @@
 (in-package :arc-compat.internal)
 
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun to-proper-lambda-list (list)
+    (cl:typecase list
+      (cl:list (if (cl:tailp () list)
+                   list
+                   (cl:let ((last (cl:last list)))
+                     `(,@(cl:butlast list)
+                         ,(car last)
+                         cl:&rest
+                         ,(cdr last)))))
+      (cl:symbol `(cl:&rest ,list))))
+  
+  (defun arc-ll-to-cl-ll (list)
+    (mapcan (lambda (x)
+              (if (cl:and (consp x)
+                          (eq 'o (car x)) )
+                  (list 'cl:&optional (cdr x))
+                  (list x) ))
+            (to-proper-lambda-list list) )))
+
+
+;[code] [Macro] mac name args [body ...]
+(defmacro mac (name args &body body)
+  "Creates a macro."
+  `(defmacro ,name ,(if (consp args)
+                        (arc-ll-to-cl-ll args)
+                        `(&rest ,args))
+     #|(arnesi:with-lisp1 ,@body)|#
+     ,@body))
+
+(defmacro def (name args &body body)
+  `(defun ,name (,@(cl:if (consp args)
+                          (arc-ll-to-cl-ll args)
+                          `(&rest ,args)))
+     ,@body))
+
 (defmacro if (&rest args)
   (cond ((null args) ''nil)
         ((null (cdr args)) (car args))
-        (T `(cl:if (not (null ,(car args)))
-                   ,(cadr args)
-                   (if ,@(cddr args))))))
+        (T `(cl:let ((it ,(car args)))
+              (cl:if (not (null it))
+                     ,(cadr args)
+                     (if ,@(cddr args)))))))
 
 (defun +INTERNAL-FLATTEN (lis)
   (cond ((atom lis) lis)

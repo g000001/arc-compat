@@ -15,8 +15,8 @@
 sets the first character of the string, which must have length at
 least one."
   `(etypecase ,list
-     (list (setf (car ,list) ,expr))
-     (string (setf (aref ,list 0) ,expr))))
+     (cl:list (setf (car ,list) ,expr))
+     (cl:string (setf (aref ,list 0) ,expr))))
 
 ;>(do
 ;    (= x '(1 2 3))

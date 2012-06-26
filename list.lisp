@@ -63,15 +63,28 @@
 ;>(nthcdr 10 '(1 2 3))
 ;nil
 ;
-;[code] [Procedure] last list
-;Returns the last element of list.
-;	
-;
+
+(def last (seq)
+  "Returns the last element of list."
+  (if (no (cdr seq))
+      (car seq)
+      (last (cdr seq))))
+
 ;>(last '(1 2 3))
 ;3
 ;
 ;[code] [Procedure] flat list [stringstoo]
-;Flattens list into a list of atoms. Any nils are removed. If stringstoo is true, empty strings are removed, but flat will fail if the list contains any non-empty strings.
+;
+(def flat (x (o stringstoo))
+  "Flattens list into a list of atoms. Any nils are removed. If stringstoo is true, empty strings are removed, but flat will fail if the list contains any non-empty strings."
+  (funcall
+   (rfn f (x acc)
+     (if (or (no x) (and stringstoo (is x "")))
+         acc
+         (and (atom x) (no (and stringstoo (isa x 'string))))
+         (cons x acc)
+         (f (car x) (f (cdr x) acc))))
+   x nil))
 ;	
 ;
 ;>(flat '(1 2 () (3 4 (5))))
@@ -230,12 +243,14 @@ last number is <= end."
 ;>(w/instring ins "abcdefg" (n-of 5 (readc ins)))
 ;(#\a #\b #\c #\d #\e)
 
-;; adjoin elt list [test]
-#|(defun adjoin (elt list &optional (test #'eql))
+(def adjoin (x xs (o test #'iso))
   "Cons elt onto list unless (test elt y) is true for some y in
 list. By default, test is iso, so elt will be joined if it is not
 present in list."
-  (cl:adjoin elt list :test test))|#
+  (if (some (fn (_) (funcall test _)) xs)
+      xs
+      (cons x xs)))
+
 
 ;>(adjoin 2 '(1 2 3))
 ;(1 2 3)
@@ -250,7 +265,28 @@ present in list."
 ;(2 0 1 2)
 ;
 ;[code] [Procedure] [Destructive] counts list [table]
-;Counts how many times each element of list occurs. The results are returned as a table mapping from the element to the count. If a table is passed in, it will be updated.
+;
+#|(def counts (seq (o c (table)))
+  (if (no seq)
+      c
+      (do (zap (fn (_) (if _ (cl:+ _ 1) 1))
+               (funcall c (car seq)))
+          (counts (cdr seq) c))))|#
+
+
+(def counts (seq (o c (table)))
+  "Counts how many times each element of list occurs. The results are returned as a table mapping from the element to the count. If a table is passed in, it will be updated."
+  (if (no seq)
+      c
+      (do (let key (car seq)
+            (multiple-value-bind (val win)
+                                 (gethash key c)
+              (declare (ignore val))
+                 (if win 
+                     (incf (gethash key c))
+                     (setf (gethash key c) 1))))
+          (counts (cdr seq) c))))
+
 ;	
 ;
 ;>(counts '(b a n a n a))
@@ -260,10 +296,22 @@ present in list."
 ;  (counts '(1 2) tl)
 ;  (counts '(1 3) tl))
 ;#hash((3 . 1) (1 . 2) (2 . 1))
-;
+
+
+#|(let tl (table)
+     (counts '(1 2) tl)
+     (counts '(1 3) tl)
+     (maphash (fn (k v) (print (list k v))) tl))|#
+
 ;[code] [Procedure] commonest list
 ;Returns the element of list occurring most frequently, along with its count.
-;	
+
+(def commonest (seq)
+  (with (winner nil n 0)
+    (ontable k v (counts seq)
+      (when (> v n) (= winner k n v)))
+    (list winner n)))
+
 ;
 ;>(commonest '(b a n a n a))
 ;(a 3)
@@ -394,8 +442,8 @@ element or a predicate.")
 ;(6 7)
 
 ;[code] [Procedure] trues f list
-;Maps function f onto list and returns only the true (non-nil) values.
 (defun trues (f seq) 
+  "Maps function f onto list and returns only the true (non-nil) values."
   (rem nil (cl:mapcar f seq)))
 ;
 ;>(trues #'cdr '((1 2) (3) (4 5)))
@@ -408,21 +456,83 @@ element or a predicate.")
 ;Arc provides an efficient sorting operation based on merge sort. Sorting in Arc uses a compare predicate function that defines the sort order. Elements x and y are defined as sorted if (compare x y) is true. The compare function does not need to define a full order. That is, it is valid for (compare x y) and (compare y x) to both be true. In this case, mergesort is stable, and will preserve the existing order of the elements.
 ;
 ;[code] [Procedure] [Destructive] mergesort compare list
-;Destructively sorts list using the given comparison function. The sort is stable; if two elements compare as equal with compare, they will remain in the same order in the output. The original list is destroyed.
+
+(def merge (less? x y)
+  "Merges two sorted lists into a sorted list. The original lists must be ordered according to the predicate function compare."
+  (if (no x) y
+      (no y) x
+      (let lup nil
+        (set lup
+             (fn (r x y r-x?) ; r-x? for optimization -- is r connected to x?
+               (if (funcall less? (car y) (car x))
+                 (do (if r-x? (scdr r y))
+                     (if (cdr y) (funcall lup y x (cdr y) nil) (scdr y x)))
+                 ; (car x) <= (car y)
+                 (do (if (no r-x?) (scdr r x))
+                     (if (cdr x) (funcall lup x (cdr x) y t) (scdr x y))))))
+        (if (funcall less? (car y) (car x))
+          (do (if (cdr y) (funcall lup y x (cdr y) nil) (scdr y x))
+              y)
+          ; (car x) <= (car y)
+          (do (if (cdr x) (funcall lup x (cdr x) y t) (scdr x y))
+              x)))))
+
+(def mergesort (less? lst)
+  "Destructively sorts list using the given comparison function. The sort is stable; if two elements compare as equal with compare, they will remain in the same order in the output. The original list is destroyed."
+  (with (n (len lst))
+    (if (<= n 1) lst
+        ; ; check if the list is already sorted
+        ; ; (which can be a common case, eg, directory lists).
+        ; (let loop ([last (car lst)] [next (cdr lst)])
+        ;   (or (null? next)
+        ;       (and (not (less? (car next) last))
+        ;            (loop (car next) (cdr next)))))
+        ; lst
+        (funcall 
+         (afn (n)
+           (if (> n 2)
+                ; needs to evaluate L->R
+                (withs (j (/ (if (even n) n (- n 1)) 2) ; faster than round
+                        a (self j)
+                        b (self (- n j)))
+                  (merge less? a b))
+               ; the following case just inlines the length 2 case,
+               ; it can be removed (and use the above case for n>1)
+               ; and the code still works, except a little slower
+               (is n 2)
+                (with (x (car lst) y (cadr lst) p lst)
+                  (= lst (cddr lst))
+                  (when (funcall less? y x) (scar p y) (scar (cdr p) x))
+                  (scdr (cdr p) nil)
+                  p)
+               (is n 1)
+                (with (p lst)
+                  (= lst (cdr lst))
+                  (scdr p nil)
+                  p)
+               nil))
+         n))))
+
+;
 ;	
 ;
-;>(mergesort < '(3 0 10 -7))
 ;(-7 0 3 10)
+;(mergesort #'< '(3 0 10 -7))
+;=>  (-7 0 3 10)
+
 ;
 ;>(mergesort (fn (a b) (< (len a) (len b)))
 ;            '("horse" "dog" "elephant" "cat"))
 ;("dog" "cat" "horse" "elephant")
+
+; (mergesort (fn (a b) (< (len a) (len b)))
+;           '("horse" "dog" "elephant" "cat"))
+;=>  ("dog" "cat" "horse" "elephant")
+
+
+
 ;
-;[code] [Procedure] [Destructive] merge compare list1 list2
-;Merges two sorted lists into a sorted list. The original lists must be ordered according to the predicate function compare.
-;	
-;
-;>(merge < '(1 2 3 5) '(2 4 6))
+;>(merge #'< '(1 2 3 5) '(2 4 6))
 ;(1 2 2 3 4 5 6)
 ;
 ;>(merge (fn (a b) (> (len a) (len b)))
@@ -430,20 +540,31 @@ element or a predicate.")
 ;("cccc" "aaa" "ddd" "ee" "b")
 ;
 ;[code] [Procedure] insert-sorted compare elt list
-;Creates a new list with elt inserted into the sorted list list. The original list must be sorted according to the comparison function. The original list is unmodified.
-;	
-;
-;>(insert-sorted > 5 '(10 3 1))
-;(10 5 3 1)
-;
-;>(insert-sorted > 5 '(10 5 1))
+(def insert-sorted (test elt seq)
+  "Creates a new list with elt inserted into the sorted list list. The original list must be sorted according to the comparison function. The original list is unmodified."
+  (if (no seq)
+       (list elt) 
+      (funcall test elt (car seq)) 
+       (cons elt seq)
+      (cons (car seq) (insert-sorted test elt (cdr seq)))))
+
+;(insert-sorted #'> 5 '(10 3 1))
+;=>  (10 5 3 1)
+
+;(insert-sorted #'> 5 '(10 5 1))
+;=>  (10 5 5 1)
 ;(10 5 5 1)
 ;
 ;[code] [Macro] [Destructive] insort (compare elt list)
-;Insert elt into previously-sorted list, updating list.
-;	
 ;
-;>(let x '(2 4 6) (insort < 3 x) x)
+(mac insort (test elt seq)
+  "Insert elt into previously-sorted list, updating list."
+  `(zap (fn (_) (insert-sorted ,test ,elt _)) ,seq))
+
+;>
+;(let x '(2 4 6) (insort #'< 3 x) x)
+;=>  (2 3 4 6)
+
 ;(2 3 4 6)
 ;
 ;[code] [Procedure] reinsert-sorted compare elt list

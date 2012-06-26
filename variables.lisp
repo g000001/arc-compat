@@ -62,8 +62,9 @@ object x is unmodified."
   (w/uniq new
     `(cl:let ((,new (etypecase ,x (sequence (copy-seq ,x)))))
        (if ',key-and-val
-	   (progn ,@(loop :for kv :on key-and-val :by #'cddr
-		          :collect `(setf (elt ,new ,(car kv)) ,(cadr kv)))
+	   (progn ,@(cl:loop
+                       :for kv :on key-and-val :by #'cddr
+                       :collect `(setf (elt ,new ,(car kv)) ,(cadr kv)))
 		  ,new)
 	   ,new))))
 

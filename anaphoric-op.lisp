@@ -14,12 +14,12 @@
 
 ;FIXME
 ;[code] [Macro] aif expr body [expr body] ...
-(defmacro aif (test-form then-form &optional else-form)
+#|(defmacro aif (test-form then-form &optional else-form)
   "Anaphoric if: 
  each expr is evaluated until one is true, and then the corresponding body is executed.
  Within the body, the anaphoric variable it refers back to the value of expr."
   `(cl:let ((it ,test-form))
-     (if it ,then-form ,else-form)))
+     (if it ,then-form ,else-form)))|#
 
 ;>
 ;(aif (> 1 2) (+ it 1) 42 (+ it 2))
@@ -27,31 +27,29 @@
 
 ;>(aif nil (+ it 1))
 ;nil
+(mac iflet (var expr then . rest)
+  (w/uniq gv
+    `(let ,gv ,expr
+       (if ,gv (let ,var ,gv ,then) ,@rest))))
 
 ;[code] [Macro] awhen expr [body ...]
 ;<- *onlisp*
-(defmacro awhen (test-form &body body)
+(defmacro when (test-form &body body)
   "Anaphoric when: if the expr is true, the body is executed. 
 Within the body, the variable it refers back to the value of expr."
-  `(aif ,test-form
-        (progn ,@body)))
+  `(if ,test-form
+       (progn ,@body)))
 
 ;>(awhen (* 2 3) (+ it 1))
 ;7
 
-;[code] [Macro] aand [arg ...]
-(defmacro aand (&rest args)
-  "Anaphoric and. Returns the last argument if all arguments are
-true, otherwise returns nil. Inside each argument the anaphoric
-variable it refers to the value of the previous argument. Like
-and, lazy evaluation is used, so evaluation stops after
-encountering a false argument."
-  (cond ((null args) t)
-        ((null (cdr args)) (car args))
-        (t `(aif ,(car args) (aand ,@(cdr args))))))
+(mac whenlet (var expr &body body)
+  `(iflet ,var ,expr (do ,@body)))
 
-;>(aand 1 (+ it 2) (* it 10))
-;30
+
+(mac unless (test . body)
+  `(if (no ,test) (do ,@body)))
+
 
 ;FIXME
 ;[code] [Macro] afn parms [body ...]
@@ -65,6 +63,42 @@ created without assigning it a name."
 
 ;>(funcall (afn (x) (if (is x 0) 1 (* 2 (self (- x 1))))) 5)
 ;32
+
+
+(mac caselet (var expr . args)
+  (let ex (afn (args)
+            (if (cl:null (cdr args)) 
+                (car args)
+                `(if (is ,var ',(car args))
+                     ,(cadr args)
+                     ,(self (cddr args)))))
+    `(let ,var ,expr ,(funcall ex args))))
+
+
+(mac case (expr . args)
+  `(caselet ,(uniq) ,expr ,@args))
+
+
+(mac check (x test (o alt))
+  (w/uniq gx
+    `(let ,gx ,x
+       (if (,test ,gx) ,gx ,alt))))
+
+
+;[code] [Macro] aand [arg ...]
+(defmacro and (&rest args)
+  "Anaphoric and. Returns the last argument if all arguments are
+true, otherwise returns nil. Inside each argument the anaphoric
+variable it refers to the value of the previous argument. Like
+and, lazy evaluation is used, so evaluation stops after
+encountering a false argument."
+  (cond ((null args) t)
+        ((null (cdr args)) (car args))
+        (t `(if ,(car args) (and ,@(cdr args))))))
+
+;>(aand 1 (+ it 2) (* it 10))
+;30
+
 
 ;FIXME
 ;[code] [Macro] rfn name parms [body ...]

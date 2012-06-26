@@ -6,7 +6,7 @@
    :expt :truncate :quote :min :eval :some
    :cddr :sqrt :warn :push :abs :mod
    :pop :atom :list :sleep :round :car :or
-   :nil :* :subseq :cons :subst :catch :max :/ :adjoin
+   :nil :* :subseq :cons :subst :catch :max :/ 
    :assoc :complement :time :nthcdr :write
    :apply :caar :cdr :- :load :close :t
    :cadr)
@@ -56,6 +56,7 @@
   (:shadowing-import-from :arc
    :cddr :subst :count :mismatch :assert :- :number :sort :atom :set :complement
    :or :rem :nil :do :cadr :truncate :cons :case :when :last :subseq :sqrt :if
+   :adjoin
    :find :some :type :write :++ :>= :max :* :push :sleep :> :list :and :let
    :apply :coerce :car :/ :t :merge :catch :mod :quote :acons :< :+ :expt :nthcdr
    :round :assoc :load :unless :min :abs :map := :time :string :caar :cdr :pop
