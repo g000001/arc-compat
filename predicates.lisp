@@ -80,3 +80,7 @@ equality with test using 'is'."
   (cl:oddp obj))
 
 
+(def alist (obj)
+  (cl:listp obj))
+
+

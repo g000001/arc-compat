@@ -1,6 +1,6 @@
 (in-package :arc-compat.internal)
 
-(in-suite :arc-compat)
+(in-suite arc-compat)
 
 ;; car list
 
@@ -19,11 +19,12 @@
       (cons x y)
       y))
 
-;>(conswhen (fn (_) (< (len _) 3)) '(1 2) '(3 4 5))
-;((1 2) 3 4 5)
-;
-;>(conswhen (fn (_) (< (len _) 3)) '(1 2 3 4) '(3 4 5))
-;(3 4 5)
+
+(tst conswhen
+  (== (conswhen (fn (_) (< (len _) 3)) '(1 2) '(3 4 5))
+      '((1 2) 3 4 5))
+  (== (conswhen (fn (_) (< (len _) 3)) '(1 2 3 4) '(3 4 5))
+      '(3 4 5)))
 
 ;; consif x list
 (defun consif (x list)
@@ -591,45 +592,63 @@ element or a predicate.")
 ;
 ;[code] [Macro] [Destructive] insortnew (compare elt list)
 (mac insortnew (test elt seq)
+  "Insert elt into previously-sorted list if it is not present, updating list."
   `(zap (fn (_) (reinsert-sorted ,test ,elt _)) ,seq))
 
-;Insert elt into previously-sorted list if it is not present, updating list.
-;	
-;
-;>(let x '(2 4 6) (insortnew #'< 3 x) x)
-;=>  (2 3 4 6)
-;(2 3 4 6)
-;
-;[code] [Procedure] best compare list
-;Returns the 'best' element of list as determined by function compare.
-;	
-;
-;>(best > '(3 1 4 5 9 6))
-;9
-;
-;[code] [Procedure] bestn n compare list
-;Returns the first n elements of list when sorted according to comparison function compare.
-;	
-;
-;>(bestn 3 > '(3 1 4 5 9 6))
-;(9 6 5)
-;
-;>(bestn 3 < '(3 1 4 5 9 6))
-;(1 3 4)
-;
-;[code] [Procedure] sort test seq
-;Sorts the sequence (list or string) using the specified comparison function. The original sequence is unmodified.
-;	
-;
-;>(sort < '(3 1 4 9 0))
-;(0 1 3 4 9)
-;
-;>(sort > "Test word")
-;"wtsroedT "
-;
-;Sequence manipulation
-;These operations act on lists, strings, or hash tables.
-;
+
+(tst insortnew
+  (== (let x '(2 4 6) (insortnew #'< 3 x) x)
+      '(2 3 4 6)))
+
+
+(def best (f seq)
+  "Returns the 'best' element of list as determined by function compare."
+  (if (no seq)
+      nil
+      (let wins (car seq)
+        (each elt (cdr seq)
+          (if (funcall f elt wins) (= wins elt)))
+        wins)))
+
+
+(tst best
+  (== (best #'> '(3 1 4 5 9 6))
+      9)
+  (== (best #'> '("3" "1" "4" "5" "9" "6"))
+      "9"))
+
+
+(def bestn (n f seq)
+  "Returns the first n elements of list when sorted according to comparison 
+  function compare."
+  (firstn n (sort f seq)))
+
+
+(tst bestn
+  (== (bestn 3 #'> '(3 1 4 5 9 6))
+      '(9 6 5))
+  (== (bestn 3 #'< '(3 1 4 5 9 6))
+      '(1 3 4)))
+
+
+(def sort (test seq)
+  "Sorts the sequence (list or string) using the specified comparison function.
+  The original sequence is unmodified."
+  (if (alist seq)
+      (mergesort test (copy seq))
+      (cl:coerce (mergesort test (cl:coerce seq 'cons)) (type seq))))
+
+
+(tst sort
+  (== (sort #'< '(3 1 4 9 0))
+      '(0 1 3 4 9))
+  (== (sort #'> "Test word")
+      "wtsroedT "))
+
+
+;;; Sequence manipulation
+;;; These operations act on lists, strings, or hash tables.
+
 ;[code] [Foundation] [Destructive] sref seq value index
 ;Sets indexed entry in a list, string, or hash table to the given value.
 ;	
@@ -644,31 +663,38 @@ element or a predicate.")
 ;    (sref x #\d 1) x)
 ;(1 #\d 3)
 ;
-;[code] [Procedure] count test seq
-;Counts the number of elements of seq that satisfy test. test is an object or predicate. For a table, the elements are the values.
-;	
-;
-;>(count #\a "banana")
-;3
-;
-;>(count (fn (_) (odd _)) '(1 2 3 4 5))
-;3
-;
-;[code] [Procedure] union f xs ys
-;Takes union of sequence xs and ys. Predicate f is used to determine equality to filter out duplicates. xs and ys must both be lists or strings.
-;	
-;
-;>(union is '(1 2 3) '(2 3 4))
-;(1 2 3 4)
-;
-;>(union is "ab" "banana")
-;"abnn"
-;
-;>(union (fn (a b) (is (mod a 10) (mod b 10))) '(1 2 3) '(13 24 35))
-;(1 2 3 24 35)
-;
 
-;; len seq
+(def count (test seq)
+  "Counts the number of elements of seq that satisfy test. test is an object or
+  predicate. For a table, the elements are the values."
+  (with (n 0 testf (testify test))
+    (each elt seq
+      (if (funcall testf elt) (++ n)))
+    n))
+
+
+(tst count
+  (== (count #\a "banana")
+      3)
+  (== (count (fn (_) (odd _)) '(1 2 3 4 5))
+      3))
+;[f _ y]
+;[code] [Procedure] union f xs ys
+(def union (f xs ys)
+  "Takes union of sequence xs and ys. Predicate f is used to determine equality
+  to filter out duplicates. xs and ys must both be lists or strings."
+  (+ xs (rem (fn (y) (some (fn (_) (funcall f _ y)) xs))
+             ys)))
+
+(tst union
+  (== (union #'is '(1 2 3) '(2 3 4))
+      '(1 2 3 4))
+  (== (union #'is "ab" "banana")
+      "abnn")
+  (== (union (fn (a b) (is (mod a 10) (mod b 10))) '(1 2 3) '(13 24 35))
+      '(1 2 3 24 35)))
+
+
 (defalias len cl:length
   "Computes the length of seq.")
 ;	

@@ -1,4 +1,5 @@
 (in-package :arc-compat.internal)
+(in-suite arc-compat)
 
 ;;; Iteration
 
@@ -123,21 +124,33 @@ A list of the expr values is returned."
 ;(128 64 32 16 8 4 2)
 
 ;[code] [Macro] for var init max [body ...]
-;Executes body repeatedly with var assigned the values from init to max, incremented by 1 each time. For the last iteration, v will be >= max. If max <= init-1, body will not be executed.
-;	
 ;
-;>(for x 2.5 4.0 (prn x))
-;2.5
-;3.5
-;4.5
-;
-;nil
-;
-;>(for x 2.5 1.6 (prn x))
-;2.5
-;
-;nil
-;
+
+(defmacro for (var init max &body body)
+  "Executes body repeatedly with var assigned the values from init to max,
+  incremented by 1 each time. For the last iteration, v will be >= max. 
+  If max <= init-1, body will not be executed."
+  (w/uniq (=> block _max)
+    `(block ,block
+       (cl:let ((,var ,init)
+                (,_max (1+ ,max)))
+         (tagbody
+           ,=> (cond ((>= ,var ,_max)
+                      (return-from ,block)))
+               (progn ,@body)
+               (incf ,var)
+               (go ,=>))))))
+
+
+(tst for
+  (== (with-output-to-string (out)
+        (for x 2.5 4.0 (princ x out)))
+      "2.53.54.5")
+  (== (with-output-to-string (out)
+        (for x 2.5 1.6 (princ x out)))
+      "2.5"))
+
+
 ;[code] [Macro] repeat n [body ...]
 ;Executes body n times. Non-integers are rounded up.
 (mac repeat (n &body body)
@@ -182,7 +195,24 @@ A list of the expr values is returned."
 ;
 ;[code] [Macro] each var expr [body ...]
 ;Executes body, with var taking on each value from expr, which can be a list, string, or table. For a table, var takes on the values, not the keys.
-;	
+
+(mac each (var expr . body)
+  (w/uniq (gseq g)
+    `(let ,gseq ,expr
+       (if (alist ,gseq)
+            (funcall 
+             (afn (,g)
+               (when (acons ,g)
+                 (let ,var (car ,g) ,@body)
+                 (self (cdr ,g))))
+             ,gseq)
+           (isa ,gseq 'table)
+            (maptable (fn (,g ,var) ,@body)
+                      ,gseq)
+            (for ,g 0 (- (len ,gseq) 1)
+              (let ,var (cl:elt ,gseq ,g) ,@body))))))
+
+
 ;
 ;>(each x '(1 (2 3) 4) (prn x))
 ;1

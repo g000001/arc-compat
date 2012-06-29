@@ -1,5 +1,6 @@
 (in-package :arc-compat.internal)
 
+(def-suite arc-compat)
 
 ;[code] [Macro] mac name args [body ...]
 (defmacro mac (name args &body body)

@@ -75,3 +75,14 @@
         ((listp (car lis))
          (append (+INTERNAL-FLATTEN (car lis)) (+INTERNAL-FLATTEN (cdr lis))))
         (t (append (list (car lis)) (+INTERNAL-FLATTEN (cdr lis))))))
+
+
+;;; fiveam
+(defmacro tst (name &body body)
+  `(5am:test ,name ,@body))
+
+(defmacro == (x y)
+  `(5am:is (cl:equal ,x ,y)))
+
+(defmacro =!= (x y)
+  `(5am:signals ,x ,y))

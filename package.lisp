@@ -47,6 +47,7 @@
    :temload :temloadall :templatize :temread :testify :thread :time :time10
    :to-nearest :tokens :tostring :trav :tree-subst :trim :trues :truncate :tuples
    :type :uniq :unless :until :upcase :urldecode :vals :w/appendfile :w/infile
+   :union
    :w/instring :w/outfile :w/outstring :w/stdin :w/stdout :w/table :w/uniq :warn
    :when :whenlet :while :whiler :whilet :whitec :with :withs :write
    :write-spaced :write-table :writeb :writec :writefile1 :zap :* :+ :++ :- :--
@@ -60,11 +61,12 @@
    :find :some :type :write :++ :>= :max :* :push :sleep :> :list :and :let
    :apply :coerce :car :/ :t :merge :catch :mod :quote :acons :< :+ :expt :nthcdr
    :round :assoc :load :unless :min :abs :map := :time :string :caar :cdr :pop
-   :loop :<= :warn :adjoin :read :reduce :close :pushnew :eval)
+   :loop :<= :warn :adjoin :read :reduce :close :pushnew :eval :union)
   (:shadow :char)
   (:import-from :fiveam :def-suite :in-suite))
 
-(5am:def-suite :arc-compat)
+(declaim (ftype (function (function sequence) (values sequence &optional))
+                arc:sort))
 
 ;;; 
 
