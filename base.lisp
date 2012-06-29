@@ -1,27 +1,6 @@
 (in-package :arc-compat.internal)
 
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun to-proper-lambda-list (list)
-    (cl:typecase list
-      (cl:list (if (cl:tailp () list)
-                   list
-                   (cl:let ((last (cl:last list)))
-                     `(,@(cl:butlast list)
-                         ,(car last)
-                         cl:&rest
-                         ,(cdr last)))))
-      (cl:symbol `(cl:&rest ,list))))
-  
-  (defun arc-ll-to-cl-ll (list)
-    (mapcan (lambda (x)
-              (if (cl:and (consp x)
-                          (eq 'o (car x)) )
-                  (list 'cl:&optional (cdr x))
-                  (list x) ))
-            (to-proper-lambda-list list) )))
-
-
 ;[code] [Macro] mac name args [body ...]
 (defmacro mac (name args &body body)
   "Creates a macro."
@@ -45,11 +24,6 @@
                      ,(cadr args)
                      (if ,@(cddr args)))))))
 
-(defun +INTERNAL-FLATTEN (lis)
-  (cond ((atom lis) lis)
-        ((listp (car lis))
-         (append (+INTERNAL-FLATTEN (car lis)) (+INTERNAL-FLATTEN (cdr lis))))
-        (t (append (list (car lis)) (+INTERNAL-FLATTEN (cdr lis))))))
 
 ;(defmacro +INTERNAL-DEPARAM (param &body body)
 ;  (DESTRUCTURING-BIND ,param ,g

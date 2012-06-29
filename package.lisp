@@ -2,6 +2,7 @@
 ;; (g1:delete-package* :arc-compat.setagaya.mc)
 (defpackage :arc-compat.setagaya.mc
   (:nicknames #:arc)
+  (:import-from :it :it :self)
   (:import-from :cl
    :expt :truncate :quote :min :eval :some
    :cddr :sqrt :warn :push :abs :mod
@@ -56,11 +57,14 @@
   (:shadowing-import-from :arc
    :cddr :subst :count :mismatch :assert :- :number :sort :atom :set :complement
    :or :rem :nil :do :cadr :truncate :cons :case :when :last :subseq :sqrt :if
-   :adjoin
    :find :some :type :write :++ :>= :max :* :push :sleep :> :list :and :let
    :apply :coerce :car :/ :t :merge :catch :mod :quote :acons :< :+ :expt :nthcdr
    :round :assoc :load :unless :min :abs :map := :time :string :caar :cdr :pop
-   :loop :<= :warn :adjoin :read :reduce :close :pushnew :eval))
+   :loop :<= :warn :adjoin :read :reduce :close :pushnew :eval)
+  (:shadow :char)
+  (:import-from :fiveam :def-suite :in-suite))
+
+(5am:def-suite :arc-compat)
 
 ;;; 
 

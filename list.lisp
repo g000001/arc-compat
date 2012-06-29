@@ -1,5 +1,7 @@
 (in-package :arc-compat.internal)
 
+(in-suite :arc-compat)
+
 ;; car list
 
 ;; cdr list
@@ -92,6 +94,7 @@
 ;
 ;; rev list
 ;
+(declaim (ftype (function (cl:sequence) (values cl:sequence &optional))))
 (defalias rev cl:reverse
   "Reverses list.")
 
@@ -457,6 +460,7 @@ element or a predicate.")
 ;
 ;[code] [Procedure] [Destructive] mergesort compare list
 
+
 (def merge (less? x y)
   "Merges two sorted lists into a sorted list. The original lists must be ordered according to the predicate function compare."
   (if (no x) y
@@ -476,6 +480,13 @@ element or a predicate.")
           ; (car x) <= (car y)
           (do (if (cdr x) (funcall lup x (cdr x) y t) (scdr x y))
               x)))))
+;>(merge #'< '(1 2 3 5) '(2 4 6))
+;(1 2 2 3 4 5 6)
+;
+;>(merge (fn (a b) (> (len a) (len b)))
+;  '("aaa" "b") '("cccc" "ddd" "ee"))
+;("cccc" "aaa" "ddd" "ee" "b")
+
 
 (def mergesort (less? lst)
   "Destructively sorts list using the given comparison function. The sort is stable; if two elements compare as equal with compare, they will remain in the same order in the output. The original list is destroyed."
@@ -513,9 +524,6 @@ element or a predicate.")
                nil))
          n))))
 
-;
-;	
-;
 ;(-7 0 3 10)
 ;(mergesort #'< '(3 0 10 -7))
 ;=>  (-7 0 3 10)
@@ -532,13 +540,7 @@ element or a predicate.")
 
 
 ;
-;>(merge #'< '(1 2 3 5) '(2 4 6))
-;(1 2 2 3 4 5 6)
-;
-;>(merge (fn (a b) (> (len a) (len b)))
-;  '("aaa" "b") '("cccc" "ddd" "ee"))
-;("cccc" "aaa" "ddd" "ee" "b")
-;
+
 ;[code] [Procedure] insert-sorted compare elt list
 (def insert-sorted (test elt seq)
   "Creates a new list with elt inserted into the sorted list list. The original list must be sorted according to the comparison function. The original list is unmodified."
@@ -568,9 +570,19 @@ element or a predicate.")
 ;(2 3 4 6)
 ;
 ;[code] [Procedure] reinsert-sorted compare elt list
-;Creates a new list with elt inserted into the sorted list list if it is not already present. The original list must be sorted according to the comparison function. The original list is unmodified.
-;	
-;
+(def reinsert-sorted (test elt seq)
+  "Creates a new list with elt inserted into the sorted list list if it is not already present. The original list must be sorted according to the comparison function. The original list is unmodified."
+  (if (no seq) 
+       (list elt) 
+      (is elt (car seq))
+       (reinsert-sorted test elt (cdr seq))
+      (funcall test elt (car seq)) 
+       (cons elt (rem elt seq))
+      (cons (car seq) (reinsert-sorted test elt (cdr seq)))))
+
+;(reinsert-sorted #'> 5 '(10 3 1))
+;=>  (10 5 3 1)
+
 ;>(reinsert-sorted > 5 '(10 3 1))
 ;(10 5 3 1)
 ;
@@ -578,10 +590,14 @@ element or a predicate.")
 ;(10 5 1)
 ;
 ;[code] [Macro] [Destructive] insortnew (compare elt list)
+(mac insortnew (test elt seq)
+  `(zap (fn (_) (reinsert-sorted ,test ,elt _)) ,seq))
+
 ;Insert elt into previously-sorted list if it is not present, updating list.
 ;	
 ;
-;>(let x '(2 4 6) (insortnew < 3 x) x)
+;>(let x '(2 4 6) (insortnew #'< 3 x) x)
+;=>  (2 3 4 6)
 ;(2 3 4 6)
 ;
 ;[code] [Procedure] best compare list
@@ -807,19 +823,10 @@ element or a predicate.")
 ;
 
 ;; rem test seq
-(defalias rem cl:remove-if
+(def rem (test seq)
   "Removes elements from seq that satisfy test. test is either a
-function or an object. seq is either a list or string.")
-
-#|(defun rem (test seq)
-  (let f (testify test)
-    (if (alist seq)
-        (funcall (afn (s)
-		   (cl:cond ((no s) nil)
-			    ((funcall f (car s)) (self (cdr s)))
-                            ('T (cons (car s) (self (cdr s)))))
-		   seq)
-        (coerce (rem test (coerce seq 'cons)) 'string)))))|#
+function or an object. seq is either a list or string."
+  (cl:remove-if (testify test) seq))
 
 
 ;>(rem #'oddp '(1 2 3 4 5))
@@ -909,10 +916,19 @@ function or an object. seq is either a list or string.")
 ;(30 20 10)
 ;
 ;[code] summing sumfn [body ...]
+(mac summing (sumfn . body)
+  (w/uniq (gc gt)
+    `(let ,gc 0
+       (let ,sumfn (fn (,gt) (if ,gt (++ ,gc)))
+         ,@body)
+       ,gc)))
+
+
 ;Sums the number of times sumfn is called with a true argument in body. The sum is returned. The sumfn argument specifies the name under which the summing function is available to the body.
 ;	
 ;
-;>(summing
-;i
-;true (map istrue '(1 nil nil t)))
+;>(summing i #'true (map #'istrue '(1 nil nil t)))
 ;2
+
+
+

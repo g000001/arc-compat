@@ -1,8 +1,8 @@
 ;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: CL-USER; -*-
-(in-package #:cl-user)
+(in-package #:asdf)
 
 
-(asdf:defsystem #:arc-compat
+(defsystem #:arc-compat
   :name "arc-compat"
   :description "Arc compatible package for CL"
   :author "CHIBA Masaomi <chiba.masaomi@gmail.com>"
@@ -23,3 +23,14 @@
 	       (:file "iteration")
 	       (:file "list")
 	       ))
+
+
+(defmethod perform ((o test-op) (c (eql (find-system :arc-compat))))
+  (load-system :arc-compat)
+  (or (flet ((_ (pkg sym)
+               (intern (symbol-name sym) (find-package pkg))))
+         (let ((result (funcall (_ :fiveam :run) (_ :arc-compat.internal
+                                                    :arc-compat))))
+           (funcall (_ :fiveam :explain!) result)
+           (funcall (_ :fiveam :results-status) result)))
+      (error "test-op failed") ))
