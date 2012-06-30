@@ -21,6 +21,7 @@
 	       (:file "boolean")
 	       (:file "variables")
 	       (:file "iteration")
+               (:file "sequence")
 	       (:file "list")
 	       ))
 
