@@ -87,3 +87,11 @@
 
 (defmacro =!= (x y)
   `(5am:signals ,x ,y))
+
+
+(defmacro w/obcall ((&rest seqs) &body body)
+  `(flet (,@(mapcar (lambda (s)
+                      `(,s (idx)
+                         (cl:elt ,s idx)))
+              seqs))
+     ,@body))

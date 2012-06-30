@@ -96,3 +96,5 @@ nil."
             fn
             seq
             more-seqs))
+
+(defalias rand cl:random)

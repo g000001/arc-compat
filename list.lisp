@@ -418,20 +418,20 @@ must return a list. nil results are omitted."
 ;(3 5)
 
 ;; reclist f list
-(defun reclist (f xs)
+(def reclist (f xs)
   "Recursively applies f to tail subsequences of list and returns
-the first true result. Returns nil if none."
-  (cl:and xs (cl:or (funcall f xs) (reclist f (cdr xs)))))
+  the first true result. Returns nil if none."
+  (and xs (or (funcall f xs) (reclist f (cdr xs)))))
 
-;>(reclist (fn (x) (print x) nil) '(a b c))
-;(a b c)
-;(b c)
-;(c)
-;
-;nil
-;
-;>(reclist (fn (_) (if (is (len _) 2) _)) '(a b c))
-;(b c)
+
+(tst reclist
+  (== (let ans ()
+        (reclist (fn (x) (push x ans) nil) '(a b c))
+        ans)
+      '((C) (B C) (A B C)))
+  (== (reclist (fn (_) (if (is (len _) 2) _)) '(a b c))
+      '(B C)))
+
 
 ;; mem test list
 (defalias mem cl:member-if
@@ -811,30 +811,38 @@ element or a predicate.")
 
 
 ;[code] [Procedure] [Predicate] before t1 t2 seq [start]
-;Tests if t1 is true before t2 in seq. seq is either a list or string. The tests are either objects or predicate functions. If start is given, search starts with the specified element.
-;	
-;
-;>(before 4 odd '(2 4 1 3))
-;t
-;
-;>(before 4 odd '(2 3 4 1))
-;nil
-;
-;>(before #\a #\n "banana")
-;t
-;
-;>(before #\a #\n "banana" 2)
-;nil
-;
+(def before (x y seq (o i 0))
+  "Tests if t1 is true before t2 in seq. seq is either a list or string. 
+  The tests are either objects or predicate functions. If start is given, search 
+  starts with the specified element."
+  (with (xp (pos x seq i) yp (pos y seq i))
+    (and xp (or (no yp) (< xp yp)))))
+
+
+(tst before
+  (== (before 4 #'odd '(2 4 1 3))
+      T)
+  (== (before 4 #'odd '(2 3 4 1))
+      NIL)
+  (== (before #\a #\n "banana")
+      T)
+  (== (before #\a #\n "banana" 2)
+      NIL))
+
+
 ;[code] [Procedure] random-elt seq
-;Returns a random element from a list, or a random character from a string. It also works on a table with integer keys from 0 to n.
-;	
-;
-;>(random-elt '(1 2 3))
-;3
-;
-;>(random-elt "abcd")
-;#\c
+(def random-elt (seq) 
+  "Returns a random element from a list, or a random character from a string. 
+  It also works on a table with integer keys from 0 to n."
+  (w/obcall (seq)
+    (seq (rand (len seq)))))
+
+
+(tst random-elt
+  (5am:is (<= 1 (random-elt '(1 2 3)) 3))
+  (5am:is (cl:find (random-elt "abcd") "abcd")))
+
+
 ;
 ;[code] [Procedure] mismatch s1 s2
 ;Compares sequences and returns the position of the first mismatch (as determined by is). Returns nil if the sequences are identical.
