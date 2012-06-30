@@ -59,17 +59,29 @@ equality with test using 'is'."
     ((or cl:string cl:symbol) (cl:string< x y))
     (cl:character (cl:char< x y))))
 
+
 (def > args
-  (not (null (cl:reduce #'x>y args))))
+  (case (len args)
+    0 (cl:error "invalid number of arguments: ~S" 'args)
+    (cl:every #'x>y args (cdr args))))
+
 
 (def <= args
-  (null (cl:reduce #'x>y args)))
+  (case (len args)
+    0 (cl:error "invalid number of arguments: ~S" 'args)
+    (not (cl:every #'x>y args (cdr args)))))
+
 
 (def < args
-  (not (null (cl:reduce #'x<y args))))
+  (case (len args)
+    0 (cl:error "invalid number of arguments: ~S" 'args)
+    (cl:every #'x<y args (cdr args))))
+
 
 (def >= args
-  (null (cl:reduce #'x<y args)))
+  (case (len args)
+    0 (cl:error "invalid number of arguments: ~S" 'args)
+    (not (cl:every #'x<y args (cdr args)))))
 
 
 (def even (obj)
