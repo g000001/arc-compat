@@ -85,7 +85,7 @@
 (defmacro == (x y)
   `(5am:is (cl:equal ,x ,y)))
 
-(defmacro =!= (x y)
+(defmacro >_< (x y)
   `(5am:signals ,x ,y))
 
 
@@ -95,3 +95,9 @@
                          (cl:elt ,s idx)))
               seqs))
      ,@body))
+
+
+(defun ref (seq index)
+  (typecase seq
+    (cl:hash-table (gethash index seq))
+    (cl:sequence (elt seq index))))

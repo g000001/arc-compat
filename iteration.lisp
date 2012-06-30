@@ -169,30 +169,36 @@ A list of the expr values is returned."
 ;nil
 ;
 ;[code] [Macro] forlen var seq [body ...]
-;Iterates over a sequence (list, string, or table) seq. var takes the values from 0 to length-1.
-;	
-;
-;>(let seq '(1 2 3) (forlen x seq (prn x " " (seq x))))
-;0 1
-;1 2
-;2 3
-;
-;nil
-;
-;>(let seq "abc" (forlen x seq (prn x " " (seq x))))
-;0 a
-;1 b
-;2 c
-;
-;nil
-;
-;>(let seq (obj 0 'val0 1 'val1)
-;  (forlen x seq (prn x " " (seq x))))
-;0 val0
-;1 val1
-;
-;nil
-;
+(mac forlen (var s . body)
+  "Iterates over a sequence (list, string, or table) seq. var takes the values 
+  from 0 to length-1."
+  `(for ,var 0 (- (len ,s) 1) ,@body))
+
+(tst forlen
+  (== (with-output-to-string (*standard-output*)
+        (let seq '(1 2 3) 
+             (w/obcall (seq)
+               (forlen x seq (prn x " " (seq x))))))
+      "0 1
+1 2
+2 3
+")
+  (== (with-output-to-string (*standard-output*)
+        (let seq "abc" 
+          (w/obcall (seq)
+            (forlen x seq (prn x " " (seq x))))))
+      "0 a
+1 b
+2 c
+")
+  (== (with-output-to-string (*standard-output*)
+        (let seq (obj 0 'val0 1 'val1) 
+             (forlen x seq (prn x " " (gethash x seq)))))
+      "0 VAL0
+1 VAL1
+"))
+
+
 ;[code] [Macro] each var expr [body ...]
 ;Executes body, with var taking on each value from expr, which can be a list, string, or table. For a table, var takes on the values, not the keys.
 
@@ -244,29 +250,38 @@ A list of the expr values is returned."
 ;nil
 ;
 ;[code] [Macro] on var s [body ...]
-;Iterates the same as each, except the variable index is assigned a count, starting at 0. For tables, var is assigned nil each iteration, so ontable is probably more useful.
-;	
-;
-;>(on x '(1 (2 3) 4) (prn index " " x))
-;0 1
-;1 (2 3)
-;2 4
-;
-;nil
-;
-;>(on x "abc" (prn index " " x))
-;0 a
-;1 b
-;2 c
-;
-;nil
-;
-;>(on x (obj key1 'val1 key2 'val2) (prn index " " x))
-;0 nil
-;1 nil
-;
-;nil
-;
+(mac on (var s . body)
+  "Iterates the same as each, except the variable index is assigned a count, 
+  starting at 0. For tables, var is assigned nil each iteration, so ontable is 
+  probably more useful."
+  (if (is var 'index)
+      (err "Can't use index as first arg to on.")
+      (w/uniq gs
+        `(let ,gs ,s
+           (forlen index ,gs
+             (let ,var (ref ,gs index)
+               ,@body))))))
+
+
+(tst on
+  (== (with-output-to-string (*standard-output*)
+        (on x '(1 (2 3) 4) (prn index " " x)))
+      "0 1
+1 (2 3)
+2 4
+")
+  (== (with-output-to-string (*standard-output*)
+        (on x "abc" (prn index " " x)))
+      "0 a
+1 b
+2 c
+")
+  (== (with-output-to-string (*standard-output*)
+        (on x (obj key1 'val1 key2 'val2) (prn index " " x)))
+      "0 NIL
+1 NIL
+"))
+
 ;[code] [Macro] ontable k v tab [body ...]
 ;Iterates over the table tab, assigning k and v each key and value.
 ;	

@@ -98,3 +98,11 @@ nil."
             more-seqs))
 
 (defalias rand cl:random)
+
+
+#|(mac do1 args
+  (w/uniq g
+    `(let ,g ,(car args)
+       ,@(cdr args)
+       ,g)))|#
+

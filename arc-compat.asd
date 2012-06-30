@@ -13,6 +13,7 @@
   :components ((:file "package")
 	       (:file "utils")
                (:file "base")
+               (:file "error")
                (:file "table")
 	       (:file "macro")
                (:file "predicates")

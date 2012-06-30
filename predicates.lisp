@@ -27,6 +27,9 @@
 ;>(is nil '())
 ;t
 
+(def isnt (x y)
+  (no (is x y)))
+
 
 ;; isa x y
 (defalias isa cl:typep

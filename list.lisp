@@ -843,20 +843,26 @@ element or a predicate.")
   (5am:is (cl:find (random-elt "abcd") "abcd")))
 
 
-;
 ;[code] [Procedure] mismatch s1 s2
-;Compares sequences and returns the position of the first mismatch (as determined by is). Returns nil if the sequences are identical.
-;	
-;
-;>(mismatch "abcde" "abXde")
-;2
-;
-;>(mismatch '(1 2 3) '(1 9 3))
-;1
-;
-;>(mismatch "abc" "abc")
-;nil
-;
+(def mismatch (s1 s2)
+  "Compares sequences and returns the position of the first mismatch 
+  (as determined by is). Returns nil if the sequences are identical."
+  (w/obcall (s2)
+    (block nil
+      (on c s1
+        (when (isnt c (s2 index))
+          (return index))))))
+
+
+(tst mismatch
+  (== (mismatch "abcde" "abXde")
+      2)
+  (== (mismatch '(1 2 3) '(1 9 3))
+      1)
+  (== (mismatch "abc" "abc")
+      NIL))
+
+
 ;[code] [Procedure] find test seq
 ;Finds and returns the first element of seq that satisfies test (object or predicate). seq can be a list or string.
 ;	
