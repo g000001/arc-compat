@@ -5,14 +5,14 @@
 ;[code] [Macro] mac name args [body ...]
 (defmacro mac (name args &body body)
   "Creates a macro."
-  `(defmacro ,name ,(if (consp args)
+  `(defmacro ,name ,(if (listp args)
                         (arc-ll-to-cl-ll args)
                         `(&rest ,args))
      #|(arnesi:with-lisp1 ,@body)|#
      ,@body))
 
 (defmacro def (name args &body body)
-  `(defun ,name (,@(cl:if (consp args)
+  `(defun ,name (,@(cl:if (listp args)
                           (arc-ll-to-cl-ll args)
                           `(&rest ,args)))
      ,@body))
@@ -89,3 +89,10 @@ nil."
 
 (defmacro do (&body forms)
   `(progn ,@forms))
+
+
+(defun map (fn seq &rest more-seqs)
+  (cl:apply #'cl:map (cl:type-of seq)
+            fn
+            seq
+            more-seqs))
