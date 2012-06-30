@@ -51,6 +51,7 @@
 
 (defun to-proper-lambda-list (list)
   (cl:typecase list
+    (cl:null () )
     (cl:list (cl:if (cl:tailp () list)
                     list
                     (cl:let ((last (cl:last list)))

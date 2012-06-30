@@ -695,90 +695,121 @@ element or a predicate.")
       '(1 2 3 24 35)))
 
 
-(defalias len cl:length
-  "Computes the length of seq.")
-;	
-;
-;>(len "abc")
-;3
-;
-;>(len '(1 2 3))
-;3
-;
-;>(len (obj a 1 b 2))
-;2
-;
-;[code] [Procedure] [Predicate] len< seq n
-;Tests if length of seq is less than n.
-;	
-;
-;>(len< "abc" 4)
-;t
-;
-;>(len< '(1 2 3) 4)
-;t
-;
-;>(len< (obj a 1 b 2) 4)
-;t
-;
-;[code] [Procedure] [Predicate] len> seq n
-;Tests if length of seq is greater than n.
-;	
-;
-;>(len> "abc" 4)
-;nil
-;
-;>(len> '(1 2 3) 4)
-;nil
-;
-;>(len> (obj a 1 b 2) 4)
-;nil
-;
+(def len (seq)
+  "Computes the length of seq."
+  (etypecase seq
+    (cl:sequence (cl:length seq))
+    (table (let cnt 0
+             (maphash (lambda (k v) 
+                        (declare (ignore k v))
+                        (++ cnt) )
+                      seq )
+             cnt ))))
+
+
+(tst len
+  (== (len "abc")
+      3)
+  (== (len '(1 2 3))
+      3)
+  (== (len (obj a 1 b 2))
+      2))
+
+
+(def len< (x n)
+  "Tests if length of seq is less than n."
+  (< (len x) n))
+
+
+(tst len<
+  (== (len< "abc" 4)
+      t)
+  (== (len< '(1 2 3) 4)
+      T)
+  (== (len< (obj a 1 b 2) 4)
+      T))
+
+
+(def len> (x n)
+  "Tests if length of seq is greater than n."
+  (> (len x) n))
+
+
+(tst len>
+  (== (len> "abc" 4)
+      NIL)
+  (== (len> '(1 2 3) 4)
+      NIL)
+  (== (len> (obj a 1 b 2) 4)
+      NIL))
+
 ;[code] [Procedure] dedup seq
-;Returns contents of seq without duplicates. For a string, returns a list of characters. For a table, returns a list of values.
-;	
-;
-;>(dedup '(1 2 3 2 1))
-;(1 2 3)
-;
-;>(dedup "abcba")
-;(#\a #\b #\c)
-;
-;>(dedup (obj a 1 b 2 c 1))
-;(2 1)
-;
-;[code] [Procedure] [Predicate] single list
-;Returns true if given a list of length one.
-;	
-;
-;>(single '(1))
-;t
-;
-;>(single 1)
-;nil
-;
-;>(single '())
-;nil
-;
-;[code] [Procedure] pos test seq [start]
-;Returns the index of the first element of seq that satisfies test. seq is a list or string. test is either an object or predicate function. If start is given, testing starts at that element.
-;	
-;
-;>(pos 'c '(a b c d))
-;2
-;
-;>(pos #\c "abcd")
-;2
-;
-;>(pos #\c "abcdc" 3)
-;4
-;
-;>(pos odd '(2 4 5 6 7))
-;2
-;
-;>(pos odd '(2 4 6))
-;nil
-;
+(def dedup (xs)
+  "Returns contents of seq without duplicates. For a string, returns a list of
+  characters. For a table, returns a list of values."
+  (with (h (table) acc nil)
+    (each x xs
+      (unless (gethash x h)
+        (push x acc)
+        (setf (gethash x h) t)))
+    (rev acc)))
+
+
+(tst dedup
+  (== (dedup '(1 2 3 2 1))
+      '(1 2 3))
+  (== (dedup "abcba")
+      '(#\a #\b #\c))
+  (== (dedup (obj a 1 b 2 c 1))
+      '(1 2)))
+
+
+(def single (x)
+  "Returns true if given a list of length one."
+  (and (acons x) (no (cdr x))))
+
+
+(tst single
+  (== (single '(1))
+      T)
+  (== (single 1)
+      NIL)
+  (== (single '())
+      NIL))
+
+
+(def pos (test seq (o start 0))
+  "Returns the index of the first element of seq that satisfies test. seq is a
+  list or string. test is either an object or predicate function. If start is
+  given, testing starts at that element."
+  (let f (testify test)
+    (if (alist seq)
+        (funcall 
+         (afn (seq n)
+           (if (no seq)   
+                nil
+               (funcall f (car seq)) 
+                n
+               (self (cdr seq) (+ n 1))))
+         (nthcdr start seq) 
+         start)
+        (recstring (fn (_) (if (funcall f (cl:char seq _)) _))
+                   seq start))))
+
+
+(tst pos
+  (== (pos 'c '(a b c d))
+      2)
+  (== (pos #\c "abcd")
+      2)
+  (== (pos #\c "abcdc" 3)
+      4)
+  (== (pos #'odd '(2 4 5 6 7))
+      2)
+  (== (pos #'odd '(2 4 6))
+      NIL))
+
+
 ;[code] [Procedure] [Predicate] before t1 t2 seq [start]
 ;Tests if t1 is true before t2 in seq. seq is either a list or string. The tests are either objects or predicate functions. If start is given, search starts with the specified element.
 ;	
