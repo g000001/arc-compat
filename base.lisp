@@ -2,7 +2,7 @@
 
 (def-suite arc-compat)
 
-;[code] [Macro] mac name args [body ...]
+
 (defmacro mac (name args &body body)
   "Creates a macro."
   `(defmacro ,name ,(if (listp args)
@@ -11,11 +11,13 @@
      #|(arnesi:with-lisp1 ,@body)|#
      ,@body))
 
+
 (defmacro def (name args &body body)
   `(defun ,name (,@(cl:if (listp args)
                           (arc-ll-to-cl-ll args)
                           `(&rest ,args)))
      ,@body))
+
 
 (defmacro if (&rest args)
   (cond ((null args) ''nil)
@@ -41,24 +43,22 @@
          (DECLARE (IGNORABLE ,@(+internal-flatten args)))
          ,@body))))
 
-;; let var val [body ...]
+
 (defmacro let (var val &body body)
   "The let statement sets the variable var to the value within the
-scope of the body. Outside the let statement, any existing value
-of var is unaffected. Let is like with but with a single variable
-binding."
+  scope of the body. Outside the let statement, any existing value
+  of var is unaffected. Let is like with but with a single variable
+  binding."
   `(DESTRUCTURING-BIND (,var) (list ,val)
      (DECLARE (IGNORABLE ,@(+internal-flatten `(,var))))
      ,@body))
 
-;; with ([var val ...]) [body ...]
-;>(with (a 1 b 2 c 3) (+ a b c))
 
 (defmacro with (binds &body body)
   "Creates a new variable binding and executes the body. The values
-are computed before any of the assignments are done (like
-Scheme's let, rather than let*). If the last variable doesn't
-have a value, it is assigned nil."
+  are computed before any of the assignments are done (like
+  Scheme's let, rather than let*). If the last variable doesn't
+  have a value, it is assigned nil."
   (cl:loop :for x :on binds :by #'cddr
            :collect (first x) :into vars
            :collect (second x) :into vals
@@ -67,14 +67,12 @@ have a value, it is assigned nil."
                          (DECLARE (IGNORABLE ,@(+internal-flatten vars)))
                          ,@body))))
 
-;; withs ([var val ...]) [body ...]
-
-"Creates a new variable binding and executes the body. The values
-are computed sequentially (like Scheme's let*, rather than
-let). If the last variable doesn't have a value, it is assigned
-nil."
 
 (defmacro withs (binds &body body)
+  "Creates a new variable binding and executes the body. The values
+  are computed sequentially (like Scheme's let*, rather than
+  let). If the last variable doesn't have a value, it is assigned
+  nil."
   (cl:let ((binds (cl:loop :for vv :on binds :by #'cddr
                         :collect `(,(car vv) ,(cadr vv)))))
     (cl:reduce (lambda (vv res) `(arc::let ,@vv ,res))
@@ -105,4 +103,17 @@ nil."
     `(let ,g ,(car args)
        ,@(cdr args)
        ,g)))|#
+
+
+(mac compose args
+  (let g (uniq)
+    `(cl:lambda (&rest ,g)
+       ,(funcall
+         (afn (fs)
+           (if (cdr fs)
+               (list 'cl:funcall (car fs) (self (cdr fs)))
+               `(apply ,(if (car fs) (car fs) 'idfn) ,g)))
+         args))))
+
+
 

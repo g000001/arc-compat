@@ -99,3 +99,4 @@ equality with test using 'is'."
   (cl:listp obj))
 
 
+(defalias alphadig cl:alphanumericp)

@@ -13,6 +13,7 @@
   :components ((:file "package")
 	       (:file "utils")
                (:file "base")
+               (:file "io")
                (:file "error")
                (:file "table")
 	       (:file "macro")
@@ -23,6 +24,7 @@
 	       (:file "variables")
 	       (:file "iteration")
                (:file "sequence")
+               (:file "string")
 	       (:file "list")
 	       ))
 

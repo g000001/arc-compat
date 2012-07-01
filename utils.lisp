@@ -85,19 +85,23 @@
 (defmacro == (x y)
   `(5am:is (cl:equal ,x ,y)))
 
+
 (defmacro >_< (x y)
   `(5am:signals ,x ,y))
+
+
+(defun ref (seq index)
+  (etypecase seq
+    (cl:hash-table (gethash index seq))
+    (cl:sequence (elt seq index))))
 
 
 (defmacro w/obcall ((&rest seqs) &body body)
   `(flet (,@(mapcar (lambda (s)
                       `(,s (idx)
-                         (cl:elt ,s idx)))
+                         (ref ,s idx)))
               seqs))
      ,@body))
 
 
-(defun ref (seq index)
-  (typecase seq
-    (cl:hash-table (gethash index seq))
-    (cl:sequence (elt seq index))))
+

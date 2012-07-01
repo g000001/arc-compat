@@ -686,6 +686,7 @@ element or a predicate.")
   (+ xs (rem (fn (y) (some (fn (_) (funcall f _ y)) xs))
              ys)))
 
+
 (tst union
   (== (union #'is '(1 2 3) '(2 3 4))
       '(1 2 3 4))
@@ -863,55 +864,68 @@ element or a predicate.")
       NIL))
 
 
-;[code] [Procedure] find test seq
-;Finds and returns the first element of seq that satisfies test (object or predicate). seq can be a list or string.
-;	
-;
-;>(find odd '(2 3 4 5))
-;3
-;
-;>(find odd '(2 4 6))
-;nil
-;
-;>(find alphadig "...abc...")
-;#\a
-;
-;[code] [Procedure] cut seq start [end]
-;Returns subsequence of seq from start to end. If end is not specified, the remainder of seq is used. The seq can be a list or string.
-;	
-;
-;>(cut "abcde" 2)
-;"cde"
-;
-;>(cut "abcde" 2 4)
-;"cd"
-;
-;>(cut '(a b c d) 2)
-;(c d)
-;
-;>(cut '(a b c d) 2 4)
-;(c d)
-;
+(def find (test seq)
+  "Finds and returns the first element of seq that satisfies test (object or 
+  predicate). seq can be a list or string."
+  (w/obcall (seq)
+    (let f (testify test)
+      (if (alist seq)
+          (reclist   (fn (_) (if (funcall (compose f #'car) _) (car _))) seq)
+          (recstring (fn (_) (if (funcall (compose f #'seq) _) (seq _))) seq)))))
 
-;; rem test seq
+
+(tst find
+  (== (find #'odd '(2 3 4 5))
+      3)
+  (== (find #'odd '(2 4 6))
+      NIL)
+  (== (find #'alphadig "...abc...")
+      #\a))
+
+
+(def cut (seq start (o end))
+  "Returns subsequence of seq from start to end. If end is not specified,
+  the remainder of seq is used. The seq can be a list or string."
+  (w/obcall (seq)
+    (let end (if (no end)   (len seq)
+               (< end 0)  (+ (len seq) end)
+                          end)
+    (if (isa seq 'string)
+        (let s2 (newstring (- end start))
+          (for i 0 (- end start 1)
+            (setf (cl:elt s2 i) (seq (+ start i))))
+          s2)
+        (firstn (- end start) (nthcdr start seq))))))
+
+
+(tst cut
+  (== (cut "abcde" 2)
+      "cde")
+  (== (cut "abcde" 2 4)
+      "cd")
+  (== (cut '(a b c d) 2)
+      '(C D))
+  (== (cut '(a b c d) 2 4)
+      '(C D)))
+
+
 (def rem (test seq)
   "Removes elements from seq that satisfy test. test is either a
-function or an object. seq is either a list or string."
+  function or an object. seq is either a list or string."
   (cl:remove-if (testify test) seq))
 
 
-;>(rem #'oddp '(1 2 3 4 5))
-;(2 4)
-;
-;>(rem 3 '(1 2 3 4 5))
-;(1 2 4 5)
-;
-;>(rem #\c "abcde")
-;"abde"
-;
-;>(rem (fn (_) (in _ #\a #\b)) "abcde")
-;"cde"
-;
+(tst rem
+  (== (rem #'oddp '(1 2 3 4 5))
+      '(2 4) )
+  (== (rem 3 '(1 2 3 4 5))
+      '(1 2 4 5) )
+  (== (rem #\c "abcde")
+      "abde" )
+  (== (rem (fn (_) (in _ #\a #\b)) "abcde")
+      "cde" ))
+
+
 ;[code] [Procedure] keep test seq
 ;Keeps elements from seq that satisfy test. test is either a function or an object. seq is either a list or string.
 ;	
