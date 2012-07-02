@@ -8,7 +8,7 @@
    :cddr :sqrt :warn :push :abs :mod
    :pop :atom :list :sleep :round :car :or
    :nil :* :subseq :cons :subst :catch :max :/ 
-   :assoc :complement :time :nthcdr :write
+   :assoc :complement :time :write
    :apply :caar :cdr :- :load :close :t
    :cadr)
   (:export
@@ -19,15 +19,17 @@
    :bound :break-thread :caar :cache :cadr :call-w/stdin :call-w/stdout :car
    :carif :caris :case :caselet :catch :ccc :cddr :cdr :client-ip :close :coerce
    :commonest :compare :complement :compose :cons :consif :conswhen :copy :count
-   :counts :current-gc-milliseconds :current-process-milliseconds :date :dead
+   :counts :current-gc-milliseconds :current-process-milliseconds :cut
+   :date :dead
    :dedup :def :default :defmemo :defset :deftem :deq :details :dir :dir-exists
    :disp :do :do1 :dotted :downcase :drain :each :ellipsize :empty :endmatch :enq
    :enq-limit :ensure-dir :ero :err :errsafe :eval :even :exact
    :expand-metafn-call :expand= :expand=list :expt :file-exists :fill-table :find
    :findsubseq :firstn :firstn-that :flat :fn :for :forlen :fromstring :headmatch
    :idfn :if :iflet :in :infile :insert-sorted :inside :insort :insortnew :inst
-   :instring :intersperse :is :isa :isnt :iso :join :jtime :keep :keys
-   :kill-thread :last :latin1-hack :len :let :list :listtab :litmatch :load
+   :instring :intersperse :is :isa :isnt :iso :it :join :jtime :keep :keys
+   :kill-thread :last :latin1-hack :len :len< :len>
+   :let :list :listtab :litmatch :load
    :load-table :load-tables :loop :lpar :mac :macex :macex1 :map :map1 :mappend
    :maps :maptable :max :median :mem :memo :memtable :merge :mergesort :metafn
    :min :mismatch :mod :most :msec :multiple :multisubst :n-of :newstring :nil
@@ -68,6 +70,11 @@
 (declaim (ftype (function (function sequence) (values sequence &optional))
                 arc:sort))
 
+(declaim (ftype (function (cl:sequence) (values cl:sequence &optional))
+                arc:rev))
+
+(declaim (ftype (function (cl:function cl:list) (values cl:list &optional))
+                arc:map1))
 ;;; 
 
 

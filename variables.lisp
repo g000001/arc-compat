@@ -2,13 +2,6 @@
 
 ;;; Variables
 
-;; do1 expr [body ...]
-(defalias do1 cl:prog1
-  "Saves the first expression and returns it after executing the body.")
-
-;>(let x 42
-;  (do1 x (= x 50)))
-;42
 
 ;; def name params [body ...]
 

@@ -1,5 +1,4 @@
 (in-package :arc-compat.internal)
-
 (def-suite arc-compat)
 
 
@@ -133,11 +132,23 @@
   (let g (uniq)
     `(cl:lambda (&rest ,g)
        ,(funcall
-         (afn (fs)
-           (if (cdr fs)
-               (list 'cl:funcall (car fs) (self (cdr fs)))
-               `(apply ,(if (car fs) (car fs) 'idfn) ,g)))
+         (labels ((self (fs)
+                    (if (cdr fs)
+                        (list 'cl:funcall (car fs) (self (cdr fs)))
+                        `(apply ,(if (car fs) (car fs) 'idfn) ,g))))
+           #'self)
          args))))
 
+
+(defalias do1 cl:prog1
+  "Saves the first expression and returns it after executing the body.")
+
+
+(tst do1
+  (== (let x 42 (do1 x (= x 50)))
+      42))
+
+
+;;; eof
 
 
