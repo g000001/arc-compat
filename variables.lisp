@@ -39,7 +39,7 @@ warning if var is already defined."
 each choice is a separate argument."
   (w/uniq insym
     `(cl:let ((,insym ,obj))
-       (or ,@(mapcar #'(lambda (c) `(eql ,insym ,c))
+       (or ,@(mapcar #'(lambda (c) `(equal ,insym ,c))
                      choices)))))
 
 ;>(in 1 2 "b" 1 #\c)
