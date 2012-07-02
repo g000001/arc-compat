@@ -40,7 +40,9 @@
                      `(&rest ,args))))
     `(LAMBDA (&rest ,g)
        (DESTRUCTURING-BIND ,args ,g
-         (DECLARE (IGNORABLE ,@(+internal-flatten args)))
+         (DECLARE (IGNORABLE ,@(remove-if (lambda (x)
+                                            (member x cl:lambda-list-keywords))
+                                          (+internal-flatten args))))
          ,@body))))
 
 
@@ -90,10 +92,32 @@
 
 
 (defun map (fn seq &rest more-seqs)
+  "Applies f to the elements of the sequences, taking the first from each, 
+  the second from each, and so on. If there are n sequences, f must be a function 
+  accepting n arguments. The sequences can be lists or strings. If any sequence is
+  a string, then f must return a character, and the result will be a string made
+  up of the results from f. Otherwise, the result will be a list of the results 
+  from f. The sequences are processed up to the length of the shortest sequence. 
+  For a single list, map is the same as map1."
   (cl:apply #'cl:map (cl:type-of seq)
             fn
             seq
             more-seqs))
+
+
+(tst map
+  (== (map (fn (a b c) (+ (* a 100) (* b 10) c))
+        '(1 2 3) '(4 5 6) '(7 8 9 10))
+      '(147 258 369))
+  (== (map (fn (_) (list _ (* _ 10))) '(1 2 3))
+      '((1 10) (2 20) (3 30)))
+  (== (map cdr '((1) (2 3) (4 5)))
+    '(nil (3) (5)))
+  (== (map (fn (c n) (coerce (+ n (coerce c 'int)) 'char)) "abc" '(0 2 4))
+    "adg")
+  (== (map min "bird" "elephant")
+    "bied"))
+
 
 (defalias rand cl:random)
 
@@ -105,7 +129,7 @@
        ,g)))|#
 
 
-(mac compose args
+(defmacro compose (&rest args)
   (let g (uniq)
     `(cl:lambda (&rest ,g)
        ,(funcall
