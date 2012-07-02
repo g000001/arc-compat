@@ -25,10 +25,10 @@
 
 
 (define-compiler-macro + (&whole form &rest args)
-  (destructuring-bind (x y) args
-    (if (cl:= 2 (length args))
-        `(x+y ,x ,y)
-        form )))
+  (if (cl:= 2 (length args))
+      (destructuring-bind (x y) args
+        `(x+y ,x ,y))
+      form ))
 
 
 (def recstring (test s (o start 0))
