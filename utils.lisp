@@ -64,8 +64,8 @@
 
 (defun arc-ll-to-cl-ll (list)
   (mapcan (lambda (x)
-            (if (cl:and (consp x)
-                        (eq 'o (car x)) )
+            (cl:if (cl:and (consp x)
+                           (eq 'o (car x)) )
                 (list 'cl:&optional (cdr x))
                 (list x) ))
           (to-proper-lambda-list list) ))
