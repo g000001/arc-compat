@@ -1,18 +1,21 @@
 (in-package :arc-compat.internal)
-
 (in-suite arc-compat)
 
+
+;;;                            List manipulation
+;;;============================================================================
+;;; As lists are the key data structure in Arc, the language includes a large
+;;; number of operations on lists and sequences. Some operations apply only to
+;;; lists, while others apply to strings and tables.
+
+
 ;; car list
-
 ;; cdr list
-
 ;; caar list
-
 ;; cadr list
-
 ;; cddr list
 
-;; conswhen f x y
+
 (defun conswhen (f x y)
   "Cons x and y if (f x) is true. Otherwise returns y."
   (if (funcall f x)
@@ -26,46 +29,36 @@
   (== (conswhen (fn (_) (< (len _) 3)) '(1 2 3 4) '(3 4 5))
       '(3 4 5)))
 
-;; consif x list
+
 (defun consif (x list)
   "Cons x onto list if x is not nil."
   (if x (cons x list) list))
-;
-;>(consif 1 '(2 3))
-;(1 2 3)
-;
-;>(consif nil '(2 3))
-;(2 3)
 
-;[code] [Procedure] firstn n list
-;Returns the first n elements of list.
+
+(tst consif
+  (== (consif 1 '(2 3))
+      '(1 2 3))
+  (== (consif nil '(2 3))
+      '(2 3)))
+
+
 (defun firstn (n list)
   "Returns first 'n' elements of list."
   (cl:loop :repeat n :for x :in list :collect x))
-;
-;>(firstn 3 '(1 2))
-;(1 2)
-;
-;>(firstn 3 '(a b c d e))
-;(a b c)
 
-;; nthcdr n list <- *cl*
-#|(defun nthcdr (n list)
-  "Returns list after skipping the first n elements."
-  (if (> 1 n)
-      list
-      (cl:nthcdr n list)))|#
 
-;> (nthcdr -88 '(1 2 3))
-;>(nthcdr 0 '(1 2 3))
-;(1 2 3)
-;
-;>(nthcdr 2 '(1 2 3))
-;(3)
-;
-;>(nthcdr 10 '(1 2 3))
-;nil
-;
+(tst firstn
+  (== (firstn 3 '(1 2))
+      '(1 2) )
+  (== (firstn 3 '(a b c d e))
+      '(a b c) ))
+
+
+(def nthcdr (n xs)
+  (if (no n)  xs
+      (> n 0) (nthcdr (- n 1) (cdr xs))
+              xs))
+
 
 (def last (seq)
   "Returns the last element of list."
@@ -73,13 +66,15 @@
       (car seq)
       (last (cdr seq))))
 
-;>(last '(1 2 3))
-;3
-;
-;[code] [Procedure] flat list [stringstoo]
-;
+(tst last
+  (== (last '(1 2 3))
+      3))
+
+
 (def flat (x (o stringstoo))
-  "Flattens list into a list of atoms. Any nils are removed. If stringstoo is true, empty strings are removed, but flat will fail if the list contains any non-empty strings."
+  "Flattens list into a list of atoms. Any nils are removed. If stringstoo is 
+  true, empty strings are removed, but flat will fail if the list contains any 
+  non-empty strings."
   (funcall
    (rfn f (x acc)
      (if (or (no x) (and stringstoo (is x "")))
@@ -88,123 +83,122 @@
          (cons x acc)
          (f (car x) (f (cdr x) acc))))
    x nil))
-;	
-;
-;>(flat '(1 2 () (3 4 (5))))
-;(1 2 3 4 5)
-;
-;; rev list
-;
-(declaim (ftype (function (cl:sequence) (values cl:sequence &optional))))
+	
+
+(tst flat
+  (== (flat '(1 2 () (3 4 (5))))
+      '(1 2 3 4 5)))
+
+
 (defalias rev cl:reverse
   "Reverses list.")
 
-;>(rev '(1 2 3))
-;(3 2 1)
-;
-;>(rev '(1 (2 3) 4))
-;(4 (2 3) 1)
-;
 
-;; carif x
+(tst rev
+  (== (rev '(1 2 3))
+    '(3 2 1))
+  (== (rev '(1 (2 3) 4))
+      '(4 (2 3) 1)))
+
+
 (defun carif (x)
   "Returns (car x) if x is a list, and returns x otherwise. This
-provides a 'safe' way to return the first element of something
-that may or may not be a list."
+  provides a 'safe' way to return the first element of something
+  that may or may not be a list."
   (if (atom x) x (car x)))
 
-;>(carif '(1 2))
-;1
-;
-;>(carif 3)
-;3
 
-;; caris x val
+(tst carif
+  (== (carif '(1 2))
+      1)
+  (== (carif 3)
+      3))
+
+
 (defun caris (x val)
   "Tests if x is a list and (car x) is val."
   (eql val (if (atom x) nil (car x))))
-;
-;>(caris '(1 2) 1)
-;t
-;
-;>(caris 1 1)
-;nil
 
-;; intersperse x list
+
+(tst caris
+  (== (caris '(1 2) 1)
+      t )
+  (== (caris 1 1)
+      nil ))
+
+
 (defun intersperse (x ys)
   "Inserts x between elements of list. If list has fewer than 2
-elements, there is no effect."
+  elements, there is no effect."
   (cons (car ys)
         (mappend (fn (_) (list x _)) 
 		 (cdr ys))))
 
-;>(intersperse 1 '(a b (c d) e))
-;(a 1 b 1 (c d) 1 e)
-;
-;>(intersperse nil '(1 2 3))
-;(1 nil 2 nil 3)
-;
-;[code] [Procedure] split list pos
-;Splits list into two lists at the given position, which must be between 1 and the length of the list.
+
+(tst intersperse
+  (== (intersperse 1 '(a b (c d) e))
+      '(a 1 b 1 (c d) 1 e))
+  (== (intersperse nil '(1 2 3))
+      '(1 nil 2 nil 3)))
+
+
 (defun split (seq pos)
+  "Splits list into two lists at the given position, which must be between 1 
+  and the length of the list."
   (withs (mid (nthcdr (- pos 1) seq)
           s2  (cdr mid))
     (wipe (cdr mid))
     (list seq s2)))
 
-;>(split '(a b c) 0)
-;((a) (b c))
-;
-;>(split '(a b c) 1)
-;((a) (b c))
-;
-;>(split '(a b c) 2)
-;((a b) (c))
-;
-;>(split '(a b c) 3)
-;((a b c) nil)
-;
 
-;; pair list [f]
+(tst split
+  (== (split (copy-list '(a b c)) 0)
+      '((a) (b c)))
+  (== (split (copy-list '(a b c)) 1)
+      '((A) (B C)))
+  (== (split (copy-list '(a b c)) 2) 
+      '((a b) (c)))
+  (== (split (copy-list '(a b c)) 3) 
+      '((a b c) nil)))
+
+
 (defun pair (xs &optional (f #'list))
   "Splits list into pairs. By default, each pair is made into a
-list. If specified, function f is applied to each pair."
+  list. If specified, function f is applied to each pair."
   (cl:cond ((no xs) nil)
 	   ((no (cdr xs)) (list (list (car xs))))
 	   ('T (cons (funcall f (car xs) (cadr xs))
 		     (pair (cddr xs) f)))))
 
-;>(pair '(a b c d))
-;((a b) (c d))
-;
-;>(pair '(a b c d e))
-;((a b) (c d) (e))
-;
-;>(pair '(1 2 3 4) #'+)
-;(3 7)
-;
-;>(pair '(10 2 3 40 50 6) max)
-;(10 40 50)
 
-;; tuples list [n]
+(tst pair
+  (== (pair '(a b c d))
+      '((a b) (c d)) )
+  (== (pair '(a b c d e))
+      '((a b) (c d) (e)) )
+  (== (pair '(1 2 3 4) #'+)
+      '(3 7) )
+  (== (pair '(10 2 3 40 50 6) #'max)
+      '(10 40 50) ))
+
+
 (defun tuples (xs &optional (n 2))
-  "Splits list into groups of n. tuples is a generalization of
-pair."
+  "Splits list into groups of n. tuples is a generalization of pair."
   (if (no xs)
       nil
       (cons (firstn n xs)
-            (tuples (nthcdr n xs) n))))
+            (tuples (nthcdr n xs) n) )))
 
-;>(tuples '(1 2 3 4 5) 1)
-;((1) (2) (3) (4) (5))
-;
-;>(tuples '(1 2 3 4 5))
-;((1 2) (3 4) (5))
-;
-;>(tuples '(1 2 3 4 5) 3)
-;((1 2 3) (4 5))
 
-;; join [list ...]
+(tst tuples
+  (== (tuples '(1 2 3 4 5) 1)
+      '((1) (2) (3) (4) (5)) )
+  (== (tuples '(1 2 3 4 5))
+      '((1 2) (3 4) (5)) )
+  (== (tuples '(1 2 3 4 5) 3)
+      '((1 2 3) (4 5)) ))
+
+
 (defun join (&rest args)
   "Joins lists into one list."
   (if (no args)
@@ -214,24 +208,24 @@ pair."
             (apply #'join (cdr args))
             (cons (car a) (apply #'join (cdr a) (cdr args)))))))
 
-;>(join '(1 2) nil '(3 4))
-;(1 2 3 4)
+(tst join
+  (== (join '(1 2) nil '(3 4))
+      '(1 2 3 4)))
 
-;; list [arg ...] <- *cl*
 
-;; range start end
 (defun range (start end)
   "Creates a list of numbers from start to end in steps of 1. The
-last number is <= end."
+  last number is <= end."
   (cl:loop :for i :from start :to end :collect i))
 
-;>(range 0 10)
-;(0 1 2 3 4 5 6 7 8 9 10)
-;
-;>(range 1.5 3.8)
-;(1.5 2.5 3.5)
 
-;; n-of n expr
+(tst range
+  (== (range 0 10)
+      '(0 1 2 3 4 5 6 7 8 9 10) )
+  (== (range 1.5 3.8)
+      '(1.5 2.5 3.5) ))
+
+
 (mac n-of (n expr)
   "Evaluates expr n times and returns a list of the results."
   `(let res ()
@@ -239,47 +233,39 @@ last number is <= end."
        (push ,expr res))
      (rev res)))
 
-;(with-input-from-string (ins "abcdefg")
-;  (n-of 5 (read-char ins)))
-;>(n-of 5 "a")
-;("a" "a" "a" "a" "a")
-;
-;>(w/instring ins "abcdefg" (n-of 5 (readc ins)))
-;(#\a #\b #\c #\d #\e)
+
+(tst n-of
+  (== (with-input-from-string (ins "abcdefg")
+        (n-of 5 (read-char ins)))
+      '(#\a #\b #\c #\d #\e))
+  (== (n-of 5 "a")
+      '("a" "a" "a" "a" "a")))
+
 
 (def adjoin (x xs (o test #'iso))
   "Cons elt onto list unless (test elt y) is true for some y in
-list. By default, test is iso, so elt will be joined if it is not
-present in list."
-  (if (some (fn (_) (funcall test _)) xs)
+  list. By default, test is iso, so elt will be joined if it is not
+  present in list."
+  (if (some (fn (_) (funcall test x _)) xs)
       xs
       (cons x xs)))
 
 
-;>(adjoin 2 '(1 2 3))
-;(1 2 3)
-;
-;>(adjoin 2 '(1 3 5))
-;(2 1 3 5)
-;
-;>(adjoin 2 '(1 2 3) <)
-;(1 2 3)
-;
-;>(adjoin 2 '(0 1 2) #'<)
-;(2 0 1 2)
-;
-;[code] [Procedure] [Destructive] counts list [table]
-;
-#|(def counts (seq (o c (table)))
-  (if (no seq)
-      c
-      (do (zap (fn (_) (if _ (cl:+ _ 1) 1))
-               (funcall c (car seq)))
-          (counts (cdr seq) c))))|#
+(tst adjoin
+  (== (adjoin 2 '(1 2 3))
+      '(1 2 3) )
+  (== (adjoin 2 '(1 3 5))
+      '(2 1 3 5) )
+  (== (adjoin 2 '(1 2 3) #'<)
+      '(1 2 3) )
+  (== (adjoin 2 '(0 1 2) #'<)
+      '(2 0 1 2) ))
 
 
 (def counts (seq (o c (table)))
-  "Counts how many times each element of list occurs. The results are returned as a table mapping from the element to the count. If a table is passed in, it will be updated."
+  "Counts how many times each element of list occurs. The results are returned
+  as a table mapping from the element to the count. If a table is passed in, 
+  it will be updated."
   (if (no seq)
       c
       (do (let key (car seq)
@@ -291,92 +277,83 @@ present in list."
                      (setf (gethash key c) 1))))
           (counts (cdr seq) c))))
 
-;	
-;
-;>(counts '(b a n a n a))
-;#hash((n . 2) (a . 3) (b . 1))
-;
-;>(let tl (table)
-;  (counts '(1 2) tl)
-;  (counts '(1 3) tl))
-;#hash((3 . 1) (1 . 2) (2 . 1))
 
+(tst counts
+  (== (let tab (counts '(b a n a n a))
+        `((a ,(ref tab 'a))
+          (b ,(ref tab 'b))
+          (n ,(ref tab 'n)) ))
+      '((A 3) (B 1) (N 2)) ))
 
-#|(let tl (table)
-     (counts '(1 2) tl)
-     (counts '(1 3) tl)
-     (maphash (fn (k v) (print (list k v))) tl))|#
-
-;[code] [Procedure] commonest list
-;Returns the element of list occurring most frequently, along with its count.
 
 (def commonest (seq)
+  "Returns the element of list occurring most frequently, along with its count."
   (with (winner nil n 0)
     (ontable k v (counts seq)
       (when (> v n) (= winner k n v)))
     (list winner n)))
 
-;
-;>(commonest '(b a n a n a))
-;(a 3)
-;
-;>(commonest nil)
-;(nil 0)
-;
-;Applying functions to lists
-;Arc provides several ways of applying functions to the elements of a list.
 
-;; reduce f list
+(tst commonest
+  (== (commonest '(b a n a n a))
+      '(a 3) )
+  (== (commonest nil)
+      '(nil 0) ))
+
+
+;;;                       Applying functions to lists
+;;;============================================================================
+;;; Arc provides several ways of applying functions to the elements of a list.
+
+
 (defun reduce (f list)
-  "Reduces list using f. Applies f to the first two elements of
-list. Then recursively applies f to that result and the next
-element of list."
+  "Reduces list using f. Applies f to the first two elements of list. 
+  Then recursively applies f to that result and the next element of list."
   (cl:reduce f list))
 
-;>(reduce #'+ '(1 2 3 4 5))
-;15
-;
-;>(reduce #'+ '("a" "b" "c"))
-;"abc"
-;
-;>(reduce #'/ '(1 2 3))
-;1/6
-;
 
-;; rreduce f list
-;
+(tst reduce
+  (== (reduce #'+ '(1 2 3 4 5))
+      15 )
+  (== (reduce #'+ '("a" "b" "c"))
+      "abc" )
+  (== (reduce #'/ '(1 2 3))
+      1/6 ))
+
+
 (defun rreduce (f list)
   "Reduces list using f in reverse. Applies f to the last two
-elements of list. Then recursively applies f to that result and
-the previous element of list."
+  elements of list. Then recursively applies f to that result and
+  the previous element of list."
   (cl:reduce f list :from-end 'T))
 
-;>(rreduce #'+ '(1 2 3 4 5))
-;15
-;
-;>(rreduce #'/ '(1 2 3))
-;3/2
 
-;; firstn-that n f list
+(tst rreduce
+  (== (rreduce #'+ '(1 2 3 4 5))
+      15)
+  (== (rreduce #'/ '(1 2 3))
+     3/2))
+
+
 (defun firstn-that (n f xs)
-  "Returns the first n elements of list for which predicate f is
-true."
+  "Returns the first n elements of list for which predicate f is true."
   (cl:cond ((or (cl:<= n 0) (no xs)) 
 	    nil)
 	   ((funcall f (car xs))
 	    (cons (car xs) (firstn-that (- n 1) f (cdr xs))))
 	   ('T (firstn-that n f (cdr xs)))))
 
-;>(firstn-that 3 #'oddp '(1 2 3 4 5 6 7 8))
-;(1 3 5)
-;
-;>(firstn-that 3 #'oddp '(2 4 6 8))
-;nil
 
-;; most f list
+(tst firstn-that
+  (== (firstn-that 3 #'oddp '(1 2 3 4 5 6 7 8))
+      '(1 3 5) )
+  (== (firstn-that 3 #'oddp '(2 4 6 8))
+      nil ))
+
+
 (defun most (f seq) 
-  "Returns the element of list for which rating function f
-returns the largest value."
+  "Returns the element of list for which rating function f returns the largest 
+  value."
   (cl:unless (no seq)
     (withs (wins (car seq) topscore (funcall f wins))
       (cl:dolist (elt (cdr seq))
@@ -384,40 +361,42 @@ returns the largest value."
           (if (cl:> score topscore) (= wins elt topscore score))))
       wins)))
 
-;>(most #'len '("cat" "bird" "dog"))
-;"bird"
-;
-;>(most #'abs '(3 -10 5))
-;-10
-;
-;>(most #'abs '(-1 1 -1))
-;-1
 
-;[code] [Procedure] map1 f list
+(tst most
+  (== (most #'len '("cat" "bird" "dog"))
+      "bird" )
+  (== (most #'abs '(3 -10 5))
+      -10 )
+  (== (most #'abs '(-1 1 -1))
+      -1 ))
 
-(defalias map1 cl:mapcar
+
+(def map1 (f list)
   "Applies f to the elements of list. The results are cons'd
-together into a list.")
+  together into a list."
+  (cl:mapcar f list))
 
-;>(map1 (fn (_) (list _ (* _ 10))) '(1 2 3))
-;((1 10) (2 20) (3 30))
-;
-;>(map1 #'cdr '((1) (2 3) (4 5)))
-;(nil (3) (5))
 
-;; mappend f [list ...]
+(tst map1
+  (== (map1 (fn (_) (list _ (* _ 10))) '(1 2 3))
+      '((1 10) (2 20) (3 30)) )
+  (== (map1 #'cdr '((1) (2 3) (4 5)))
+      '(nil (3) (5)) ))
+
+
 (defun mappend (f &rest args)
-  "Maps f on the arguments, and then joins the results together. f
-must return a list. nil results are omitted."
+  "Maps f on the arguments, and then joins the results together. f must return a
+  list. nil results are omitted."
   (apply #'cl:append (apply #'cl:mapcar f args)))
 
-;>(mappend (fn (_) (list _ (* _ 10))) '(1 2 3))
-;(1 10 2 20 3 30)
-;
-;>(mappend #'cdr '((1) (2 3) (4 5)))
-;(3 5)
 
-;; reclist f list
+(tst mappend
+  (== (mappend (fn (_) (list _ (* _ 10))) '(1 2 3))
+      '(1 10 2 20 3 30))
+  (== (mappend #'cdr '((1) (2 3) (4 5)))
+      '(3 5)))
+
+
 (def reclist (f xs)
   "Recursively applies f to tail subsequences of list and returns
   the first true result. Returns nil if none."
@@ -426,44 +405,51 @@ must return a list. nil results are omitted."
 
 (tst reclist
   (== (let ans ()
-        (reclist (fn (x) (push x ans) nil) '(a b c))
+        (reclist (fn (x) (push x ans) nil) (copy-list '(a b c)))
         ans)
       '((C) (B C) (A B C)))
-  (== (reclist (fn (_) (if (is (len _) 2) _)) '(a b c))
+  (== (reclist (fn (_) (if (is (len _) 2) _)) (copy-list '(a b c)))
       '(B C)))
 
 
-;; mem test list
-(defalias mem cl:member-if
-  "Tests elements of list. If test is true for an element, returns
-the remainder of the list from that point. test is either an
-element or a predicate.")
+(def mem (test list)
+  "Tests elements of list. If test is true for an element, returns the remainder
+  of the list from that point. test is either an element or a predicate."
+  (cl:member-if (testify test) list))
 
-;>(mem (fn (_) (oddp _)) '(2 4 5 6 7))
-;(5 6 7)
-;
-;>(mem 6 '(2 4 5 6 7))
-;(6 7)
 
-;[code] [Procedure] trues f list
+(tst mem
+  (== (mem (fn (_) (oddp _)) '(2 4 5 6 7))
+      '(5 6 7) )
+  (== (mem 6 '(2 4 5 6 7))
+      '(6 7) ))
+
+
 (defun trues (f seq) 
   "Maps function f onto list and returns only the true (non-nil) values."
   (rem nil (cl:mapcar f seq)))
-;
-;>(trues #'cdr '((1 2) (3) (4 5)))
-;((2) (5))
-;
-;>(trues (fn (_) (if (oddp _) (* 10 _))) '(1 2 3 4 5))
-;(10 30 50)
-;
-;Sorting
-;Arc provides an efficient sorting operation based on merge sort. Sorting in Arc uses a compare predicate function that defines the sort order. Elements x and y are defined as sorted if (compare x y) is true. The compare function does not need to define a full order. That is, it is valid for (compare x y) and (compare y x) to both be true. In this case, mergesort is stable, and will preserve the existing order of the elements.
-;
-;[code] [Procedure] [Destructive] mergesort compare list
+
+
+(tst trues
+  (== (trues #'cdr '((1 2) (3) (4 5)))
+      '((2) (5)))
+  (== (trues (fn (_) (if (oddp _) (* 10 _))) '(1 2 3 4 5))
+      '(10 30 50)))
+
+
+;;;                               Sorting
+;;;============================================================================
+;;; Arc provides an efficient sorting operation based on merge sort. Sorting in
+;;; Arc uses a compare predicate function that defines the sort order. Elements
+;;; x and y are defined as sorted if (compare x y) is true. The compare function
+;;; does not need to define a full order. That is, it is valid for (compare x y)
+;;; and (compare y x) to both be true. In this case, mergesort is stable, and
+;;; will preserve the existing order of the elements.
 
 
 (def merge (less? x y)
-  "Merges two sorted lists into a sorted list. The original lists must be ordered according to the predicate function compare."
+  "Merges two sorted lists into a sorted list. The original lists must be ordered 
+  according to the predicate function compare."
   (if (no x) y
       (no y) x
       (let lup nil
@@ -481,16 +467,20 @@ element or a predicate.")
           ; (car x) <= (car y)
           (do (if (cdr x) (funcall lup x (cdr x) y t) (scdr x y))
               x)))))
-;>(merge #'< '(1 2 3 5) '(2 4 6))
-;(1 2 2 3 4 5 6)
-;
-;>(merge (fn (a b) (> (len a) (len b)))
-;  '("aaa" "b") '("cccc" "ddd" "ee"))
-;("cccc" "aaa" "ddd" "ee" "b")
+
+
+(tst merge
+  (== (merge #'< '(1 2 3 5) '(2 4 6))
+      '(1 2 2 3 4 5 6) )
+  (== (merge (fn (a b) (> (len a) (len b)))
+             '("aaa" "b") '("cccc" "ddd" "ee"))
+      '("cccc" "aaa" "ddd" "ee" "b") ))
 
 
 (def mergesort (less? lst)
-  "Destructively sorts list using the given comparison function. The sort is stable; if two elements compare as equal with compare, they will remain in the same order in the output. The original list is destroyed."
+  "Destructively sorts list using the given comparison function. The sort is 
+  stable; if two elements compare as equal with compare, they will remain in 
+  the same order in the output. The original list is destroyed."
   (with (n (len lst))
     (if (<= n 1) lst
         ; ; check if the list is already sorted
@@ -525,54 +515,47 @@ element or a predicate.")
                nil))
          n))))
 
-;(-7 0 3 10)
-;(mergesort #'< '(3 0 10 -7))
-;=>  (-7 0 3 10)
 
-;
-;>(mergesort (fn (a b) (< (len a) (len b)))
-;            '("horse" "dog" "elephant" "cat"))
-;("dog" "cat" "horse" "elephant")
-
-; (mergesort (fn (a b) (< (len a) (len b)))
-;           '("horse" "dog" "elephant" "cat"))
-;=>  ("dog" "cat" "horse" "elephant")
+(tst mergesort
+  (== (mergesort #'< '(3 0 10 -7))
+      '(-7 0 3 10))
+  (== (mergesort (fn (a b) (< (len a) (len b)))
+               '("horse" "dog" "elephant" "cat"))
+      '("dog" "cat" "horse" "elephant")))
 
 
-
-;
-
-;[code] [Procedure] insert-sorted compare elt list
 (def insert-sorted (test elt seq)
-  "Creates a new list with elt inserted into the sorted list list. The original list must be sorted according to the comparison function. The original list is unmodified."
+  "Creates a new list with elt inserted into the sorted list list. The original 
+  list must be sorted according to the comparison function. The original list 
+  is unmodified."
   (if (no seq)
        (list elt) 
       (funcall test elt (car seq)) 
        (cons elt seq)
       (cons (car seq) (insert-sorted test elt (cdr seq)))))
 
-;(insert-sorted #'> 5 '(10 3 1))
-;=>  (10 5 3 1)
 
-;(insert-sorted #'> 5 '(10 5 1))
-;=>  (10 5 5 1)
-;(10 5 5 1)
-;
-;[code] [Macro] [Destructive] insort (compare elt list)
-;
+(tst insert-sorted
+  (== (insert-sorted #'> 5 '(10 3 1))
+      '(10 5 3 1) )
+  (== (insert-sorted #'> 5 '(10 5 1))
+      '(10 5 5 1) ))
+
+
 (mac insort (test elt seq)
   "Insert elt into previously-sorted list, updating list."
   `(zap (fn (_) (insert-sorted ,test ,elt _)) ,seq))
 
-;>
-;(let x '(2 4 6) (insort #'< 3 x) x)
-;=>  (2 3 4 6)
 
-;(2 3 4 6)
-;
-;[code] [Procedure] reinsert-sorted compare elt list
+(tst insort
+  (== (let x '(2 4 6) (insort #'< 3 x) x)
+      '(2 3 4 6)))
+
+
 (def reinsert-sorted (test elt seq)
-  "Creates a new list with elt inserted into the sorted list list if it is not already present. The original list must be sorted according to the comparison function. The original list is unmodified."
+  "Creates a new list with elt inserted into the sorted list list if it is not 
+  already present. The original list must be sorted according to the comparison 
+  function. The original list is unmodified."
   (if (no seq) 
        (list elt) 
       (is elt (car seq))
@@ -581,16 +564,14 @@ element or a predicate.")
        (cons elt (rem elt seq))
       (cons (car seq) (reinsert-sorted test elt (cdr seq)))))
 
-;(reinsert-sorted #'> 5 '(10 3 1))
-;=>  (10 5 3 1)
 
-;>(reinsert-sorted > 5 '(10 3 1))
-;(10 5 3 1)
-;
-;>(reinsert-sorted > 5 '(10 5 1))
-;(10 5 1)
-;
-;[code] [Macro] [Destructive] insortnew (compare elt list)
+(tst reinsert-sorted
+  (== (reinsert-sorted #'> 5 '(10 3 1))
+      '(10 5 3 1))
+  (== (reinsert-sorted #'> 5 '(10 5 1))
+      '(10 5 1)))
+
+
 (mac insortnew (test elt seq)
   "Insert elt into previously-sorted list if it is not present, updating list."
   `(zap (fn (_) (reinsert-sorted ,test ,elt _)) ,seq))
@@ -646,7 +627,8 @@ element or a predicate.")
       "wtsroedT "))
 
 
-;;; Sequence manipulation
+;;;                        Sequence manipulation
+;;;============================================================================
 ;;; These operations act on lists, strings, or hash tables.
 
 ;[code] [Foundation] [Destructive] sref seq value index
@@ -664,6 +646,7 @@ element or a predicate.")
 ;(1 #\d 3)
 ;
 
+
 (def count (test seq)
   "Counts the number of elements of seq that satisfy test. test is an object or
   predicate. For a table, the elements are the values."
@@ -678,8 +661,8 @@ element or a predicate.")
       3)
   (== (count (fn (_) (odd _)) '(1 2 3 4 5))
       3))
-;[f _ y]
-;[code] [Procedure] union f xs ys
+
+
 (def union (f xs ys)
   "Takes union of sequence xs and ys. Predicate f is used to determine equality
   to filter out duplicates. xs and ys must both be lists or strings."
@@ -744,7 +727,7 @@ element or a predicate.")
   (== (len> (obj a 1 b 2) 4)
       NIL))
 
-;[code] [Procedure] dedup seq
+
 (def dedup (xs)
   "Returns contents of seq without duplicates. For a string, returns a list of
   characters. For a table, returns a list of values."
@@ -811,7 +794,6 @@ element or a predicate.")
       NIL))
 
 
-;[code] [Procedure] [Predicate] before t1 t2 seq [start]
 (def before (x y seq (o i 0))
   "Tests if t1 is true before t2 in seq. seq is either a list or string. 
   The tests are either objects or predicate functions. If start is given, search 
@@ -831,7 +813,6 @@ element or a predicate.")
       NIL))
 
 
-;[code] [Procedure] random-elt seq
 (def random-elt (seq) 
   "Returns a random element from a list, or a random character from a string. 
   It also works on a table with integer keys from 0 to n."
@@ -844,7 +825,6 @@ element or a predicate.")
   (5am:is (cl:find (random-elt "abcd") "abcd")))
 
 
-;[code] [Procedure] mismatch s1 s2
 (def mismatch (s1 s2)
   "Compares sequences and returns the position of the first mismatch 
   (as determined by is). Returns nil if the sequences are identical."
@@ -926,94 +906,99 @@ element or a predicate.")
       "cde" ))
 
 
-;[code] [Procedure] keep test seq
-;Keeps elements from seq that satisfy test. test is either a function or an object. seq is either a list or string.
-;	
-;
-;>(keep odd '(1 2 3 4 5))
-;(1 3 5)
-;
-;>(keep 3 '(1 2 3 4 5))
-;(3)
-;
-;>(keep #\c "abcde")
-;"c"
-;
-;>(keep (fn (_) (in _ #\a #\b)) "abcde")
-;"ab"
-;
-;[code] [Procedure] map f [seq ...]
-;Applies f to the elements of the sequences, taking the first from each, the second from each, and so on. If there are n sequences, f must be a function accepting n arguments. The sequences can be lists or strings. If any sequence is a string, then f must return a character, and the result will be a string made up of the results from f. Otherwise, the result will be a list of the results from f. The sequences are processed up to the length of the shortest sequence. For a single list, map is the same as map1.
-;	
-;
-;>(map (fn (a b c) (+ (* a 100) (* b 10) c))
-;  '(1 2 3) '(4 5 6) '(7 8 9 10))
-;(147 258 369)
-;
-;>(map (fn (_) (list _ (* _ 10))) '(1 2 3))
-;((1 10) (2 20) (3 30))
-;
-;>(map cdr '((1) (2 3) (4 5)))
-;(nil (3) (5))
-;
-;>(map (fn (c n) (coerce (+ n (coerce c 'int)) 'char)) "abc" '(0 2 4))
-;"adg"
-;
-;>(map min "bird" "elephant")
-;"bied"
-;
-;Other
-;
-;[code] [Macro] rand-choice expr [...]
-;Randomly choose one of the expressions.
-;	
-;
-;>(
-;and-choice "a" 42 '(1 2 3))
-;(1 2 3)
-;
-;[code] [Procedure] compare comparer scorer
-;Creates a procedure on two values that applies scorer to each value, and then applies comparer to the two scores.
-;	
-;
-;>(compare < len)
-;#<procedure>
-;
-;pre> >((compare < len) "yz" "abc") t
-;[code] [Procedure] only f
-;Creates a procedure that will apply f to its arguments only if there are arguments.
-;	
-;
-;>(only +)
-;#<procedure>
-;
-;>((only +) 1 2 3)
-;6
-;
-;>((only +))
-;nil
-;
-;/a> [code] [Macro] accum accfn [body ...]
-;Executes body. Inside body, each time cfn is called, its argument is pushed on a list that becomes the return value. Note that the list is in reverse order.
-;	
-;
-;>(accum accfn (each x '(1 2 3) (accfn (* x 10))))
-;(30 20 10)
-;
-;[code] summing sumfn [body ...]
+(def keep (test seq)
+  "Keeps elements from seq that satisfy test. test is either a function or an 
+  object. seq is either a list or string."
+  (rem (complement (testify test)) seq))
+
+
+(tst keep
+  (== (keep #'odd '(1 2 3 4 5))
+      '(1 3 5))
+  (== (keep 3 '(1 2 3 4 5))
+      '(3))
+  (== (keep #\c "abcde")
+      "c")
+  (== (keep (fn (_) (in _ #\a #\b)) "abcde")
+      "ab"))
+
+
+;;;                                Other
+;;;============================================================================
+
+
+(mac rand-choice exprs
+  "Randomly choose one of the expressions."
+  `(case (rand ,(len exprs))
+     ,@(let key -1
+         (mappend (fn (_) (list (++ key) _))
+                  exprs))))
+
+(tst rand-choice
+  (== (in (rand-choice "a" 42 '(1 2 3))
+          "a" 42 '(1 2 3))
+      T))
+
+
+(def compare (comparer scorer)
+  "Creates a procedure on two values that applies scorer to each value, and then
+  applies comparer to the two scores."
+  (fn (x y) (funcall comparer (funcall scorer x) (funcall scorer y))))
+
+
+(tst compare
+  (== (functionp (compare #'< #'len))
+      T)
+  (== (funcall (compare #'< #'len) "yz" "abc")
+      T))
+
+
+(def only (f)
+  "Creates a procedure that will apply f to its arguments only if there are 
+  arguments."
+  (fn args (if (car args) (apply f args))))
+
+
+(tst only
+  (== (functionp (only #'+))
+      T)
+  (== (funcall (only #'+) 1 2 3)
+      6)
+  (== (funcall (only #'+))
+      nil))
+
+
+(mac accum (accfn . body)
+  "Executes body. Inside body, each time accfn is called, its argument is pushed
+  on a list that becomes the return value. Note that the list is in reverse order."
+  (w/uniq gacc
+    `(withs (,gacc nil)
+       (flet ((,accfn (_)
+                (push _ ,gacc)))
+         ,@body
+         (rev ,gacc)))))
+
+
+(tst accum
+  (== (accum accfn (each x '(1 2 3) (accfn (* x 10))))
+      '(10 20 30)))
+
+
 (mac summing (sumfn . body)
+  "Sums the number of times sumfn is called with a true argument in body.
+  The sum is returned. The sumfn argument specifies the name under which 
+  the summing function is available to the body."
   (w/uniq (gc gt)
     `(let ,gc 0
-       (let ,sumfn (fn (,gt) (if ,gt (++ ,gc)))
+       (flet ((,sumfn (,gt)
+                (if ,gt (++ ,gc))))
          ,@body)
        ,gc)))
 
 
-;Sums the number of times sumfn is called with a true argument in body. The sum is returned. The sumfn argument specifies the name under which the summing function is available to the body.
-;	
-;
-;>(summing i #'true (map #'istrue '(1 nil nil t)))
-;2
+(tst summing
+  (== (summing sumfn (each x '(1 nil nil t) (sumfn x)))
+      2))
 
 
-
+;;; eof
