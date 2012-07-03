@@ -548,8 +548,8 @@
 
 
 (tst insort
-  (== (let x '(2 4 6) (insort #'< 3 x) x)
-      '(2 3 4 6)))
+  (== (let x (list 2 4 6) (insort #'< 3 x) x)
+      (list 2 3 4 6)))
 
 
 (def reinsert-sorted (test elt seq)
@@ -578,8 +578,8 @@
 
 
 (tst insortnew
-  (== (let x '(2 4 6) (insortnew #'< 3 x) x)
-      '(2 3 4 6)))
+  (== (let x (list 2 4 6) (insortnew #'< 3 x) x)
+      (list 2 3 4 6)))
 
 
 (def best (f seq)
@@ -782,15 +782,15 @@
 
 
 (tst pos
-  (== (pos 'c '(a b c d))
+  (== (pos :c (list :a :b :c :d))
       2)
   (== (pos #\c "abcd")
       2)
   (== (pos #\c "abcdc" 3)
       4)
-  (== (pos #'odd '(2 4 5 6 7))
+  (== (pos #'odd (list 2 4 5 6 7))
       2)
-  (== (pos #'odd '(2 4 6))
+  (== (pos #'odd (list 2 4 6))
       NIL))
 
 
@@ -855,9 +855,9 @@
 
 
 (tst find
-  (== (find #'odd '(2 3 4 5))
+  (== (find #'odd (list 2 3 4 5))
       3)
-  (== (find #'odd '(2 4 6))
+  (== (find #'odd (list 2 4 6))
       NIL)
   (== (find #'alphadig "...abc...")
       #\a))
