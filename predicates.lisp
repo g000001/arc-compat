@@ -303,7 +303,4 @@
   (cl:oddp obj))
 
 
-(defalias alphadig cl:alphanumericp)
-
-
 ;;; eof

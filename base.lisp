@@ -149,6 +149,17 @@
       42))
 
 
+(defun coerce (thing type)
+  (typecase thing
+    (sym (coerce (cl:string thing) type))
+    (t (cl:case type
+         (sym (intern (cl:string thing)))
+         (cl:otherwise (cl:coerce thing type))))))
+
+
+(defun sym (x) (coerce x 'sym))
+
+
 ;;; eof
 
 
