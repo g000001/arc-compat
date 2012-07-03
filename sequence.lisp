@@ -31,20 +31,5 @@
       form ))
 
 
-(def recstring (test s (o start 0))
-  (let n (len s)
-    (funcall
-     (afn (i)
-       (and (< i (len s))
-            (or (funcall test i)
-                (self (+ i 1)))))
-     start)))
-
-
-(tst recstring
-  (== (let str "abcde"
-           (recstring
-            (fn (idx) (if (is (cl:char str idx) #\c) (+ 10 idx)))
-            str ))
-      12 ))
+;;; eof
 
