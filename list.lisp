@@ -176,10 +176,10 @@
       '((a b) (c d)) )
   (== (pair '(a b c d e))
       '((a b) (c d) (e)) )
-  (== (pair '(1 2 3 4) #'+)
-      '(3 7) )
-  (== (pair '(10 2 3 40 50 6) #'max)
-      '(10 40 50) ))
+  (== (pair (list 1 2 3 4) #'+)
+      (list 3 7) )
+  (== (pair (list 10 2 3 40 50 6) #'max)
+      (list 10 40 50) ))
 
 
 (defun tuples (xs &optional (n 2))

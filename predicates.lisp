@@ -2,6 +2,10 @@
 (in-suite arc-compat)
 
 
+;;;                           Predicates
+;;;============================================================================
+
+
 (def x>y (x y)
   (etypecase x
     (cl:number (cl:> x y))
@@ -293,14 +297,6 @@
   (== NIL (empty (list 1 2 3)))
   (== NIL (empty "123"))
   (== NIL (empty (let tab (make-hash-table) (setf (gethash 1 tab) 1) tab))) )
-
-
-(def even (obj)
-  (cl:evenp obj))
-
-
-(def odd (obj)
-  (cl:oddp obj))
 
 
 ;;; eof

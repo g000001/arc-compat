@@ -1,6 +1,9 @@
 (in-package :arc-compat.internal)
 (in-suite arc-compat)
 
+;;;                       String operations
+;;;============================================================================
+
 
 (def newstring (length (o char #\Nul))
   "Creates a string of the given length."
@@ -196,8 +199,10 @@
           (w/bars (pr "a") 42 (pr "b") (pr "c") nil))
         "a - b - c")))
 
+
+;;;                      strings.arc library
+;;;============================================================================
+
+
+
 ;;; eof
-
-
-
-

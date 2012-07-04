@@ -4,10 +4,10 @@
   (:nicknames #:arc)
   (:import-from :it :it :self)
   (:import-from :cl
-   :expt :truncate :quote :min :eval :some
+   :expt :truncate :quote :eval :some
    :cddr :sqrt :warn :push :abs :mod
    :pop :atom :list :sleep :round :car :or
-   :nil :* :subseq :cons :subst :catch :max :/ 
+   :nil :* :subseq :cons :subst :catch :/ 
    :assoc :complement :time :write
    :apply :caar :cdr :- :load :close :t
    :cadr)
@@ -47,7 +47,8 @@
    :split :splitn :sqrt :sread :sref :ssexpand :ssyntax :stderr :stdin :stdout
    :string :subseq :subst :summing :swap :sym :system :t :t! :table :tablist :td
    :temload :temloadall :templatize :temread :testify :thread :time :time10
-   :to-nearest :tokens :tostring :trav :tree-subst :trim :trues :truncate :tuples
+   :to-nearest :tokens :tostring :trav :tree-subst :trim :trues :trunc
+   :truncate :tuples
    :type :uniq :unless :until :upcase :urldecode :vals :w/appendfile :w/infile
    :union
    :w/instring :w/outfile :w/outstring :w/stdin :w/stdout :w/table :w/uniq :warn
