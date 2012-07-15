@@ -21,10 +21,18 @@
 (defmacro if (&rest args)
   (cond ((null args) ''nil)
         ((null (cdr args)) (car args))
+        (T `(cl:if ,(car args)
+                   ,(cadr args)
+                   (if ,@(cddr args))))))
+
+
+(defmacro aif (&rest args)
+  (cond ((null args) ''nil)
+        ((null (cdr args)) (car args))
         (T `(cl:let ((it ,(car args)))
               (cl:if (not (null it))
                      ,(cadr args)
-                     (if ,@(cddr args)))))))
+                     (aif ,@(cddr args)))))))
 
 
 ;(defmacro +INTERNAL-DEPARAM (param &body body)
