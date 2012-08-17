@@ -20,12 +20,28 @@
     (cl:character (cl:char< x y))))
 
 
+(define-compiler-macro x<y (&whole form x y)
+  (cond ((some #'numberp (cdr form))
+         `(cl:< ,x ,y))
+        ((some #'characterp (cdr form))
+         `(cl:char< ,x ,y))
+        ((some #'stringp (cdr form))
+         `(cl:string< ,x ,y))
+        (T form)))
+
+
 (def < args
   "Less than comparison. Applies to numbers, strings, symbols, or chars. 
   If multiple arguments are given, the sequence must be monotonically increasing."
-  (case (len args)
-    0 (cl:error "invalid number of arguments: ~S" 'args)
-    (cl:every #'x<y args (cdr args))))
+  (cl:every #'x<y args (cdr args)))
+
+
+(define-compiler-macro < (&whole form &rest args)
+  (destructuring-bind (x y &rest rest)
+                      args
+    (if (null rest)
+        `(x<y ,x ,y)
+        form)))
 
 
 (tst <
@@ -46,9 +62,7 @@
 (def > args
   "Greater than comparison. Applies to numbers, strings, symbols, or chars. 
   If multiple arguments are given, the sequence must be monotonically decreasing."
-  (case (len args)
-    0 (cl:error "invalid number of arguments: ~S" 'args)
-    (cl:every #'x>y args (cdr args))))
+  (cl:every #'x>y args (cdr args)))
 
 
 (tst >
@@ -205,18 +219,6 @@
       (list NIL NIL T NIL T NIL)))
 
 
-(def atend (i s)
-  "Tests if index i is at the end or beyond in sequence or string s."
-  (> i (- (len s) 2)))
-
-
-(tst atend 
-  (== (atend 10 "foo")
-      T )
-  (== (atend 1 "foo")
-      NIL ))
-
-
 (defun testify (x)
   "Creates a predicate from test. If test is a function, it is used
   as the predicate. Otherwise, a function is created to test
@@ -284,9 +286,21 @@
       t))
 
 
+(def atend (i s)
+  "Tests if index i is at the end or beyond in sequence or string s."
+  (> i (- (len s) 2)))
+
+
+(tst atend 
+  (== (atend 10 "foo")
+      T )
+  (== (atend 1 "foo")
+      NIL ))
+
+
 (def empty (seq)
   "Tests if seq is empty. Works on lists, strings, and tables."
-  (or (no seq)
+  (or (not seq)
       (and (no (acons seq)) (is (len seq) 0))))
 
 

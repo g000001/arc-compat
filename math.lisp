@@ -103,11 +103,7 @@
   (ref (sort #'> ns) (trunc (/ (len ns) 2))))
 
 
-(tst median
-  (== (median (list 1 5 3 2 4))
-      3 )
-  (== (median (list "dog" "cat" "bird"))
-      "cat" ))
+;;; tst :: median -> test-after
 
 
 (def avg (ns) 
@@ -137,6 +133,14 @@
         (each elt (cdr seq)
           (if (funcall f elt wins) (= wins elt)))
         wins)))
+
+
+(tst best
+  (== (best #'> '(3 1 4 5 9 6))
+      9))
+
+
+
 
 
 (def max args 

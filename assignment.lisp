@@ -3,10 +3,12 @@
 ;  [code] [Foundation] [Destructive] set symbol expr
 (defmacro set (&rest args)
   "set is used to set a variable to an expression."
-  `(cl:setq ,@args))
+  `(cl:setf ,@args))
 
 ;>(set x 10)
 ;10
+
+(defalias = set)
 
 ;[code] [Foundation] [Destructive] scar list expr
 
@@ -44,7 +46,7 @@ least one."
 
 ;[code] [Macro] [Destructive] = [place expr] ... [place]
 (defalias = cl:setf
-  "Sets each place to the associated expression. If the last place
+  "Sets each place to the associated expression.  If the last place
 has no associated expression, it is set to nil.")
 
 ;>(= x 1)
@@ -52,6 +54,9 @@ has no associated expression, it is set to nil.")
 
 ;>(= x 2 y 4)
 ;4
+
+;;(w/table t1 (= (t1 "a") 42) (write-table t1))
+
 
 ;[code] [Macro] [Destructive] wipe [place ...]
 ;

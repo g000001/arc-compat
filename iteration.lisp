@@ -291,3 +291,18 @@ A list of the expr values is returned."
 ;key2 val2
 ;
 ;#hash((key2 . val2) (key1 . val1)))
+
+(mac accum (accfn . body)
+  "Executes body. Inside body, each time accfn is called, its argument is pushed
+  on a list that becomes the return value. Note that the list is in reverse order."
+  (w/uniq gacc
+    `(withs (,gacc nil)
+       (flet ((,accfn (_)
+                (push _ ,gacc)))
+         ,@body
+         (rev ,gacc)))))
+
+
+(tst accum
+  (== (accum accfn (each x '(1 2 3) (accfn (* x 10))))
+      '(10 20 30)))

@@ -96,6 +96,12 @@
     (cl:sequence (elt seq index))))
 
 
+(defun (setf ref) (val seq index)
+  (etypecase seq
+    (cl:hash-table (setf (gethash index seq) val))
+    (cl:sequence (setf (elt seq index) val))))
+
+
 (defmacro w/obcall ((&rest seqs) &body body)
   `(flet (,@(mapcar (lambda (s)
                       `(,s (idx)

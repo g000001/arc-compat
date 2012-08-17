@@ -25,6 +25,9 @@
                    ,(cadr args)
                    (if ,@(cddr args))))))
 
+(defmacro when (pred &body body)
+  `(if ,pred (cl:progn ,@body)))
+
 
 (defmacro aif (&rest args)
   (cond ((null args) ''nil)
@@ -169,6 +172,22 @@
 
 
 (defun sym (x) (coerce x 'sym))
+
+
+(defun len (seq)
+  "Computes the length of seq."
+  (etypecase seq
+    (cl:sequence (cl:length seq))
+    (table (cl:hash-table-count seq))))
+
+
+(tst len
+  (== (len "abc")
+      3)
+  (== (len '(1 2 3))
+      3)
+  (== (len (obj a 1 b 2))
+      2))
 
 
 ;;; eof

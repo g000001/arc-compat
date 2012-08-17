@@ -56,6 +56,11 @@
    :write-spaced :write-table :writeb :writec :writefile1 :zap :* :+ :++ :- :--
    :/ :< :<= := :> :>=))
 
+(defpackage :arc-user
+  (:use :arc)
+  (:import-from :cl :in-package))
+
+
 (defpackage :arc-compat.internal
   (:use :cl :arc)
   (:shadowing-import-from :arc

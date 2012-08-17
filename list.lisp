@@ -450,6 +450,7 @@
 (def merge (less? x y)
   "Merges two sorted lists into a sorted list. The original lists must be ordered 
   according to the predicate function compare."
+  (cl:declare (cl:optimize (cl:debug 1) (cl:space 3)))
   (if (no x) y
       (no y) x
       (let lup nil
@@ -677,27 +678,6 @@
       "abnn")
   (== (union (fn (a b) (is (mod a 10) (mod b 10))) '(1 2 3) '(13 24 35))
       '(1 2 3 24 35)))
-
-
-(def len (seq)
-  "Computes the length of seq."
-  (etypecase seq
-    (cl:sequence (cl:length seq))
-    (table (let cnt 0
-             (maphash (lambda (k v) 
-                        (declare (ignore k v))
-                        (++ cnt) )
-                      seq )
-             cnt ))))
-
-
-(tst len
-  (== (len "abc")
-      3)
-  (== (len '(1 2 3))
-      3)
-  (== (len (obj a 1 b 2))
-      2))
 
 
 (def len< (x n)
@@ -966,22 +946,6 @@
       6)
   (== (funcall (only #'+))
       nil))
-
-
-(mac accum (accfn . body)
-  "Executes body. Inside body, each time accfn is called, its argument is pushed
-  on a list that becomes the return value. Note that the list is in reverse order."
-  (w/uniq gacc
-    `(withs (,gacc nil)
-       (flet ((,accfn (_)
-                (push _ ,gacc)))
-         ,@body
-         (rev ,gacc)))))
-
-
-(tst accum
-  (== (accum accfn (each x '(1 2 3) (accfn (* x 10))))
-      '(10 20 30)))
 
 
 (mac summing (sumfn . body)

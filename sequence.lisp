@@ -14,8 +14,8 @@
          `(cl:+ ,x ,y))
         ((or (stringp x) (stringp y))
          `(cl:concatenate 'cl:string ,x ,y))
-        ((or (typep x '(cons (eql the) (cons (cl:member cl:number cl:fixnum))))
-             (typep y '(cons (eql the) (cons (cl:member cl:number cl:fixnum)))))
+        ((or (typep x '(cons (eql cl:the) (cons (cl:member cl:number cl:fixnum))))
+             (typep y '(cons (eql cl:the) (cons (cl:member cl:number cl:fixnum)))))
          `(cl:+ ,x ,y))
         (T form)))
 
