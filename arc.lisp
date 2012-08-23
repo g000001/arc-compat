@@ -40,15 +40,12 @@
                  `(do (sref sig ',parms ',name)
                       (safeset ,name (fn ,parms ,@body))))))|#
 
-(def caar (xs) (car (car xs)))
-(def cadr (xs) (car (cdr xs)))
-(def cddr (xs) (cdr (cdr xs)))
 
 (def no (x) (is x nil))
 
 (def acons (x) (is (type x) 'cons))
 
-(def atom (x) (no (acons x)))
+;(def atom (x) (no (acons x)))
 
 ; Can return to this def once Rtm gets ac to make all rest args
 ; nil-terminated lists.

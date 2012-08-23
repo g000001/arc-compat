@@ -25,10 +25,10 @@
 
 
 (define-compiler-macro + (&whole form &rest args)
-  (if (cl:= 2 (length args))
-      (destructuring-bind (x y) args
-        `(x+y ,x ,y))
-      form ))
+  (cl:if (cl:= 2 (length args))
+         (destructuring-bind (x y) args
+           `(x+y ,x ,y))
+         form ))
 
 
 ;;; eof

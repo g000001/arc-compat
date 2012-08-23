@@ -20,7 +20,7 @@
 false. It returns t if all arguments are false, and nil if any
 arguments are true. It performs 'short-circuit' evaluation, and
 doesn't evaluate arguments that follow a true one."
-  `(no (or ,@args)))
+  `(no (cl:or ,@args)))
 
 ;>(nor nil nil)
 ;t

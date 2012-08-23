@@ -202,7 +202,7 @@ A list of the expr values is returned."
 ;[code] [Macro] each var expr [body ...]
 ;Executes body, with var taking on each value from expr, which can be a list, string, or table. For a table, var takes on the values, not the keys.
 
-(mac each (var expr . body)
+(mac each (var expr &body body)
   (w/uniq (gseq g)
     `(let ,gseq ,expr
        (if (alist ,gseq)

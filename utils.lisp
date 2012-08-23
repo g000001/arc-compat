@@ -5,9 +5,9 @@
   `(progn
      (setf (documentation ',alias 'function)
 	   ,doc-string)
-     (if (macro-function ',orig)
-	 (setf (macro-function ',alias) (macro-function ',orig))
-	 (setf (symbol-function ',alias) (symbol-function ',orig)))))
+     (cl:if (macro-function ',orig)
+            (setf (macro-function ',alias) (macro-function ',orig))
+            (setf (symbol-function ',alias) (symbol-function ',orig)))))
 
 
 #|(defmacro def (name args &body body)
@@ -62,20 +62,28 @@
     (cl:symbol `(cl:&rest ,list)) ))
 
 
+(defun reduce-&optional (args)
+  (cl:let ((count (cl:count 'cl:&optional args)))
+    (cl:if (cl:>= 1 count)
+           args
+           (cl:remove 'cl:&optional args :from-end T :count (1- count)))))
+
+
 (defun arc-ll-to-cl-ll (list)
-  (mapcan (lambda (x)
-            (cl:if (cl:and (consp x)
-                           (eq 'o (car x)) )
-                (list 'cl:&optional (cdr x))
-                (list x) ))
-          (to-proper-lambda-list list) ))
+  (reduce-&optional 
+   (mapcan (lambda (x)
+             (cl:if (cl:and (consp x)
+                            (eq 'o (car x)) )
+                    (cl:list 'cl:&optional (cdr x))
+                    (cl:list x) ))
+           (to-proper-lambda-list list) )))
 
 
 (defun +INTERNAL-FLATTEN (lis)
-  (cond ((atom lis) lis)
-        ((listp (car lis))
+  (cond ((cl:atom lis) lis)
+        ((cl:listp (car lis))
          (append (+INTERNAL-FLATTEN (car lis)) (+INTERNAL-FLATTEN (cdr lis))))
-        (t (append (list (car lis)) (+INTERNAL-FLATTEN (cdr lis))))))
+        (t (append (cl:list (car lis)) (+INTERNAL-FLATTEN (cdr lis))))))
 
 
 ;;; fiveam
@@ -110,4 +118,8 @@
      ,@body))
 
 
+(defun caar (xs) (car (car xs)))
+(defun cadr (xs) (car (cdr xs)))
+(defun cddr (xs) (cdr (cdr xs)))
+(defun list (&rest args) (cl:copy-list args))
 

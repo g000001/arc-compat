@@ -4,9 +4,9 @@
 
 (defmacro mac (name args &body body)
   "Creates a macro."
-  `(defmacro ,name ,(if (listp args)
-                        (arc-ll-to-cl-ll args)
-                        `(&rest ,args))
+  `(defmacro ,name ,(cl:if (listp args)
+                           (arc-ll-to-cl-ll args)
+                           `(&rest ,args))
      #|(arnesi:with-lisp1 ,@body)|#
      ,@body))
 
@@ -45,9 +45,9 @@
 
 (defmacro FN (args &body body)
   (cl:let ((g (gensym))
-           (args (if (consp args)
-                     args
-                     `(&rest ,args))))
+           (args (cl:if (consp args)
+                        args
+                        `(&rest ,args))))
     `(LAMBDA (&rest ,g)
        (DESTRUCTURING-BIND ,args ,g
          (DECLARE (IGNORABLE ,@(remove-if (lambda (x)
@@ -144,9 +144,9 @@
     `(cl:lambda (&rest ,g)
        ,(funcall
          (labels ((self (fs)
-                    (if (cdr fs)
-                        (list 'cl:funcall (car fs) (self (cdr fs)))
-                        `(apply ,(if (car fs) (car fs) 'idfn) ,g))))
+                    (cl:if (cdr fs)
+                           (list 'cl:funcall (car fs) (self (cdr fs)))
+                           `(apply ,(if (car fs) (car fs) 'idfn) ,g))))
            #'self)
          args))))
 
