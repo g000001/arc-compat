@@ -9,14 +9,14 @@
 (def x>y (x y)
   (etypecase x
     (cl:number (cl:> x y))
-    ((or cl:string cl:symbol) (cl:string> x y))
+    ((cl:or cl:string cl:symbol) (cl:string> x y))
     (cl:character (cl:char> x y))))
 
 
 (def x<y (x y)
   (etypecase x
     (cl:number (cl:< x y))
-    ((or cl:string cl:symbol) (cl:string< x y))
+    ((cl:or cl:string cl:symbol) (cl:string< x y))
     (cl:character (cl:char< x y))))
 
 
