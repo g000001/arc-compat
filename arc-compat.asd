@@ -8,7 +8,7 @@
   :author "CHIBA Masaomi <chiba.masaomi@gmail.com>"
   :maintainer "CHIBA Masaomi <chiba.masaomi@gmail.com>"
   :version "0.0.4"
-  :depends-on (:fiveam)
+  :depends-on (:fiveam :named-readtables)
   :serial T
   :components ((:file "package")
 	       (:file "utils")
@@ -31,6 +31,9 @@
                (:file "list")
                ;; 
                (:file "test-after")
+               ;; readtable
+               (:file "readtable")
+               (:file "readtable-setup")
 	       ))
 
 
