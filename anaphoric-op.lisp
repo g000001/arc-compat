@@ -86,7 +86,7 @@ created without assigning it a name."
 
 
 ;[code] [Macro] aand [arg ...]
-(defmacro and (&rest args)
+(defmacro aand (&rest args)
   "Anaphoric and. Returns the last argument if all arguments are
 true, otherwise returns nil. Inside each argument the anaphoric
 variable it refers to the value of the previous argument. Like

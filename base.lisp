@@ -25,6 +25,16 @@
                    ,(cadr args)
                    (if ,@(cddr args))))))
 
+
+(defalias or cl:or)
+
+(defalias and cl:and)
+
+(defalias atom cl:atom)
+
+(defalias complement cl:complement)
+
+
 (defmacro when (pred &body body)
   `(if ,pred (cl:progn ,@body)))
 
