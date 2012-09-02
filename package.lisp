@@ -11,6 +11,7 @@
    :time :write
    :apply :cdr :- :load :close :t)
   (:export
+   :=*
    :assert
    :aand :abs :accum :acons :adjoin :afn :after :aif :alist :all :alphadig :alref
    :and :andf :annotate :apply :assoc :atend :atlet :atom :atomic :atomic-invoke

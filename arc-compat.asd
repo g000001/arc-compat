@@ -34,6 +34,7 @@
                ;; readtable
                (:file "readtable")
                (:file "readtable-setup")
+               (:file "ext")
 	       ))
 
 
