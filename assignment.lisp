@@ -1,4 +1,5 @@
 (in-package :arc-compat.internal)
+(in-readtable :common-lisp)
 
 ;  [code] [Foundation] [Destructive] set symbol expr
 (defmacro set (&rest args)

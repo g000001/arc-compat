@@ -1,4 +1,5 @@
 (in-package :arc-compat.internal)
+(in-readtable :common-lisp)
 
 ;;; Variables
 

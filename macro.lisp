@@ -1,4 +1,5 @@
 (in-package :arc-compat.internal)
+(in-readtable :common-lisp)
 
 ;; '(w/uniq)
 ;; Copyright 1995 by Paul Graham.
@@ -39,3 +40,8 @@ names can either be a single symbol or a list of symbols."
 ;[code] [Foundation] quote arg
 ;The single quote ' is shorthand for quote, e.g. 'x is the same as (quote x)
 ;<- cl
+
+(defmacro in (x &rest choices)
+  (cl:let ((g (gensym)))
+    `(cl:let ((,g ,x))
+       (cl:or ,@(cl:mapcar (fn (c) `(is ,g ,c)) choices)))))

@@ -1,4 +1,6 @@
 (in-package :arc-compat.internal)
+(in-readtable :common-lisp)
+
 
 ;;; '(w/uniq)
 ;;; Copyright 1995 by Paul Graham.

@@ -11,7 +11,7 @@
    :time :write
    :apply :cdr :- :load :close :t)
   (:export
-   :=*
+   :=* :*let
    :assert
    :aand :abs :accum :acons :adjoin :afn :after :aif :alist :all :alphadig :alref
    :and :andf :annotate :apply :assoc :atend :atlet :atom :atomic :atomic-invoke
@@ -64,7 +64,7 @@
 
 
 (defpackage :arc-compat.internal
-  (:use :cl :arc)
+  (:use :cl :arc :named-readtables)
   (:shadowing-import-from :arc
    :cddr :subst :count :mismatch :assert :- :number :sort :atom :set :complement
    :or :rem :nil :do :cadr :truncate :cons :case :when :last :subseq :sqrt :if

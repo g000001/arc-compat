@@ -1,4 +1,5 @@
 (in-package :arc-compat.internal)
+(in-readtable :common-lisp)
 
 
 (defmacro defalias (alias orig &optional doc-string)
