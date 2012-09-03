@@ -5,8 +5,9 @@
   (:merge :standard)
   (:macro-char #\[ (lambda (srm char)
                      (cl:declare (cl:ignore char))
-                     `(lambda (arc::_)
-                        ,(sb-impl::read-delimited-list #\] srm T))))
+                     (let ((*readtable* (copy-readtable nil)))
+                       `(lambda (arc::_)
+                          ,(sb-impl::read-delimited-list #\] srm T)))))
   (:syntax-from :standard #\) #\])
   #|(:dispatch-macro-char #\# #\"
                         (lambda (srm char arg)
@@ -162,6 +163,7 @@
 
 
 (let ((r (copy-readtable nil)))
+  (cl:set-syntax-from-char #\] #\) r)
   (defun arc-compat.internal::read-symbol (stream)
     (let* ((*readtable* r)
            (obj (read-preserving-whitespace stream)) )
