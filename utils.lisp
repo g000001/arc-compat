@@ -80,11 +80,15 @@
            (to-proper-lambda-list list) )))
 
 
-(defun +INTERNAL-FLATTEN (lis)
-  (cond ((cl:atom lis) lis)
-        ((cl:listp (car lis))
-         (append (+INTERNAL-FLATTEN (car lis)) (+INTERNAL-FLATTEN (cdr lis))))
-        (t (append (cl:list (car lis)) (+INTERNAL-FLATTEN (cdr lis))))))
+(defun  +internal-flatten (tree)
+  (cond ((atom tree) tree)
+        ((not (listp (cdr tree)))
+         (+internal-flatten (list (car tree) (cdr tree))))
+        ((listp (car tree))
+         (append (+internal-flatten (car tree))
+                 (+internal-flatten (cdr tree))))
+        (T (cons (car tree)
+                  (+internal-flatten (cdr tree))))))
 
 
 ;;; fiveam
