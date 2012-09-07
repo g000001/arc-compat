@@ -29,9 +29,12 @@
 
 (defalias or cl:or)
 
+
 (defalias and cl:and)
 
+
 (defalias atom cl:atom)
+
 
 (defalias complement cl:complement)
 

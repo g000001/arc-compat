@@ -9,6 +9,19 @@
                        `(lambda (arc::_)
                           ,(sb-impl::read-delimited-list #\] srm T)))))
   (:syntax-from :standard #\) #\])
+  (:dispatch-macro-char 
+   #\# #\!
+   (lambda (srm char arg)
+     (declare (cl:ignore char arg))
+     (ecase (cl:read-char srm t nil t)
+       ((#\C #\c) 
+        (let ((*readtable*
+               (named-readtables:find-readtable :standard)))
+          (read srm t nil t)))
+       ((#\A #\a) 
+        (let ((*readtable* 
+               (named-readtables:find-readtable :arc)))
+          (read srm t nil t))))))
   #|(:dispatch-macro-char #\# #\"
                         (lambda (srm char arg)
                           (declare (cl:ignore char arg))

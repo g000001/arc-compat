@@ -81,14 +81,14 @@
 
 
 (defun  +internal-flatten (tree)
-  (cond ((atom tree) tree)
-        ((not (listp (cdr tree)))
+  (cond ((cl:atom tree) tree)
+        ((not (cl:listp (cdr tree)))
          (+internal-flatten (list (car tree) (cdr tree))))
-        ((listp (car tree))
-         (append (+internal-flatten (car tree))
+        ((cl:listp (car tree))
+         (cl:append (+internal-flatten (car tree))
                  (+internal-flatten (cdr tree))))
-        (T (cons (car tree)
-                  (+internal-flatten (cdr tree))))))
+        (T (cl:cons (car tree)
+                    (+internal-flatten (cdr tree))))))
 
 
 ;;; fiveam
