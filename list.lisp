@@ -832,7 +832,8 @@
     (let f (testify test)
       (if (alist seq)
           (reclist   (fn (_) (if (funcall (compose f #'car) _) (car _))) seq)
-          (recstring (fn (_) (if (funcall (compose f #'seq) _) (seq _))) seq)))))
+          (recstring (fn (_) (if (funcall (compose f (fn (x) (ref seq x))) _)
+                                 (seq _))) seq)))))
 
 
 (tst find

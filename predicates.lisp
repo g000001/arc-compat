@@ -10,14 +10,14 @@
 (def x>y (x y)
   (etypecase x
     (cl:number (cl:> x y))
-    ((cl:or cl:string cl:symbol) (cl:string> x y))
+    ((cl:or cl:string cl:symbol) (and (cl:string> x y) t))
     (cl:character (cl:char> x y))))
 
 
 (def x<y (x y)
   (etypecase x
     (cl:number (cl:< x y))
-    ((cl:or cl:string cl:symbol) (cl:string< x y))
+    ((cl:or cl:string cl:symbol) (and (cl:string< x y) t))
     (cl:character (cl:char< x y))))
 
 
@@ -27,7 +27,7 @@
         ((some #'characterp (cdr form))
          `(cl:char< ,x ,y))
         ((some #'stringp (cdr form))
-         `(cl:string< ,x ,y))
+         `(and (cl:string< ,x ,y) t))
         (T form)))
 
 
