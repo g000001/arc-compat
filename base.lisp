@@ -80,6 +80,12 @@
      ,@body))
 
 
+(defmacro leto (var val &body body)
+  `(cl:let ((,var ,val))
+     (w/obcall (,var)
+       ,@body)))
+
+
 (defmacro with (binds &body body)
   "Creates a new variable binding and executes the body. The values
   are computed before any of the assignments are done (like
@@ -94,6 +100,17 @@
                          ,@body))))
 
 
+(defmacro witho (binds &body body)
+  (cl:loop :for x :on binds :by #'cddr
+           :collect (first x) :into vars
+           :collect (second x) :into vals
+           :finally (return
+                      `(DESTRUCTURING-BIND ,vars (list ,@vals)
+                         (DECLARE (IGNORABLE ,@(+internal-flatten vars)))
+                         (w/obcall (,vars)
+                           ,@body)))))
+
+
 (defmacro withs (binds &body body)
   "Creates a new variable binding and executes the body. The values
   are computed sequentially (like Scheme's let*, rather than
@@ -105,6 +122,17 @@
                binds
                :initial-value `(progn ,@body)
                :from-end 'T)))
+
+
+(defmacro withos (binds &body body)
+  (cl:let ((binds (cl:loop :for vv :on binds :by #'cddr
+                     :collect `(,(car vv) ,(cadr vv)))))
+          (cl:reduce (lambda (vv res) `(arc::let ,@vv ,res))
+                     binds
+                     :initial-value `(w/obcall (,@(mapcar #'car binds))
+                                       ,@body)
+                     :from-end 'T)))
+
 
 ;>(withs (a 1 b (+ a 1)) (+ a b))
 ;3

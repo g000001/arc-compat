@@ -116,12 +116,12 @@
 
 
 (defmacro w/obcall ((&rest seqs) &body body)
-  `(flet (,@(mapcar (lambda (s)
-                      `(,s (idx)
-                         (ref ,s idx)))
-              seqs))
-     ,@body))
-
+  (w/uniq idx
+    `(macrolet (,@(mapcar (lambda (s)
+                            `(,s (,idx)
+                                 `(ref ,',s ,,idx)))
+                    seqs))
+       ,@body)))
 
 (defun caar (xs) (car (car xs)))
 (defun cadr (xs) (car (cdr xs)))
