@@ -5,9 +5,8 @@
   (:merge :standard)
   (:macro-char #\[ (lambda (srm char)
                      (cl:declare (cl:ignore char))
-                     (let ((*readtable* (copy-readtable nil)))
-                       `(lambda (arc::_)
-                          ,(sb-impl::read-delimited-list #\] srm T)))))
+                     `(lambda (arc::_)
+                        ,(sb-impl::read-delimited-list #\] srm T))))
   (:syntax-from :standard #\) #\])
   (:dispatch-macro-char 
    #\# #\!
