@@ -157,7 +157,8 @@ A list of the expr values is returned."
 (mac repeat (n &body body)
   (w/uniq (var =>)
     `(prog ((,var ,n))
-       ,=> (when (>= 0 ,var) (return))
+           (cl:declare (cl:fixnum ,var))
+       ,=> (when (cl:>= 0 ,var) (return))
            ,@body
 	   (setq ,var (cl:1- ,var))
 	   (go ,=>))))
