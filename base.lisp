@@ -182,8 +182,9 @@
 
 
 (defmacro compose (&rest args)
-  (let g (uniq)
+  (let g (uniq "compose-arg-")
     `(cl:lambda (&rest ,g)
+       (cl:declare (cl:dynamic-extent ,g))
        ,(funcall
          (labels ((self (fs)
                     (cl:if (cdr fs)
