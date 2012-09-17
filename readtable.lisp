@@ -175,16 +175,23 @@
    sym))
 
 
-(let ((r (copy-readtable nil)))
+(let ((R (copy-readtable nil)))
+  (cl:set-macro-character #\[ 
+                          (lambda (SRM CHAR)
+                            (cl:declare (cl:ignore CHAR))
+                            `(lambda (arc::_)
+                               ,(cl:read-delimited-list #\] SRM t) ))
+                          nil
+                          R )
   (cl:set-syntax-from-char #\] #\) r)
-  (defun arc-compat.internal::read-symbol (stream)
-    (let* ((*readtable* r)
-           (obj (read-preserving-whitespace stream)) )
-      (typecase obj
-        (symbol (if (arc-compat.internal::ssyntax? obj)
-                    (arc-compat.internal::expand-ssyntax obj)
-                    obj))
-        (otherwise obj) ))))
+  (defun arc-compat.internal::Read-symbol (STREAM)
+    (let* ((*readtable* R)
+           (OBJ (read-preserving-whitespace STREAM)) )
+      (typecase OBJ
+        (symbol (if (arc-compat.internal::Ssyntax? OBJ)
+                    (arc-compat.internal::Expand-ssyntax OBJ)
+                    OBJ ))
+        (otherwise OBJ) ))))
 
 
 (defun arc-compat.internal::compose-reader-macro-reader (stream char)
