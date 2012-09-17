@@ -14,6 +14,7 @@
    ;; ext
    :=* :*let :w/obcall :ref :leto :witho :withos
    ;; 
+   :_
    :assert
    :aand :abs :accum :acons :adjoin :afn :after :aif :alist :all :alphadig :alref
    :and :andf :annotate :apply :assoc :atend :atlet :atom :atomic :atomic-invoke
