@@ -75,9 +75,16 @@
   scope of the body. Outside the let statement, any existing value
   of var is unaffected. Let is like with but with a single variable
   binding."
-  `(DESTRUCTURING-BIND (,var) (list ,val)
-     (DECLARE (IGNORABLE ,@(+internal-flatten `(,var))))
-     ,@body))
+  (if (consp var)
+      (cl:let ((tem (gensym "let-")))
+        `((CL:LAMBDA (&REST ,tem)
+            (DECLARE (DYNAMIC-EXTENT ,tem))
+            (DESTRUCTURING-BIND (,var) ,tem
+              (DECLARE (IGNORABLE ,@(+internal-flatten `(,var))))
+              ,@body ))
+          ,val))
+      `(CL:LET ((,var ,val)) 
+         ,@body)))
 
 
 (defmacro leto (var val &body body)
