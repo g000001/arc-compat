@@ -5,10 +5,6 @@ Licence: Perl Foundations's Artistic License 2.0.
 Example:
 
 (in-package :arc-user)
-(in-readtable :arc)
-
-
-(in-package :arc-user)
 (named-readtables:in-readtable :arc)
 
 
