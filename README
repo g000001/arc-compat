@@ -1,4 +1,20 @@
--*- mode: text; coding: utf-8 -*-
+* arc-compat
 
-Arcの関数/マクロをCLで真似た糞コード集です。
+Licence: Perl Foundations's Artistic License 2.0.
 
+Example:
+
+(in-package :arc-user)
+(in-readtable :arc)
+
+
+(in-package :arc-user)
+(named-readtables:in-readtable :arc)
+
+
+(map [car cdr._] '((1 2) (1 2) (1 2) (1 2) (1 2)))
+;=>  (2 2 2 2 2)
+
+
+(map car∘cdr '((1 2) (1 2) (1 2) (1 2) (1 2)))
+;=>  (2 2 2 2 2)
