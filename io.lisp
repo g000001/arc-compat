@@ -2,6 +2,11 @@
 (in-readtable :common-lisp)
 (in-suite arc-compat)
 
+;;; This software is copyright (c) Paul Graham and Robert Morris.  Permission
+;;; to use it is granted under the Perl Foundations's Artistic License 2.0.
+;;; 
+;;; Ported to Common Lisp by CHIBA Masaomi.
+
 
 (defalias disp cl:princ)
 (defalias writec cl:write-char)

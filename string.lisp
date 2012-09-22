@@ -4,6 +4,10 @@
 
 ;;;                       String operations
 ;;;============================================================================
+;;; This software is copyright (c) Paul Graham and Robert Morris.  Permission
+;;; to use it is granted under the Perl Foundations's Artistic License 2.0.
+;;; 
+;;; Ported to Common Lisp by CHIBA Masaomi.
 
 
 (def newstring (length (o char #\Nul))

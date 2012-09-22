@@ -9,6 +9,11 @@
 ;;; number of operations on lists and sequences. Some operations apply only to
 ;;; lists, while others apply to strings and tables.
 
+;;; This software is copyright (c) Paul Graham and Robert Morris.  Permission
+;;; to use it is granted under the Perl Foundations's Artistic License 2.0.
+;;; 
+;;; Ported to Common Lisp by CHIBA Masaomi.
+
 
 ;; car list
 ;; cdr list
