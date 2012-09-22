@@ -18,6 +18,7 @@
      (arnesi:with-lisp1
        ,@body)))|#
 
+
 (deftype fn () 'cl:function)
 (deftype sym () 'cl:symbol)
 (deftype char () 'cl:character)
@@ -38,7 +39,7 @@
         ((cl:symbolp x)        'sym)
         ((cl:functionp x)     'fn)
         ((cl:characterp x)          'char)
-        ((cl:stringp x)        'string)
+        ((cl:stringp x)        'arc:string)
         ((cl:integerp x)       'int)
         ((cl:numberp x)        'num)     ; unsure about this
         ((cl:hash-table-p x)    'table)
@@ -116,7 +117,7 @@
 
 
 (defmacro w/obcall ((&rest seqs) &body body)
-  (w/uniq idx
+  (cl:let ((idx (gensym)))
     `(macrolet (,@(mapcar (lambda (s)
                             `(,s (,idx)
                                  `(ref ,',s ,,idx)))

@@ -125,7 +125,20 @@ assigning place1 to the last place.")
 ;[code] [Macro] [Destructive] zap op place [args ...]
 "Gets the value at the place, evaluates (op value args...), and stores the result in the place."
 (mac zap (op place &rest args)
-  `(setf ,place (apply ,op ,place ',args)))
+  `(setf ,place (apply ,op ,place (list ,@args))))
+
+#|(mac zap (op place . args)
+  (with (gop    (uniq)
+         gargs  (map (fn (_) (declare (ignore _)) (uniq)) args)
+         mix    (afn seqs 
+                  (if (some no seqs)
+                      nil
+                      (+ (map car seqs)
+                         (apply self (map cdr seqs))))))
+    (let (binds val setter) (setforms place)
+      `(atwiths ,(+ binds (list gop op) (mix gargs args))
+         (,setter (,gop ,val ,@gargs))))))|# 
+
 
 ;(let ((x '(0 10 20))) (zap #'* (cadr x) 5 8 9 10) x)
 
