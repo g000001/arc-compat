@@ -108,6 +108,24 @@
        (let ((name (string x)))
          (arc-compat.internal::has-ssyntax-char? name (- (length name) 1)))))
 
+(defun arc-compat.internal::Make-compose-form (ARGS)
+  (do ((ARGS ARGS)
+       (ANS '() ))
+      ((endp ARGS) `(arc::compose ,@(nreverse ANS)))
+    (let ((PKG (elt ARGS 0))
+          (SYM (elt ARGS 1)))
+      (cond ((find-package PKG)
+             (or (find-symbol (string SYM) PKG)
+                 (error "find-symbol ~A ~A => NIL in ~A" 
+                        SYM
+                        PKG
+                        'arc-compat.internal::Make-compose-form))
+             (push `#',(intern (string SYM) PKG)
+                   ANS)
+             (setq ARGS (cddr ARGS)))
+            ('t (push `#',PKG ANS)
+                (pop ARGS))))))
+
 
 (defun arc-compat.internal::expand-compose (sym)
   (let ((elts (mapcar (lambda (tok)
@@ -128,9 +146,11 @@
         (let ((args (gensym)))
           `(lambda (&rest ,args)
              (declare (dynamic-extent ,args))
-             (apply (arc::compose ,@(mapcar (lambda (e) `#',e) 
+             (apply ,(arc-compat.internal::Make-compose-form elts)
+                    ,args)
+             #|(apply (arc::compose ,@(mapcar (lambda (e) `#',e) 
                                             elts))
-                    ,args) )))))
+                    ,args)|# )))))
 
 
 (defun arc-compat.internal::expand-ssyntax (sym)
