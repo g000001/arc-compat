@@ -240,6 +240,14 @@
       2))
 
 
+(defun instring (string)
+  (cl:make-string-input-stream string))
+
+
+(defun outstring ()
+  (cl:make-string-output-stream))
+
+
 ;;; eof
 
 
