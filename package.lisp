@@ -8,7 +8,7 @@
    :expt :truncate :quote :eval :some
    :sqrt :warn :push :abs :mod
    :pop :sleep :round :car
-   :nil :* :subseq :cons :subst :catch :/ 
+   :nil :* :subseq :cons :catch :/ 
    :time :write
    :apply :cdr :- :load :close :t)
   (:export
