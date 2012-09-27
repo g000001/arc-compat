@@ -205,6 +205,25 @@
         "a - b - c")))
 
 
+(def headmatch (pat seq (o start 0))
+  (let p (len pat) 
+    (funcall (afn (i)      
+       (or (is i p) 
+           (and (is (ref pat i) (ref seq (+ i start)))
+                (self (+ i 1)))))
+     0)))
+
+
+(def subst (new old seq)
+  (let boundary (+ (- (len seq) (len old)) 1)
+    (tostring 
+      (forlen i seq
+        (if (and (< i boundary) (headmatch old seq i))
+            (do (++ i (- (len old) 1))
+                (pr new))
+            (pr (ref seq i)))))))
+
+
 ;;;                      strings.arc library
 ;;;============================================================================
 
