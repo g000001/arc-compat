@@ -8,7 +8,7 @@
    :expt :truncate :quote :eval :some
    :sqrt :warn :push :abs :mod
    :pop :sleep :round :car
-   :nil :* :subseq :cons :catch :/ 
+   :nil :* :subseq :cons :/ 
    :time :write
    :apply :cdr :- :load :close :t)
   (:export
@@ -30,6 +30,7 @@
    :enq-limit :ensure-dir :ero :err :errsafe :eval :even :exact
    :expand-metafn-call :expand= :expand=list :expt :file-exists :fill-table :find
    :findsubseq :firstn :firstn-that :flat :fn :for :forlen :fromstring :headmatch
+   :get
    :idfn :if :iflet :in :infile :insert-sorted :inside :insort :insortnew 
    :index :inst
    :instring :intersperse :is :isa :isnt :iso :it :join :jtime :keep :keys
@@ -60,7 +61,9 @@
    :w/instring :w/outfile :w/outstring :w/stdin :w/stdout :w/table :w/uniq :warn
    :when :whenlet :while :whiler :whilet :whitec :with :withs :write
    :write-spaced :write-table :writeb :writec :writefile1 :zap :* :+ :++ :- :--
-   :/ :< :<= := :> :>=))
+   :/ :< :<= := :> :>=
+   :catch :throw
+   ))
 
 (defpackage :arc-user
   (:use :arc)
@@ -72,6 +75,7 @@
   (:shadowing-import-from :arc
    :cddr :subst :count :mismatch :assert :- :number :sort :atom :set :complement
    :or :rem :nil :do :cadr :truncate :cons :case :when :last :subseq :sqrt :if
+   :get :catch :throw
    :find :some :type :write :++ :>= :max :* :push :sleep :> :list :and :let
    :apply :coerce :car :/ :t :merge :catch :mod :quote :acons :< :+ :expt :nthcdr
    :round :assoc :load :unless :min :abs :map := :time :string :caar :cdr :pop

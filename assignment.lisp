@@ -4,7 +4,11 @@
 ;  [code] [Foundation] [Destructive] set symbol expr
 (defmacro set (&rest args)
   "set is used to set a variable to an expression."
-  `(cl:setf ,@args))
+  (cl:let ((args (if (oddp (length args))
+                     (append args (list t))
+                     args)))
+          `(cl:setf ,@args)))
+
 
 ;>(set x 10)
 ;10

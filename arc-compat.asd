@@ -7,7 +7,7 @@
   :description "Arc compatible package for CL"
   :author "CHIBA Masaomi <chiba.masaomi@gmail.com>"
   :maintainer "CHIBA Masaomi <chiba.masaomi@gmail.com>"
-  :version "0.0.4"
+  :version "0.8.71"
   :depends-on (:fiveam :named-readtables #+:it :root.package.it)
   :serial T
   :components ((:file "package")
@@ -35,6 +35,7 @@
                (:file "readtable")
                (:file "readtable-setup")
                (:file "ext")
+               (:file "arc.arc")
 	       ))
 
 
