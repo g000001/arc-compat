@@ -1,5 +1,6 @@
 (in-package :arc-compat.internal)
 (in-readtable :arc)
+(in-suite arc-compat)
 
 ;;;============================================================================
 ;;; This software is copyright (c) Paul Graham and Robert Morris.  Permission
@@ -29,6 +30,10 @@
 ;  (= (cdr (cdr str)) "foo") couldn't work because no way to get str tail
 ;  not sure this is a mistake; strings may be subtly different from 
 ;  lists of chars
+
+
+(defvar ar-the-lock (bt:make-lock "Arc"))
+
 
 ;;;; #||||
 ;;;; 
@@ -316,20 +321,40 @@
 ;;;;   (disp (+ "Warning: " msg ". "))
 ;;;;   (map [do (write _) (disp " ")] args)
 ;;;;   (disp #\newline))
-;;;; 
-;;;; (mac atomic body
-;;;;   `(atomic-invoke (fn () ,@body)))
-;;;; 
-;;;; (mac atlet args
-;;;;   `(atomic (let ,@args)))
-;;;;   
-;;;; (mac atwith args
-;;;;   `(atomic (with ,@args)))
-;;;; 
-;;;; (mac atwiths args
-;;;;   `(atomic (withs ,@args)))
-;;;; 
-;;;; 
+
+
+(defun atomic-invoke (f)
+  (bt:with-recursive-lock-held (ar-the-lock)
+    (funcall f)))
+
+
+(tst atomic-invoke
+  (== (cl:with-output-to-string (out)
+        (cl:let ((ths '() ))
+          (dotimes (i 10)
+            (push (bt:make-thread 
+                   (lambda (&aux (i i)) 
+                     (atomic-invoke (lambda ()
+                                      (sleep (random .2))
+                                      (princ i out) ) )))
+                  ths ))
+          (mapc #'bt:join-thread ths) ) )
+      "0123456789"))
+
+
+(mac atomic body
+  `(atomic-invoke (fn () ,@body)))
+
+(mac atlet args
+  `(atomic (let ,@args)))
+  
+(mac atwith args
+  `(atomic (with ,@args)))
+
+(mac atwiths args
+  `(atomic (withs ,@args)))
+
+
 ;;;; ; setforms returns (vars get set) for a place based on car of an expr
 ;;;; ;  vars is a list of gensyms alternating with expressions whose vals they
 ;;;; ;   should be bound to, suitable for use as first arg to withs
@@ -388,11 +413,15 @@
 ;;;; ; position.  Such bugs will be seen only when the code is executed, when 
 ;;;; ; sref complains it can't set a reference to a function.
 
+(def ssyntax (expr) 
+  (cl:declare (cl:ignore expr))
+  nil)
+
 #|(def setforms (expr0)
   (let expr (macex expr0)
     (if (isa expr 'sym)
          (if (ssyntax expr)
-             (setforms (ssexpand expr))
+             nil;(setforms (ssexpand expr))
              (w/uniq (g h)
                (list (list g expr)
                      g
@@ -404,7 +433,7 @@
          (setforms (list (cadr expr) (cadr (car expr))))
          (let f (setter (car expr))
            (if f
-               (f expr)
+               (funcall f expr)
                ; assumed to be data structure in fn position
                (do (when (caris (car expr) 'fn)
                      (warn "Inverting what looks like a function call"
@@ -412,27 +441,36 @@
                    (w/uniq (g h)
                      (let argsyms (map [uniq] (cdr expr))
                         (list (+ (list g (car expr))
-                                 (mappend list argsyms (cdr expr)))
+                                 (mappend #'list argsyms (cdr expr)))
                               `(,g ,@argsyms)
                               `(fn (,h) (sref ,g ,h ,(car argsyms))))))))))))|#
 
-;;;; (def metafn (x)
-;;;;   (or (ssyntax x)
-;;;;       (and (acons x) (in (car x) 'compose 'complement))))
-;;;; 
-;;;; (def expand-metafn-call (f args)
-;;;;   (if (is (car f) 'compose)
-;;;;        ((afn (fs)
-;;;;           (if (caris (car fs) 'compose)            ; nested compose
-;;;;                (self (join (cdr (car fs)) (cdr fs)))
-;;;;               (cdr fs)
-;;;;                (list (car fs) (self (cdr fs)))
-;;;;               (cons (car fs) args)))
-;;;;         (cdr f))
-;;;;       (is (car f) 'no)
-;;;;        (err "Can't invert " (cons f args))
-;;;;        (cons f args)))
-;;;; 
+#|(defun setforms (expr0) ; => (vars get set)
+  (cl:multiple-value-bind (vars vals store-vars writer-form reader-form)
+                          (cl:get-setf-expansion expr0)
+    (declare (ignore vars vals))
+    (list (+ store-vars (list reader-form))
+          (car store-vars)
+          `(lambda () ,writer-form))))|#
+
+
+(def metafn (x)
+  (or (ssyntax x)
+      (and (acons x) (in (car x) 'compose 'complement))))
+
+(def expand-metafn-call (f args)
+  (if (is (car f) 'compose)
+       (funcall (afn (fs)
+          (if (caris (car fs) 'compose)            ; nested compose
+               (self (join (cdr (car fs)) (cdr fs)))
+              (cdr fs)
+               (list (car fs) (self (cdr fs)))
+              (cons (car fs) args)))
+        (cdr f))
+      (is (car f) 'no)
+       (err "Can't invert " (cons f args))
+       (cons f args)))
+
 ;;;; (def expand= (place val)
 ;;;;   (if (and (isa place 'sym) (~ssyntax place))
 ;;;;       `(assign ,place ,val)
@@ -561,13 +599,17 @@
 ;;;;          (atwiths ,binds
 ;;;;            (,setter (cons ,gx ,val)))))))
 ;;;; 
-;;;; (mac swap (place1 place2)
-;;;;   (w/uniq (g1 g2)
-;;;;     (with ((binds1 val1 setter1) (setforms place1)
-;;;;            (binds2 val2 setter2) (setforms place2))
-;;;;       `(atwiths ,(+ binds1 (list g1 val1) binds2 (list g2 val2))
-;;;;          (,setter1 ,g2)
-;;;;          (,setter2 ,g1)))))
+
+#|(mac swap (place1 place2)
+  (w/uniq (g1 g2)
+    (with ((binds1 val1 setter1) (setforms place1)
+           (binds2 val2 setter2) (setforms place2))
+      `(atwiths ,(+ binds1 (list g1 val1) binds2 (list g2 val2))
+         (funcall ,setter1 ,g2)
+         (funcall ,setter2 ,g1)))))|#
+
+
+
 ;;;; 
 ;;;; (mac rotate places
 ;;;;   (with (vars (map [uniq] places)
@@ -1467,8 +1509,9 @@
        (deq q))
      (enq val q)))|#
 
-(def median (ns)
-  (funcall (sort #'> ns) (trunc (/ (len ns) 2))))
+;;; -> math.lisp
+#|(def median (ns)
+  (funcall (sort #'> ns) (trunc (/ (len ns) 2))))|#
 
 (mac noisy-each (n var val . body)
   (w/uniq (gn gc)
@@ -1489,7 +1532,7 @@
               ,@body)))))|#
 
 (mac point (name . body)
-  `(cl:macrolet ((throw (val)
+  `(cl:macrolet ((,name (val)
                    `(cl:return-from ,',name ,val)))
      (cl:block ,name ,@body)))
 
@@ -1502,8 +1545,8 @@
   (mac throw (val)
     `(cl:throw ',tag ,val)))|#
 
-
-(def downcase (x)
+;;; --> string.lisp
+#|(def downcase (x)
   (let downc (fn (c)
                (let n (coerce c 'int)
                  (if (or (< 64 n 91) (< 191 n 215) (< 215 n 223))
@@ -1513,10 +1556,10 @@
       string (map downc x)
       char   (funcall downc x)
       sym    (sym (map downc (coerce x 'string)))
-             (err "Can't downcase" x))))
+             (err "Can't downcase" x))))|#
 
-
-(def upcase (x)
+;;; --> string.lisp
+#|(def upcase (x)
   (let upc (fn (c)
              (let n (coerce c 'int)
                (if (or (< 96 n 123) (< 223 n 247) (< 247 n 255))
@@ -1526,7 +1569,7 @@
       string (map upc x)
       char   (funcall upc x)                    
       sym    (sym (map upc (coerce x 'string)))
-             (err "Can't upcase" x))))
+             (err "Can't upcase" x))))|#
 
 (def range (start end)
   (if (> start end)
@@ -1544,8 +1587,9 @@
     (each k ks (set (h k)))
     h))
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (= bar* " | "))
+;;; --> string.lisp
+#|(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar bar* " | "))|#
 
 (mac w/bars body
   (w/uniq (out needbars)
@@ -1578,8 +1622,7 @@
     `(atwiths ,binds
        (or ,val (,setter ,expr)))))|#
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (=* hooks* (table)))
+(defvar hooks* (table))
 
 (def hook (name . args)
   (aif (ref hooks* name) (apply it args)))
@@ -1594,8 +1637,7 @@
 (def get (index) (w/obcall (_) [_ index]))
 
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (=* savers* (table)))
+(defvar savers* (table))
 
 (mac fromdisk (var file init load save)
   (w/uniq (gf gv)
