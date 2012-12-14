@@ -22,6 +22,7 @@
    :atwith :atwiths :avg :awhen :before :begins :best :bestn :blank :blank-url
    :bound :break-thread :caar :cddr :cache :cadr :call-w/stdin :call-w/stdout :car
    :carif :caris :case :caselet :catch :ccc :cdr :client-ip :close :coerce
+   :char
    :commonest :compare :complement :compose :cons :consif :conswhen :copy :count
    :counts :current-gc-milliseconds :current-process-milliseconds :cut
    :date :dead
@@ -79,8 +80,8 @@
    :find :some :type :write :++ :>= :max :* :push :sleep :> :list :and :let
    :apply :coerce :car :/ :t :merge :catch :mod :quote :acons :< :+ :expt :nthcdr
    :round :assoc :load :unless :min :abs :map := :time :string :caar :cdr :pop
-   :loop :<= :warn :adjoin :read :reduce :close :pushnew :eval :union)
-  (:shadow :char)
+   :loop :<= :warn :adjoin :read :reduce :close :pushnew :eval :union
+   :char)
   (:import-from :fiveam :def-suite :in-suite))
 
 (declaim (ftype (function (function sequence) (values sequence &optional))
