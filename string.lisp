@@ -154,7 +154,9 @@
 
 (tst string
   (== (string 2 'a '(#\b #\c))
-      "2Abc"))
+      "2Abc")
+  (== (string 2 'a #\a #\b)
+      "2Aab"))
 
 
 (def recstring (test s (o start 0))
