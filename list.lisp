@@ -477,11 +477,11 @@
 
 
 (tst merge
-  (== (merge #'< '(1 2 3 5) '(2 4 6))
-      '(1 2 2 3 4 5 6) )
+  (== (merge #'< (list 1 2 3 5) (list 2 4 6))
+      (list 1 2 2 3 4 5 6) )
   (== (merge (fn (a b) (> (len a) (len b)))
-             '("aaa" "b") '("cccc" "ddd" "ee"))
-      '("cccc" "aaa" "ddd" "ee" "b") ))
+             (list "aaa" "b") (list "cccc" "ddd" "ee"))
+      (list "cccc" "aaa" "ddd" "ee" "b") ))
 
 
 (def mergesort (less? lst)
@@ -524,11 +524,11 @@
 
 
 (tst mergesort
-  (== (mergesort #'< '(3 0 10 -7))
-      '(-7 0 3 10))
+  (== (mergesort #'< (list 3 0 10 -7))
+      (list -7 0 3 10))
   (== (mergesort (fn (a b) (< (len a) (len b)))
-               '("horse" "dog" "elephant" "cat"))
-      '("dog" "cat" "horse" "elephant")))
+                 (list "horse" "dog" "elephant" "cat"))
+      (list "dog" "cat" "horse" "elephant")))
 
 
 (def insert-sorted (test elt seq)
