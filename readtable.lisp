@@ -21,6 +21,15 @@
         (let ((*readtable* 
                (named-readtables:find-readtable :arc)))
           (read srm t nil t))))))
+  (:dispatch-macro-char 
+   #\# #\[
+   (lambda (srm char arg)
+     (declare (cl:ignore char arg))
+     (let ((key (cl:read srm t nil t)))
+       (cond ((string-equal key :ignore)
+              (arc-compat.internal::ignore-vars 
+               (cl:read-delimited-list #\] srm t)))
+             (T nil)))))
   #|(:dispatch-macro-char #\# #\"
                         (lambda (srm char arg)
                           (declare (cl:ignore char arg))
