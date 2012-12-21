@@ -1,0 +1,11 @@
+;; optional args
+(def read-table ((o i (stdin)) (o eof))
+  (let e (read i eof)
+    (if (alist e) (listtab e) e)))
+
+(def foo ((o x) y (o z))
+  (list x y z))
+
+
+READ:
+cl:code-char.code
