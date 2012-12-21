@@ -329,17 +329,20 @@
 
 
 (tst atomic-invoke
-  (== (cl:with-output-to-string (out)
-        (cl:let ((ths '() ))
-          (dotimes (i 10)
-            (push (bt:make-thread 
-                   (lambda (&aux (i i)) 
-                     (atomic-invoke (lambda ()
-                                      (sleep (random .2))
-                                      (princ i out) ) )))
-                  ths ))
-          (mapc #'bt:join-thread ths) ) )
-      "0123456789"))
+  (dotimes (i 5)
+    (== (cl:with-output-to-string (out)
+          (cl:let ((ths '() )
+                   (cnt 0))
+            (dotimes (i 100)
+              (push (bt:make-thread 
+                     (lambda () 
+                       (atomic-invoke (lambda ()
+                                        (sleep (random .02))
+                                        (princ cnt out)
+                                        (++ cnt)) )))
+                    ths ))
+            (mapc #'bt:join-thread ths) ) )
+        "0123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899")))
 
 
 (mac atomic body
