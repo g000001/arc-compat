@@ -67,7 +67,7 @@
    ))
 
 (defpackage :arc-user
-  (:use :arc)
+  (:use :arc :named-readtables)
   (:import-from :cl :in-package))
 
 

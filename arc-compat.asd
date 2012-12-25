@@ -33,6 +33,7 @@
                ;; 
                (:file "test-after")
                ;; readtable
+               (:file "reader")
                (:file "readtable")
                (:file "readtable-setup")
                (:file "ext")
