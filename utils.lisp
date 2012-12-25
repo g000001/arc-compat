@@ -75,7 +75,7 @@
   (reduce-&optional 
    (mapcan (lambda (x)
              (cl:if (cl:and (consp x)
-                            (eq 'o (car x)) )
+                            (string= 'o (car x)) )
                     (cl:list 'cl:&optional (cdr x))
                     (cl:list x) ))
            (to-proper-lambda-list list) )))
