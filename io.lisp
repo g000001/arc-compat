@@ -80,5 +80,6 @@
       (w/stdin ,gv ,@body))))
 
 
-
+(def stderr ()
+  cl:*error-output*)
 
