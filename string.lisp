@@ -164,6 +164,7 @@
   returns that value. Returns nil otherwise. The values passed to f are integer 
   indices; the indices start at 0, or start if specified."
   (let n (len s)
+    n                                   ;ignore
     (funcall
      (afn (i)
        (and (< i (len s))
