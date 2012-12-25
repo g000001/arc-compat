@@ -25,41 +25,6 @@
                             (and (cl:string-equal key :ignore)
                                  (arc-compat.internal::ignore-vars 
                                   (cl:read-delimited-list #\] srm t))))))
-  #|(:dispatch-macro-char #\# #\"
-                        (fn (srm char arg)
-                          (declare (cl:ignore char arg))
-                          (let ((args (gensym "ARGS-")))
-                           `(cl:fn (&rest ,args)
-                              (declare (dynamic-extent ,args))
-                              (cl:apply
-                               (arc:compose
-                                ,@(mapcar 
-                                   (fn (x) 
-                                     (if (and (symbolp x)
-                                              (char= (char (symbol-name x) 0)
-                                                     #\_))
-                                         x
-                                         `#',x))
-                                   (sb-impl::read-delimited-list #\" srm T)))
-                               ,args)))))|#
-  #|(:macro-char #\∘ (fn (srm char)
-                     (cl:declare (cl:ignore char))
-                     (let ((args (gensym "ARGS-")))
-                       `(cl:fn (&rest ,args)
-                          (declare (dynamic-extent ,args))
-                          (cl:apply
-                           (arc:compose
-                            ,@(cl:loop 
-                                 :for fctn := (cl:read-preserving-whitespace srm t nil t)
-                                 :then (progn 
-                                         (cl:read-char srm t nil t)
-                                         (cl:read-preserving-whitespace srm t nil t))
-                                 :collect `#',fctn
-                                 :while (eql (cl:peek-char nil srm nil nil t)
-                                             #\∘)))
-                           ,args)))))|#
-  ;; (:macro-char #\^ #'tao-read-toga)
-  ;; (:macro-char #\. #'read-|.| 'T)
   (:case :upcase))
 
 
