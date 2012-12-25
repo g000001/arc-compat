@@ -2,11 +2,11 @@
 
 
 (defun chars->value (chars) 
-  (read-from-string (coerce chars 'string)))
+  (read-from-string (coerce chars 'cl:string)))
 
 
 (defun symbol->chars (x) 
-  (coerce (string x) 'list))
+  (coerce (cl:string x) 'cl:list))
 
 
 (defun insym? (char sym)
@@ -47,7 +47,7 @@
 (defun ssyntax? (x)
   (and (symbolp x)
        (not (or (eql x 'arc:+) (eql x 'arc:++) (eql x 'arc::_)))
-       (cl:let ((name (string x)))
+       (cl:let ((name (cl:string x)))
          (has-ssyntax-char? name (- (length name) 1)))))
 
 
@@ -58,12 +58,12 @@
     (cl:let ((PKG (elt ARGS 0))
              (SYM (elt ARGS 1)))
       (cond ((find-package PKG)
-             (or (find-symbol (string SYM) PKG)
+             (or (find-symbol (cl:string SYM) PKG)
                  (error "find-symbol ~A ~A => NIL in ~A" 
                         SYM
                         PKG
                         'Make-compose-form))
-             (push `#',(intern (string SYM) PKG)
+             (push `#',(intern (cl:string SYM) PKG)
                    ANS)
              (setq ARGS (cddr ARGS)))
             ('t (push `#',PKG ANS)
@@ -159,10 +159,6 @@
 (defun compose-reader-macro-reader (stream char)
   (unread-char char stream)
   (read-symbol stream))
-
-
-(defun ignore-vars-form (vars)
-  `(cl:declare (cl:ignore ,@vars)))
 
 
 ;;; eof
