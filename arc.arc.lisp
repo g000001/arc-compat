@@ -1315,9 +1315,9 @@
 ;;;;   `(safeset ,name (cache (fn () ,lasts)
 ;;;;                          (fn () ,@body))))
 ;;;; 
-;;;; (mac errsafe (expr)
-;;;;   `(on-err (fn (c) nil)
-;;;;            (fn () ,expr)))
+(mac errsafe (expr)
+  `(on-err (fn (c) nil)
+           (fn () ,expr)))
 ;;;; 
 ;;;; (def saferead (arg) (errsafe:read arg))
 ;;;; 
