@@ -86,12 +86,18 @@
   but all arguments must be of the same type."
   (case (len args)
     0 (cl:error "invalid number of arguments: ~S" 'args)
-    (not (cl:every #'x>y args (cdr args)))))
+    (cl:notany #'x>y args (cdr args))))
 
 
 (tst <= 
   (== (<= 2 2.0)
       t )
+  (== (<= 1 2 3 4 5)
+      t )
+  (== (<= 1 2 3 5 4)
+      nil )
+  (== (<= 1 3 2 5 4)
+      nil )
   (== (<= #\a #\c #\e)
       t )
   (== (<= "foo" "bar")
@@ -105,11 +111,15 @@
   arguments must be of the same type."
   (case (len args)
     0 (cl:error "invalid number of arguments: ~S" 'args)
-    (not (cl:every #'x<y args (cdr args)))))
+    (cl:notany #'x<y args (cdr args))))
 
 
 (tst >= 
   (== (>= 2 3)
+      nil )
+  (== (>= 3 2 1 1)
+      nil )
+  (== (>= 3 1 2 1)
       nil )
   (== (>= #\a #\c #\e)
       nil )
