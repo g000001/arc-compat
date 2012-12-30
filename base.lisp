@@ -251,6 +251,10 @@
   (cl:make-string-output-stream))
 
 
+(defun on-err (errfn f)
+  (or (cl:ignore-errors (funcall f))
+      (funcall errfn)))
+
 ;;; eof
 
 
