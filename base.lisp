@@ -252,8 +252,9 @@
 
 
 (defun on-err (errfn f)
-  (or (cl:ignore-errors (funcall f))
-      (funcall errfn)))
+  (cl:multiple-value-bind (ans cond)
+                          (cl:ignore-errors (funcall f))
+    (or ans (funcall errfn cond))))
 
 ;;; eof
 
