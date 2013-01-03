@@ -109,6 +109,7 @@ encountering a false argument."
 the scope of the rfn macro. This allows recursive functions to be
 created without polluting the wider scope."
   `(labels ((,name ,parms ,@body))
+     (declare (optimize (debug 1)))
      #',name))
 
 ;(funcall (rfn pow2 (x) (if (= x 0) 1 (* 2 (pow2 (- x 1))))) 5)
