@@ -864,9 +864,22 @@
   (== (readstring1 "readstring1")
       'readstring1))
 
-;;;; 
-;;;; (def read ((o x (stdin)) (o eof nil))
-;;;;   (if (isa x 'string) (readstring1 x eof) (sread x eof)))
+
+(def read ((o x (stdin)) (o eof nil))
+  (if (isa x 'string) (readstring1 x eof) (sread x eof)))
+
+
+(tst read
+  (== (read "read test")
+      'read)
+  (w/instring s "read test"
+    (== (read s) 'read))
+  (== (read "")
+      nil)
+  (let eof (uniq)
+   (w/instring s ""
+     (== (read s eof) eof))))
+
 ;;;; 
 ;;;; ; inconsistency between names of readfile[1] and writefile
 ;;;; 
