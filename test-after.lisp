@@ -58,4 +58,26 @@
       (list 1 4)))
 
 
+(tst is
+  (== (is 1 2)
+      nil )
+  (== (is "a" "a")
+      t )
+  (== (is (list 1) (list 1))
+      nil )
+  (== (is 1 1 1 1)
+      t )
+  (== (is nil '())
+      t ))
+
+
+(tst len
+  (== (len "abc")
+      3)
+  (== (len '(1 2 3))
+      3)
+  (== (len (obj a 1 b 2))
+      2))
+
+
 ;;; eof

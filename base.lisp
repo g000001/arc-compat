@@ -1,6 +1,5 @@
 (in-package :arc-compat.internal)
 (in-readtable :common-lisp)
-(def-suite arc-compat)
 
 
 (defmacro mac (name args &body body)

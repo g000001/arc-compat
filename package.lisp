@@ -10,7 +10,7 @@
    :expt :truncate :quote :eval :some
    :sqrt :warn :push :abs :mod
    :pop :sleep :round :car
-   :nil :* :subseq :cons :/ 
+   :nil :* :subseq :/ 
    :time :write
    :cdr :- :load :close :t)
   ;; xdefs
@@ -98,7 +98,15 @@
    :apply :coerce :car :/ :t :merge :catch :mod :quote :acons :< :+ :expt :nthcdr
    :round :assoc :load :unless :min :abs :map := :time :string :caar :cdr :pop
    :loop :<= :warn :adjoin :read :reduce :close :pushnew :eval :union
-   :char)
+   :char :log)
+  (:shadowing-import-from :arc
+   :subst :sort :assert :last :adjoin :eval :* :rem :union :time :case :get
+   :mismatch :set := :count :catch :< :string :sin :+ :t :if :number :cos :find
+   :cdr :warn :throw :sleep :map :quote :expt :apply :load :subseq :atom :> :max
+   :reduce :abs :cddr :when :complement :acons :or :tan :cons :mod :list :push
+   :sqrt :char :let :caar :/ :coerce :log :cadr :round :- :pushnew :assoc :loop
+   :pop :do :read :unless :min :nil :some :nthcdr :<= :and :merge :car :++ :write
+   :declare :truncate :close :type :>=)
   (:import-from :fiveam :def-suite :in-suite))
 
 
@@ -113,6 +121,8 @@
 (declaim (ftype (function (cl:function cl:list) (values cl:list &optional))
                 arc:map1))
 
+
+(5am:def-suite arc-compat.internal::arc-compat)
 
 ;;; eof
 

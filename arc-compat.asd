@@ -8,8 +8,12 @@
   :author "CHIBA Masaomi <chiba.masaomi@gmail.com>"
   :maintainer "CHIBA Masaomi <chiba.masaomi@gmail.com>"
   :version "0.8.88"
-  :depends-on (:fiveam :named-readtables #+:it :root.package.it
-               :bordeaux-threads)
+  :depends-on (:fiveam
+               :named-readtables
+               #+:it :root.package.it
+               :bordeaux-threads
+               #+sbcl :sb-introspect
+               )
   :serial T
   :components ((:file "package")
 	       (:file "utils")

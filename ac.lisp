@@ -41,19 +41,6 @@
 	      vals)))
 
 
-(tst is
-  (== (is 1 2)
-      nil )
-  (== (is "a" "a")
-      t )
-  (== (is (list 1) (list 1))
-      nil )
-  (== (is 1 1 1 1)
-      t )
-  (== (is nil '())
-      t ))
-
-
 (defun arc:err (&rest args)
   (cl:error "Error: ~{~A~^ ~}" args))
 
@@ -76,15 +63,6 @@
   (etypecase seq
     (cl:sequence (cl:length seq))
     (arc:table (cl:hash-table-count seq))))
-
-
-(tst len
-  (== (len "abc")
-      3)
-  (== (len '(1 2 3))
-      3)
-  (== (len (obj a 1 b 2))
-      2))
 
 
 ;; (xdef annotate ar-tag)
