@@ -8,20 +8,6 @@
 ;;; Ported to Common Lisp by CHIBA Masaomi.
 
 
-(defalias disp cl:princ)
-(defalias writec cl:write-char)
-
-
-(def infile (name)
-  (cl:open name :direction :input))
-
-
-(def outfile (name)
-  (cl:open name :direction :output
-           :if-exists :supersede
-           :if-does-not-exist :create))
-
-
 (def pr args
   (map1 #'disp args)
   (car args))

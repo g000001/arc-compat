@@ -30,7 +30,8 @@
   `(satisfies cl:output-stream-p))
 (deftype input () 
   `(satisfies cl:input-stream-p))
-
+(deftype cons ()
+  'cl:cons)
 
 (defun type (x)
   (cond ;((ar-tagged? x)     (vector-ref x 1))

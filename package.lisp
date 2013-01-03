@@ -12,7 +12,7 @@
    :pop :sleep :round :car
    :nil :* :subseq :cons :/ 
    :time :write
-   :apply :cdr :- :load :close :t)
+   :cdr :- :load :close :t)
   ;; xdefs
   (:export
    :sig :apply :cons :car :cdr :is :err 

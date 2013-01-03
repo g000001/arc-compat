@@ -15,12 +15,43 @@
             (setf (symbol-function ',alias) (symbol-function ',orig)))))
 
 
-;; (xdef sig fn-signatures)
-;; (xdef apply (lambda (fn . args)
-;; (xdef cons cons)
+(defun arc:sig (name)
+  #+sbcl
+  (sb-introspect:function-lambda-list name)
+  #-sbcl nil)
+
+
+(xdef arc:apply cl:apply)
+
+
+(xdef arc:cons cl:cons)
+
+
 ;; (xdef car (lambda (x)
 ;; (xdef cdr (lambda (x)
-;; (xdef is (lambda args (pairwise ar-is2 args)))
+
+
+(defun arc:is (val &rest vals)
+  "Tests equality with eqv?"
+  (cl:flet ((eqfn (x y)
+	      (cl:or (cl:eql x y) (cl:and (cl:stringp x)
+				    (cl:stringp y)
+				    (cl:string= x y)))))
+    (cl:every (lambda (_) (eqfn val _))
+	      vals)))
+
+
+(tst is
+  (== (is 1 2)
+      nil )
+  (== (is "a" "a")
+      t )
+  (== (is (list 1) (list 1))
+      nil )
+  (== (is 1 1 1 1)
+      t )
+  (== (is nil '())
+      t ))
 
 
 (defun arc:err (&rest args)
@@ -38,14 +69,41 @@
 ;; (xdef sqrt sqrt)
 ;; (xdef > (lambda args (pairwise ar->2 args)))
 ;; (xdef < (lambda args (pairwise ar-<2 args)))
-;; (xdef len (lambda (x)
+
+
+(defun arc:len (seq)
+  "Computes the length of seq."
+  (etypecase seq
+    (cl:sequence (cl:length seq))
+    (arc:table (cl:hash-table-count seq))))
+
+
+(tst len
+  (== (len "abc")
+      3)
+  (== (len '(1 2 3))
+      3)
+  (== (len (obj a 1 b 2))
+      2))
+
+
 ;; (xdef annotate ar-tag)
 ;; (xdef type ar-type)
 ;; (xdef rep ar-rep)
 ;; (xdef uniq ar-gensym)
 ;; (xdef ccc call-with-current-continuation)
-;; (xdef infile  open-input-file)
-;; (xdef outfile (lambda (f . args) 
+
+
+(defun arc:infile (name)
+  (cl:open name :direction :input))
+
+
+(defun arc:outfile (name)
+  (cl:open name :direction :output
+           :if-exists :supersede
+           :if-does-not-exist :create))
+
+
 (defun arc:instring (string)
   (cl:make-string-input-stream string))
 
@@ -74,14 +132,37 @@
 ;; (xdef readc (lambda (str) 
 ;; (xdef readb (lambda (str)
 ;; (xdef peekc (lambda (str) 
-;; (xdef writec (lambda (c . args) 
+
+
+(xdef arc:writec cl:write-char)
+
+
 ;; (xdef writeb (lambda (b . args) 
 ;; (xdef write (lambda args (printwith write   args)))
-;; (xdef disp  (lambda args (printwith display args)))
+
+
+(xdef arc:disp cl:princ)
+
+
 (defun arc:sread (p eof)
   (cl:let ((expr (cl:read p nil eof)))
     (if (eq eof expr) eof expr)))
-;; (xdef coerce 
+
+
+(defun coerce (thing type)
+  (typecase thing
+    (char (cl:case type
+            (string (cl:string thing))
+            (cl:otherwise (cl:coerce thing type))))
+    (sym (coerce (cl:string thing) type))
+    (int (cl:case type
+           (string (write-to-string thing))
+           (cl:otherwise (cl:coerce thing type))))
+    (t (cl:case type
+         (sym (intern (cl:string thing)))
+         (cl:otherwise (cl:coerce thing type))))))
+
+
 ;; (xdef open-socket  (lambda (num) (tcp-listen num 50 #t))) 
 ;; (xdef socket-accept (lambda (s)
 ;; (xdef new-thread thread)
@@ -96,7 +177,11 @@
   (cl:make-hash-table :test 'cl:equal))
 
 
-;; (xdef maptable (lambda (fn table)               ; arg is (fn (key value) ...)
+(defun arc:maptable (f tab)
+  (cl:maphash f tab)
+  nil)
+
+
 ;; (xdef protect protect)
 ;; (xdef rand random)
 ;; (xdef dir (lambda (name)
@@ -176,8 +261,15 @@
 
 
 (xdef arc:sin cl:sin)
+
+
 (xdef arc:cos cl:cos)
+
+
 (xdef arc:tan cl:tan)
+
+
 (xdef arc:log cl:log)
+
 
 ;;; eof

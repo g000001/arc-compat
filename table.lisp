@@ -46,9 +46,7 @@
     (if (alist e) (listtab e) e)))|#
 
 
-(def maptable (f tab)
-  (cl:maphash f tab)
-  nil)
+;;; maptable --> ac.lisp
 
 
 (mac ontable (k v h . body)

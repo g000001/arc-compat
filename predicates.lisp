@@ -152,27 +152,7 @@
       nil))
 
 
-(defun is (val &rest vals)
-  "Tests equality with eqv?"
-  (cl:flet ((eqfn (x y)
-	      (cl:or (cl:eql x y) (cl:and (cl:stringp x)
-				    (cl:stringp y)
-				    (cl:string= x y)))))
-    (cl:every (fn (_) (eqfn val _))
-	      vals)))
-
-
-(tst is
-  (== (is 1 2)
-      nil )
-  (== (is "a" "a")
-      t )
-  (== (is (list 1) (list 1))
-      nil )
-  (== (is 1 1 1 1)
-      t )
-  (== (is nil '())
-      t ))
+;;; is: --> ac.lisp
 
 
 (defalias isa cl:typep

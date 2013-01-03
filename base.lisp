@@ -211,37 +211,10 @@
       42))
 
 
-(defun coerce (thing type)
-  (typecase thing
-    (char (cl:case type
-            (string (cl:string thing))
-            (cl:otherwise (cl:coerce thing type))))
-    (sym (coerce (cl:string thing) type))
-    (int (cl:case type
-           (string (write-to-string thing))
-           (cl:otherwise (cl:coerce thing type))))
-    (t (cl:case type
-         (sym (intern (cl:string thing)))
-         (cl:otherwise (cl:coerce thing type))))))
-
-
 (defun sym (x) (coerce x 'sym))
 
 
-(defun len (seq)
-  "Computes the length of seq."
-  (etypecase seq
-    (cl:sequence (cl:length seq))
-    (table (cl:hash-table-count seq))))
 
-
-(tst len
-  (== (len "abc")
-      3)
-  (== (len '(1 2 3))
-      3)
-  (== (len (obj a 1 b 2))
-      2))
 
 
 ;;; eof
