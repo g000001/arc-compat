@@ -7,7 +7,7 @@
   :description "Arc compatible package for CL"
   :author "CHIBA Masaomi <chiba.masaomi@gmail.com>"
   :maintainer "CHIBA Masaomi <chiba.masaomi@gmail.com>"
-  :version "0.8.83"
+  :version "0.8.88"
   :depends-on (:fiveam :named-readtables #+:it :root.package.it
                :bordeaux-threads)
   :serial T
