@@ -137,6 +137,13 @@
 ;; (xdef memory current-memory-use)
 ;; (xdef declare (lambda (key val)
 ;; (xdef timedate 
+(defun arc:timedate (&optional arg)
+  (multiple-value-bind (s m h d mo y)
+                       (decode-universal-time (or arg (get-universal-time))
+                                              0)
+    (list s m h d mo y)))
+
+
 (xdef arc:sin cl:sin)
 (xdef arc:cos cl:cos)
 (xdef arc:tan cl:tan)
