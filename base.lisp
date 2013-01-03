@@ -256,6 +256,16 @@
                           (cl:ignore-errors (funcall f))
     (cl:or ans (funcall errfn cond))))
 
+
+(defun sread (p eof)
+  (cl:let ((expr (cl:read p nil eof)))
+    (if (eq eof expr) eof expr)))
+
+
+(defun stdin ()
+  cl:*standard-input*)
+
+
 ;;; eof
 
 
