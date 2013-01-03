@@ -50,4 +50,12 @@
       (list #\d 2 3)))
 
 
+(tst scdr
+  (== (let x nil
+        (= x (list 1 2 3))
+        (arc:scdr x (list 4))
+        x)
+      (list 1 4)))
+
+
 ;;; eof

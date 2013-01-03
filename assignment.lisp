@@ -18,16 +18,8 @@
 ;[code] [Foundation] [Destructive] scar list expr -> ac.lisp
 
 
-;[code] [Foundation] [Destructive] scdr list exp
+;[code] [Foundation] [Destructive] scdr list exp -> ac.lisp
 
-(defalias scdr cl:rplacd
-  "Sets cdr of a list.")
-	
-;>(do
-;    (= x '(1 2 3))
-;    (scdr x '(4))
-;    x)
-;(1 4)
 
 ;[code] [Macro] [Destructive] = [place expr] ... [place]
 (defalias = cl:setf

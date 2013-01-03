@@ -125,7 +125,12 @@
     (cl:string (setf (cl:char list 0) expr))))
 
 
-;; (xdef scdr (lambda (x val) 
+(defun arc:scdr (list val)
+  "Sets cdr of a list."
+  (cl:rplacd list val)
+  nil)
+
+
 ;; (xdef sref 
 ;; (xdef bound (lambda (x) (tnil (bound? x))))
 (defun arc:newstring (length &optional (char #\Nul))
