@@ -129,3 +129,10 @@
 (defun cddr (xs) (cdr (cdr xs)))
 (defun list (&rest args) (cl:copy-list args))
 
+(defmacro w/tco (() cl:&body body)
+  `(cl:locally 
+        #+sbcl (cl:declare (cl:optimize (cl:debug 1)))
+        #-sbcl (cl:declare (cl:optimize (cl:debug 1)))
+        ,@body))
+
+;;; eof
