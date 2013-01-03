@@ -1,5 +1,7 @@
 (in-package #:cl-user)
 ;; (g1:delete-package* :arc-compat.setagaya.mc)
+
+
 (defpackage :arc-compat.setagaya.mc
   (:use)
   (:nicknames #:arc)
@@ -66,6 +68,7 @@
    :catch :throw
    ))
 
+
 (defpackage :arc-user
   (:use :arc :named-readtables)
   (:import-from :cl :in-package))
@@ -84,14 +87,19 @@
    :char)
   (:import-from :fiveam :def-suite :in-suite))
 
+
 (declaim (ftype (function (function sequence) (values sequence &optional))
                 arc:sort))
+
 
 (declaim (ftype (function (cl:sequence) (values cl:sequence &optional))
                 arc:rev))
 
+
 (declaim (ftype (function (cl:function cl:list) (values cl:list &optional))
                 arc:map1))
-;;; 
+
+
+;;; eof
 
 
