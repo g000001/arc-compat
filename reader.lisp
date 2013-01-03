@@ -154,7 +154,7 @@
             (cons (cl:let ((args (gensym)))
                     ;; (print elts)
                     `(lambda (&rest ,args)
-                       (declare (dynamic-extent ,args))
+                       (cl:declare (cl:dynamic-extent ,args))
                        (apply ,(Make-compose-form elts)
                               ,args)
                        #|(apply (arc::compose ,@(mapcar (lambda (e) `#',e) 
