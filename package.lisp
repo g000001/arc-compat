@@ -13,6 +13,20 @@
    :nil :* :subseq :cons :/ 
    :time :write
    :apply :cdr :- :load :close :t)
+  ;; xdefs
+  (:export
+   :sig :apply :cons :car :cdr :is :err 
+   ;; :nil :t
+   :+ :- :* :/ :mod :expt :sqrt :>
+   :< :len :annotate :type :rep :uniq :ccc :infile :outfile :instring :outstring
+   :inside :stdout :stdin :stderr :call-w/stdout :call-w/stdin :readc :readb
+   :peekc :writec :writeb :write :disp :sread :coerce :open-socket :socket-accept
+   :new-thread :kill-thread :break-thread :sleep :system :pipe-from :table
+   :maptable :protect :rand :dir :file-exists :dir-exists :rmfile :mvfile :macex
+   :macex1 :eval :on-err :details :scar :scdr :sref :bound :newstring :trunc
+   :exact :msec :current-process-milliseconds :current-gc-milliseconds :seconds
+   :client-ip :atomic-invoke :dead :flushout :ssyntax :ssexpand :quit :close
+   :force-close :memory :declare :timedate :sin :cos :tan :log)
   (:export
    ;; ext
    :=* :*let :w/obcall :ref :leto :witho :withos

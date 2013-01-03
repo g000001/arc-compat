@@ -64,9 +64,10 @@
                         `(&rest ,args))))
     `(LAMBDA (&rest ,g)
        (DESTRUCTURING-BIND ,args ,g
-         (DECLARE (IGNORABLE ,@(remove-if (lambda (x)
-                                            (member x cl:lambda-list-keywords))
-                                          (+internal-flatten args))))
+         (cl:DECLARE 
+          (cl:IGNORABLE ,@(remove-if (lambda (x)
+                                       (member x cl:lambda-list-keywords))
+                                     (+internal-flatten args))))
          ,@body))))
 
 
@@ -78,9 +79,9 @@
   (if (consp var)
       (cl:let ((tem (gensym "let-")))
         `((CL:LAMBDA (&REST ,tem)
-            (DECLARE (DYNAMIC-EXTENT ,tem))
+            (cl:DECLARE (cl:DYNAMIC-EXTENT ,tem))
             (DESTRUCTURING-BIND (,var) ,tem
-              (DECLARE (IGNORABLE ,@(+internal-flatten `(,var))))
+              (cl:DECLARE (cl:IGNORABLE ,@(+internal-flatten `(,var))))
               ,@body ))
           ,val))
       `(CL:LET ((,var ,val)) 
@@ -103,7 +104,7 @@
            :collect (second x) :into vals
            :finally (return
                       `(DESTRUCTURING-BIND ,vars (list ,@vals)
-                         (DECLARE (IGNORABLE ,@(+internal-flatten vars)))
+                         (cl:DECLARE (cl:IGNORABLE ,@(+internal-flatten vars)))
                          ,@body))))
 
 
@@ -113,7 +114,7 @@
            :collect (second x) :into vals
            :finally (return
                       `(DESTRUCTURING-BIND ,vars (list ,@vals)
-                         (DECLARE (IGNORABLE ,@(+internal-flatten vars)))
+                         (cl:DECLARE (cl:IGNORABLE ,@(+internal-flatten vars)))
                          (w/obcall (,vars)
                            ,@body)))))
 
@@ -255,11 +256,6 @@
   (cl:multiple-value-bind (ans cond)
                           (cl:ignore-errors (funcall f))
     (cl:or ans (funcall errfn cond))))
-
-
-(defun sread (p eof)
-  (cl:let ((expr (cl:read p nil eof)))
-    (if (eq eof expr) eof expr)))
 
 
 (defun stdin ()

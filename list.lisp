@@ -277,7 +277,7 @@
       (do (let key (car seq)
             (multiple-value-bind (val win)
                                  (gethash key c)
-              (declare (ignore val))
+              (cl:declare (cl:ignore val))
                  (if win 
                      (incf (gethash key c))
                      (setf (gethash key c) 1))))

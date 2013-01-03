@@ -1,4 +1,4 @@
-(in-package :arc-compat.internal)
+(cl:in-package :arc-compat.internal)
 (in-readtable :arc)
 (in-suite arc-compat)
 
