@@ -489,13 +489,23 @@
 ;;;; (mac = args
 ;;;;   (expand=list args))
 ;;;; 
-;;;; (mac loop (start test update . body)
-;;;;   (w/uniq (gfn gparm)
-;;;;     `(do ,start
-;;;;          ((rfn ,gfn (,gparm) 
-;;;;             (if ,gparm
-;;;;                 (do ,@body ,update (,gfn ,test))))
-;;;;           ,test))))
+(mac loop (start test update . body)
+  (w/uniq (gfn gparm)
+    `(w/tco ()
+       (do ,start
+         (funcall 
+          (rfn ,gfn (,gparm) 
+            (if ,gparm
+                  (do ,@body ,update (,gfn ,test))))
+          ,test)))))
+
+
+(tst loop
+  (== (let x 0
+        (loop (= x 0) (< x 300000) (++ x))
+        x)
+      300000))
+
 ;;;; 
 ;;;; (mac for (v init max . body)
 ;;;;   (w/uniq (gi gm)
@@ -845,7 +855,15 @@
 ;;;;    `(w/instring ,gv ,str
 ;;;;       (w/stdin ,gv ,@body))))
 ;;;; 
-;;;; (def readstring1 (s (o eof nil)) (w/instring i s (read i eof)))
+(def readstring1 (s (o eof nil)) (w/instring i s (cl:read i nil eof)))
+
+
+(tst readstring1 
+  (== (readstring1 "")
+      nil)
+  (== (readstring1 "readstring1")
+      'readstring1))
+
 ;;;; 
 ;;;; (def read ((o x (stdin)) (o eof nil))
 ;;;;   (if (isa x 'string) (readstring1 x eof) (sread x eof)))
@@ -1613,12 +1631,12 @@
 (mac thread body 
   `(new-thread (fn () ,@body)))
 
-(mac trav (x . fs)
+#|(mac trav (x . fs)
   (w/uniq g
-    `((afn (,g)
+    `(funcall (afn (,g)
         (when ,g
           ,@(map [list _ g] fs)))
-      ,x)))
+      ,x)))|#
 
 #|(mac or= (place expr)
   (let (binds val setter) (setforms place) ;!!!
@@ -1657,7 +1675,7 @@
   `(fromdisk ,var ,file (table) load-table save-table) )
 
 (mac todisk (var (o expr var))
-  `((savers* ',var) 
+  `(funcall (savers* ',var) 
     ,(if (is var expr) var `(= ,var ,expr)) ))
 
 
