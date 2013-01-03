@@ -36,4 +36,18 @@
   (== (timedate 0)
       (list 0 0 0 1 1 1900)))
 
+
+(tst scar
+  (== (let x nil
+        (= x "abc")
+        (scar x #\d)
+        x)
+      "dbc")
+  (== (let x nil
+        (= x (list 1 2 3))
+        (scar x #\d)
+        x)
+      (list #\d 2 3)))
+
+
 ;;; eof

@@ -15,28 +15,8 @@
 
 (defalias = set)
 
-;[code] [Foundation] [Destructive] scar list expr
+;[code] [Foundation] [Destructive] scar list expr -> ac.lisp
 
-(defmacro scar (list expr)
-  "Sets car of list to a new expression. If applied to a string,
-sets the first character of the string, which must have length at
-least one."
-  `(etypecase ,list
-     (cl:list (setf (car ,list) ,expr))
-     (cl:string (setf (aref ,list 0) ,expr))))
-
-;>(do
-;    (= x '(1 2 3))
-;    (= x "abc")
-;    (scar x #\d)
-;    x)
-;"dbc"
-;
-;>(do
-;    (= x '(1 2 3))
-;    (scar x #\d)
-;    x)
-;(#\d 2 3)
 
 ;[code] [Foundation] [Destructive] scdr list exp
 

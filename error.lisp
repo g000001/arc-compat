@@ -3,8 +3,7 @@
 
 (in-suite arc-compat)
 
-(def err args
-  (cl:error "Error: ~{~A~^ ~}" args))
+
 
 
 

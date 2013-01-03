@@ -3,8 +3,7 @@
 (in-suite arc-compat)
 
 
-(def table ()
-  (cl:make-hash-table :test 'cl:equal))
+;;; table --> ac.lisp
 
 
 (mac w/table (var . body)

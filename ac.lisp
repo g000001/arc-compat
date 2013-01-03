@@ -21,7 +21,12 @@
 ;; (xdef car (lambda (x)
 ;; (xdef cdr (lambda (x)
 ;; (xdef is (lambda args (pairwise ar-is2 args)))
-;; (xdef err err)
+
+
+(defun arc:err (&rest args)
+  (cl:error "Error: ~{~A~^ ~}" args))
+
+
 ;; (xdef nil 'nil)
 ;; (xdef t   't)
 ;; (xdef + (lambda args
@@ -85,8 +90,12 @@
 ;; (xdef sleep (wrapnil sleep))
 ;; (xdef system (wrapnil system))
 ;; (xdef pipe-from (lambda (cmd)
-;; (xdef table (lambda () (make-hash-table 'equal)))
-;; ;(xdef table (lambda args
+
+
+(defun arc:table ()
+  (cl:make-hash-table :test 'cl:equal))
+
+
 ;; (xdef maptable (lambda (fn table)               ; arg is (fn (key value) ...)
 ;; (xdef protect protect)
 ;; (xdef rand random)
@@ -102,8 +111,20 @@
   (cl:multiple-value-bind (ans cond)
                           (cl:ignore-errors (funcall f))
     (cl:or ans (funcall errfn cond))))
+
+
 ;; (xdef details (lambda (c)
-;; (xdef scar (lambda (x val) 
+
+
+(defun arc:scar (list expr)
+  "Sets car of list to a new expression. If applied to a string,
+   sets the first character of the string, which must have length at
+   least one."
+  (etypecase list
+    (cl:list (setf (cl:car list) expr))
+    (cl:string (setf (cl:char list 0) expr))))
+
+
 ;; (xdef scdr (lambda (x val) 
 ;; (xdef sref 
 ;; (xdef bound (lambda (x) (tnil (bound? x))))
@@ -121,14 +142,19 @@
 ;; (xdef current-gc-milliseconds      current-gc-milliseconds)
 ;; (xdef seconds current-seconds)
 ;; (xdef client-ip (lambda (port) 
-;; (xdef atomic-invoke (lambda (f)
 (defun arc:atomic-invoke (f)
   (bt:with-recursive-lock-held (ar-the-lock)
     (funcall f)))
 
 
 ;; (xdef dead (lambda (x) (tnil (thread-dead? x))))
-;; (xdef flushout (lambda () (flush-output) 't))
+
+
+(defun arc:flushout ()
+  (cl:force-output cl:*standard-output*)
+  't)
+
+
 ;; (xdef ssyntax (lambda (x) (tnil (ssyntax? x))))
 ;; (xdef ssexpand (lambda (x)
 (xdef arc:quit #+sbcl sb-ext:exit #-sbcl cl-user::quit)
@@ -136,7 +162,7 @@
 ;; (xdef force-close (lambda args
 ;; (xdef memory current-memory-use)
 ;; (xdef declare (lambda (key val)
-;; (xdef timedate 
+
 (defun arc:timedate (&optional arg)
   (multiple-value-bind (s m h d mo y)
                        (decode-universal-time (or arg (get-universal-time))
