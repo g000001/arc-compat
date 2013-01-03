@@ -104,12 +104,20 @@
 ;;;;           (car args))
 ;;;;       't))
 ;;;; 
-;;;; (def assoc (key al)
-;;;;   (if (atom al)
-;;;;        nil
-;;;;       (and (acons (car al)) (is (caar al) key))
-;;;;        (car al)
-;;;;       (assoc key (cdr al))))
+(def assoc (key al)
+  (if (atom al)
+       nil
+      (and (acons (car al)) (is (caar al) key))
+       (car al)
+      (assoc key (cdr al))))
+
+
+(tst assoc
+  (== (assoc 'a (rev (copy '((a . 1) (b . 2) (c . 3)))))
+      (cons 'a 1))
+  (== (assoc 'z (rev (copy '((a . 1) (b . 2) (c . 3)))))
+      NIL))
+
 ;;;; 
 ;;;; (def alref (al key) (cadr (assoc key al)))
 ;;;; 
