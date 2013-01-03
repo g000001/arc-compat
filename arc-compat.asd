@@ -7,7 +7,7 @@
   :description "Arc compatible package for CL"
   :author "CHIBA Masaomi <chiba.masaomi@gmail.com>"
   :maintainer "CHIBA Masaomi <chiba.masaomi@gmail.com>"
-  :version "0.8.71"
+  :version "0.8.83"
   :depends-on (:fiveam :named-readtables #+:it :root.package.it
                :bordeaux-threads)
   :serial T
@@ -50,3 +50,7 @@
            (funcall (_ :fiveam :explain!) result)
            (funcall (_ :fiveam :results-status) result)))
       (error "test-op failed") ))
+
+
+;;; eof
+
