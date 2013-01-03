@@ -27,14 +27,7 @@
 ;;; sqrt
 
 
-(def trunc (num)
-  "Truncates to an integer. Was 'truncate' in arc0."
-  (values (cl:truncate num)))
-
-
-(tst trunc
-  (== (trunc -1.1)
-      -1))
+;;; trunc -> ac.lisp
 
 
 (defalias number cl:numberp

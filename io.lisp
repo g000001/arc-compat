@@ -56,9 +56,6 @@
   `(let ,var (make-string-output-stream) ,@body))
 
 
-(defalias inside cl:get-output-stream-string)
-
-
 (mac w/stdout (str . body)
   `(let cl:*standard-output* ,str ,@body))
 
@@ -80,6 +77,5 @@
       (w/stdin ,gv ,@body))))
 
 
-(def stderr ()
-  cl:*error-output*)
+;;; eof
 

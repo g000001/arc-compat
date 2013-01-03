@@ -244,24 +244,6 @@
       2))
 
 
-(defun instring (string)
-  (cl:make-string-input-stream string))
-
-
-(defun outstring ()
-  (cl:make-string-output-stream))
-
-
-(defun on-err (errfn f)
-  (cl:multiple-value-bind (ans cond)
-                          (cl:ignore-errors (funcall f))
-    (cl:or ans (funcall errfn cond))))
-
-
-(defun stdin ()
-  cl:*standard-input*)
-
-
 ;;; eof
 
 

@@ -10,11 +10,6 @@
 ;;; Ported to Common Lisp by CHIBA Masaomi.
 
 
-(def newstring (length (o char #\Nul))
-  "Creates a string of the given length."
-  (cl:make-string length :initial-element char))
-
-
 (def whitec (c)
   "Predicate to test if a character is whitespace 
   (space, newline, tab, or return)."

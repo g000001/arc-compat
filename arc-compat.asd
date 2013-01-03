@@ -12,8 +12,8 @@
                :bordeaux-threads)
   :serial T
   :components ((:file "package")
-               (:file "ac")
 	       (:file "utils")
+               (:file "ac")
                (:file "base")
                ;; (:file "arc")
 	       (:file "boolean")
