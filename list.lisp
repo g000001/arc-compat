@@ -752,19 +752,20 @@
   "Returns the index of the first element of seq that satisfies test. seq is a
   list or string. test is either an object or predicate function. If start is
   given, testing starts at that element."
-  (let f (testify test)
-    (if (alist seq)
-        (funcall 
-         (afn (seq n)
-           (if (no seq)   
-                nil
-               (funcall f (car seq)) 
-                n
-               (self (cdr seq) (+ n 1))))
-         (nthcdr start seq) 
-         start)
-        (recstring (fn (_) (if (funcall f (cl:char seq _)) _))
-                   seq start))))
+  (w/tco ()
+    (let f (testify test)
+      (if (alist seq)
+          (funcall 
+           (afn (seq n)
+             (if (no seq)   
+                 nil
+                 (funcall f (car seq)) 
+                 n
+                 (self (cdr seq) (+ n 1))))
+           (nthcdr start seq) 
+           start)
+          (recstring (fn (_) (if (funcall f (cl:char seq _)) _))
+                     seq start)))))
 
 
 (tst pos

@@ -209,17 +209,17 @@ A list of the expr values is returned."
   (w/uniq (gseq g)
     `(let ,gseq ,expr
        (if (alist ,gseq)
-            (funcall 
-             (afn (,g)
-               (when (acons ,g)
-                 (let ,var (car ,g) ,@body)
-                 (self (cdr ,g))))
-             ,gseq)
-           (isa ,gseq 'table)
-            (maptable (fn (,g ,var) ,@body)
-                      ,gseq)
-            (for ,g 0 (- (len ,gseq) 1)
-              (let ,var (cl:elt ,gseq ,g) ,@body))))))
+             (funcall 
+              (afn (,g)
+                (when (acons ,g)
+                  (let ,var (car ,g) ,@body)
+                  (self (cdr ,g))))
+              ,gseq)
+             (isa ,gseq 'table)
+             (maptable (fn (,g ,var) ,@body)
+                       ,gseq)
+             (for ,g 0 (- (len ,gseq) 1)
+               (let ,var (cl:elt ,gseq ,g) ,@body))))))
 
 
 ;

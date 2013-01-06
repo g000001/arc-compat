@@ -19,39 +19,6 @@
        ,@body)))|#
 
 
-(deftype fn () 'cl:function)
-(deftype sym () 'cl:symbol)
-(deftype char () 'cl:character)
-(deftype string () 'cl:string)
-(deftype int () 'cl:integer)
-(deftype num () 'cl:number)
-(deftype table () 'cl:hash-table)
-(deftype output () 
-  `(satisfies cl:output-stream-p))
-(deftype input () 
-  `(satisfies cl:input-stream-p))
-(deftype cons ()
-  'cl:cons)
-
-(defun type (x)
-  (cond ;((ar-tagged? x)     (vector-ref x 1))
-        ((cl:consp x)          'cons)
-        ((cl:null x)          'sym)
-        ((cl:symbolp x)        'sym)
-        ((cl:functionp x)     'fn)
-        ((cl:characterp x)          'char)
-        ((cl:stringp x)        'arc:string)
-        ((cl:integerp x)       'int)
-        ((cl:numberp x)        'num)     ; unsure about this
-        ((cl:hash-table-p x)    'table)
-        ((cl:output-stream-p x)   'output)
-        ((cl:input-stream-p x)    'input)
-        ;((tcp-listener? x)  'socket)
-        ;((exn? x)           'exception)
-        ;((thread? x)        'thread)
-        (T                 (error "Type: unknown type ~A" x))))
-
-
 (defun to-proper-lambda-list (list)
   (cl:typecase list
     (cl:null () )

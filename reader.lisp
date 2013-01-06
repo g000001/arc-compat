@@ -1,5 +1,5 @@
 (cl:in-package :arc-compat.internal)
-
+(in-readtable :common-lisp)
 
 (defconstant compose-marker #\:)
 (defconstant compose-marker2 #\∘)
@@ -42,11 +42,11 @@
 
 
 (defun chars->value (chars) 
-  (read-from-string (coerce chars 'cl:string)))
+  (read-from-string (cl:coerce chars 'cl:string)))
 
 
 (defun symbol->chars (x) 
-  (coerce (cl:string x) 'cl:list))
+  (cl:coerce (cl:string x) 'cl:list))
 
 
 (defun insym? (char sym)

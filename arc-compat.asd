@@ -16,6 +16,7 @@
                )
   :serial T
   :components ((:file "package")
+               (:file "type")
 	       (:file "utils")
                (:file "ac")
                (:file "base")
