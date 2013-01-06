@@ -66,7 +66,26 @@
 
 
 ;; (xdef annotate ar-tag)
-;; (xdef type ar-type)
+
+
+(defun arc:type (x)
+  (cl:etypecase x
+    (arc:cons   'arc:cons)
+    (cl:null    'arc:sym)
+    (arc:sym    'arc:sym)
+    (arc:fn     'arc:fn)
+    (arc:char   'arc:char)
+    (arc:string 'arc:string)
+    (arc:int    'arc:int)
+    (arc:num    'arc:num)
+    (arc:table  'arc:table)
+    (arc:output 'arc:output)
+    ;((tcp-listener? x)  'socket)
+    ;;((exn? x)           'exception)
+    ;;((thread? x)        'thread)
+    ))
+
+
 ;; (xdef rep ar-rep)
 ;; (xdef uniq ar-gensym)
 ;; (xdef ccc call-with-current-continuation)
