@@ -13,6 +13,10 @@
    :nil :* :subseq :/ 
    :time :write
    :cdr :- :load :close :t)
+  ;; types
+  (:export
+   :cons :sym :fn :char :string :int :num :table :output :socket :exception
+   :thread :input)
   ;; xdefs
   (:export
    :sig :apply :cons :car :cdr :is :err 
