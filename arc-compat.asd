@@ -30,7 +30,6 @@
                (:file "io")
                (:file "error")
                ;; 
-               (:file "sequence")
                (:file "math")
 	       (:file "iteration")
                (:file "table")

@@ -10,7 +10,7 @@
 (def unimplements ()
   (let arcsyms (arc-compat-external-symbols)
     (let unimps (keep (fn (_) (and (not (cl:fboundp _))
-                                 (not (cl:boundp _))))
+                                   (not (cl:boundp _))))
                       arcsyms)
       (cl:values unimps (len arcsyms) (len unimps)))))
 

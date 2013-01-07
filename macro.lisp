@@ -21,9 +21,6 @@
 (defalias macex1 cl:macroexpand-1
   "Expands a macro to one level.")
 
-;[code] [Foundation] uniq
-(defalias uniq cl:gensym
-  "Generates a unique symbol.")
 
 ;; *onlisp*
 (defmacro w/uniq (syms &body body)

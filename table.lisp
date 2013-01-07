@@ -7,7 +7,7 @@
 
 
 (mac w/table (var . body)
-  `(let ,var (table) ,@body ,var))
+  `(leto ,var (table) ,@body ,var))
 
 
 (tst w/table
