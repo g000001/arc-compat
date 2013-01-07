@@ -155,6 +155,9 @@
     (int (cl:case type
            (string (write-to-string thing))
            (cl:otherwise (cl:coerce thing type))))
+    ((string 0) (cl:case type
+                  (cons nil)
+                  (cl:otherwise (cl:coerce thing type))))
     (t (cl:case type
          (sym (intern (cl:string thing)))
          (cl:otherwise (cl:coerce thing type))))))
