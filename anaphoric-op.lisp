@@ -1,6 +1,6 @@
 (in-package :arc-compat.internal)
 (in-readtable :common-lisp)
-
+(in-suite arc-compat)
 
 ;;; '(w/uniq)
 ;;; Copyright 1995 by Paul Graham.
@@ -53,18 +53,25 @@ Within the body, the variable it refers back to the value of expr."
   `(if (no ,test) (do ,@body)))
 
 
-;FIXME
-;[code] [Macro] afn parms [body ...]
-;<- *onlisp* /alambda/
-(defmacro afn (parms &body body)
+(defmacro afn (params &body body)
   "Creates an anaphoric function, which can be called recursively
-with the name self. This allows a recursive function to be
-created without assigning it a name."
-  `(labels ((self ,parms ,@body))
-     #'self))
+  with the name self. This allows a recursive function to be
+  created without assigning it a name."
+  (cl:let ((args (gensym)))
+    `(labels ((self (&rest ,args) 
+                (cl:declare (cl:dynamic-extent ,args))
+                (destructuring-bind ,params ,args
+                  (cl:declare (cl:ignorable 
+                               ,@(remove-if (lambda (x)
+                                              (member x cl:lambda-list-keywords))
+                                            (+internal-flatten params))))
+                  ,@body)))
+       #'self)))
 
-;>(funcall (afn (x) (if (is x 0) 1 (* 2 (self (- x 1))))) 5)
-;32
+
+(tst afn
+  (== (funcall (afn (x) (if (is x 0) 1 (* 2 (self (- x 1))))) 5)
+      32))
 
 
 (mac caselet (var expr . args)

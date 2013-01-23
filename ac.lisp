@@ -170,7 +170,10 @@
 (xdef arc:writec cl:write-char)
 
 
-;; (xdef writeb (lambda (b . args) 
+(defun arc:writeb (int)
+  (cl:write-byte int *standard-output*)) 
+
+
 ;; (xdef write (lambda args (printwith write   args)))
 
 
@@ -182,18 +185,22 @@
     (if (eq eof expr) eof expr)))
 
 
-(defun coerce (thing type)
+(defun coerce (thing type &optional type-opt)
   (typecase thing
     (char (cl:case type
+            (int (cl:char-code thing))
             (string (cl:string thing))
             (cl:otherwise (cl:coerce thing type))))
     (sym (coerce (cl:string thing) type))
     (int (cl:case type
-           (string (write-to-string thing))
+           (string (write-to-string thing :base (or type-opt 10.)))
            (cl:otherwise (cl:coerce thing type))))
     ((string 0) (cl:case type
                   (cons nil)
                   (cl:otherwise (cl:coerce thing type))))
+    (string (cl:case type
+              (int (values (parse-integer thing :radix (or type-opt 10.))))
+              (cl:otherwise (cl:coerce thing type))))
     (t (cl:case type
          (sym (intern (cl:string thing)))
          (cl:otherwise (cl:coerce thing type))))))

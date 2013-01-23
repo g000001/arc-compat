@@ -144,7 +144,10 @@
 
 (def string args
   "Converts the args into a string. The args must be coerce-able to a string."
-  (apply #'+ "" (map (fn (_) (coerce _ 'string)) args)))
+  (apply #'+
+         (make-string 0)
+         (map (fn (_) (coerce _ 'string)) 
+              (rem nil args))))
 
 
 (tst string

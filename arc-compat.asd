@@ -43,6 +43,7 @@
                (:file "readtable-setup")
                (:file "ext")
                (:file "arc.arc")
+               (:file "string.arc")
 	       ))
 
 

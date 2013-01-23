@@ -53,13 +53,13 @@
   (member char (symbol->chars sym)))
 
 
-(defun tokens (test source token acc keepsep?)
+(defun ac-tokens (test source token acc keepsep?)
   (cond ((null source)
          (reverse (if (consp token) 
                       (cons (reverse token) acc)
                       acc)))
         ((funcall test (car source))
-         (tokens test
+         (ac-tokens test
                  (cdr source)
                  '()
                  (cl:let ((rec (if (null token)
@@ -69,7 +69,7 @@
                        (cons (car source) rec)
                        rec))
                  keepsep?))
-        (T (tokens test
+        (T (ac-tokens test
                    (cdr source)
                    (cons (car source) token)
                    acc
@@ -130,15 +130,16 @@
                  (Recompose-symbols (cdr SYMS))))))
 
 
+
+
 (defun expand-compose (sym)
   (cl:let ((elts (mapcar (lambda (tok)
                            (if (eql (car tok) #\~)
                                (if (null (cdr tok))
                                    'arc:no
-                                   `(cl:complement 
-                                     #',(chars->value (cdr tok))))
+                                   `(cl:complement ,(chars->value (cdr tok))))
                                (chars->value tok)))
-                         (tokens 
+                         (ac-tokens 
                           (lambda (c) 
                             (or (eql c compose-marker)
                                 (eql c compose-marker2)))
@@ -195,7 +196,7 @@
 
 (defun expand-sexpr (sym)
   (build-sexpr
-   (reverse (tokens
+   (reverse (ac-tokens
              (lambda (c) (or (eql c #\.) (eql c #\!)))
              (symbol->chars sym)
              '()

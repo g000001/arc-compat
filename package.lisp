@@ -83,8 +83,9 @@
    :when :whenlet :while :whiler :whilet :whitec :with :withs :write
    :write-spaced :write-table :writeb :writec :writefile1 :zap :* :+ :++ :- :--
    :/ :< :<= := :> :>=
-   :catch :throw
-   ))
+   :catch :throw)
+  (:export 
+   :front :both :end))
 
 
 (defpackage :arc-user
