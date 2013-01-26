@@ -61,13 +61,16 @@
            (args (cl:if (consp args)
                         args
                         `(&rest ,args))))
-    `(LAMBDA (&rest ,g)
-       (DESTRUCTURING-BIND ,args ,g
-         (cl:DECLARE 
-          (cl:IGNORABLE ,@(remove-if (lambda (x)
-                                       (member x cl:lambda-list-keywords))
-                                     (+internal-flatten args))))
-         ,@body))))
+    (if (and (tailp () args)
+             (every #'atom args))
+        `(LAMBDA (,@args) ,@body)
+        `(LAMBDA (&rest ,g)
+           (DESTRUCTURING-BIND ,args ,g
+             (cl:DECLARE 
+              (cl:IGNORABLE ,@(remove-if (lambda (x)
+                                           (member x cl:lambda-list-keywords))
+                                         (+internal-flatten args))))
+             ,@body)))))
 
 
 (defmacro let (var val &body body)
@@ -114,7 +117,7 @@
            :finally (return
                       `(DESTRUCTURING-BIND ,vars (list ,@vals)
                          (cl:DECLARE (cl:IGNORABLE ,@(+internal-flatten vars)))
-                         (w/obcall (,vars)
+                         (w/obcall (,@vars)
                            ,@body)))))
 
 
