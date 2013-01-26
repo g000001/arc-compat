@@ -37,13 +37,25 @@
 ;;;; (assign do (annotate 'mac
 ;;;;              (fn args `((fn () ,@args)))))
 ;;;; 
-;;;; (assign safeset (annotate 'mac
-;;;;                   (fn (var val)
-;;;;                     `(do (if (bound ',var)
-;;;;                              (do (disp "*** redefining " (stderr))
-;;;;                                  (disp ',var (stderr))
-;;;;                                  (disp #\newline (stderr))))
-;;;;                          (assign ,var ,val)))))
+(cl:defmacro safeset (var val)
+  `(do (if (cl:boundp ',var)
+           (do (disp "*** redefining " (stderr))
+               (disp ',var (stderr))
+             (disp #\newline (stderr))))
+       (cl:setf ,var ,val)))
+
+
+;;; ext
+(cl:defmacro fsafeset (var val)
+  `(do (if (cl:fboundp ',var)
+           (do (disp "*** redefining " (stderr))
+               (disp ',var (stderr))
+             (disp #\newline (stderr))))
+       (cl:progn
+         #+sbcl
+         (cl:declaim (cl:ftype ,(sb-introspect:function-type (eval val)) ,var))
+         (cl:setf (cl:fdefinition ',var) ,val))))
+
 ;;;; 
 ;;;; (assign def (annotate 'mac
 ;;;;                (fn (name parms . body)
@@ -636,6 +648,9 @@
 ;;;;     (let (binds val setter) (setforms place)
 ;;;;       `(atwiths ,(+ (list gx x) binds)
 ;;;;          (,setter (adjoin ,gx ,val ,@args))))))
+(xdef pushnew cl:pushnew)
+
+
 ;;;; 
 ;;;; (mac pull (test place)
 ;;;;   (w/uniq g
@@ -977,19 +992,21 @@
 ;;;; ; Could make this look at the sig of f and return a fn that took the 
 ;;;; ; right no of args and didn't have to call apply (or list if 1 arg).
 ;;;; 
-;;;; (def memo (f)
-;;;;   (with (cache (table) nilcache (table))
-;;;;     (fn args
-;;;;       (or (cache args)
-;;;;           (and (no (nilcache args))
-;;;;                (aif (apply f args)
-;;;;                     (= (cache args) it)
-;;;;                     (do (set (nilcache args))
-;;;;                         nil)))))))
-;;;; 
-;;;; 
-;;;; (mac defmemo (name parms . body)
-;;;;   `(safeset ,name (memo (fn ,parms ,@body))))
+(def memo (f)
+  (witho (cache (table) nilcache (table))
+    (fn args
+      (or (cache args)
+          (and (no (nilcache args))
+               (aif (apply f args)
+                    (= (cache args) it)
+                    (do (set (nilcache args))
+                        nil)))))))
+
+
+(mac defmemo (name parms . body)
+  `(fsafeset ,name (memo (fn ,parms ,@body))))
+
+
 ;;;; 
 ;;;; (def <= args
 ;;;;   (or (no args)
@@ -1081,11 +1098,14 @@
 ;;;;   (each (k v) (pair data) (= (table k) v))
 ;;;;   table)
 ;;;; 
-;;;; (def keys (h) 
-;;;;   (accum a (ontable k v h (a k))))
-;;;; 
-;;;; (def vals (h) 
-;;;;   (accum a (ontable k v h (a v))))
+(def keys (h) 
+  (accum a (ontable k v h (a k))))
+
+
+(def vals (h) 
+  (accum a (ontable k v h (a v))))
+
+
 ;;;; 
 ;;;; ; These two should really be done by coerce.  Wrap coerce?
 ;;;; 
