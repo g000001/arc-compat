@@ -61,8 +61,8 @@
            (args (cl:if (consp args)
                         args
                         `(&rest ,args))))
-    (if (and (tailp () args)
-             (every #'atom args))
+    (if (cl:and (cl:tailp () args)
+                (cl:every #'cl:atom args))
         `(LAMBDA (,@args) ,@body)
         `(LAMBDA (&rest ,g)
            (DESTRUCTURING-BIND ,args ,g
@@ -214,9 +214,6 @@
 
 
 (defun sym (x) (coerce x 'sym))
-
-
-
 
 
 ;;; eof

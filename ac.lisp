@@ -48,8 +48,7 @@
 ;; (xdef nil 'nil)
 ;; (xdef t   't)
 
-
-(def x+y (x y)
+(defun x+y (x y)
   (etypecase x
     (cl:number (cl:+ x y))
     (cl:list (cl:append x y))
@@ -68,7 +67,7 @@
         (T form)))
 
 
-(def arc:+ obj
+(defun arc:+ (&rest obj)
   (cl:reduce #'x+y obj))
 
 
@@ -211,8 +210,38 @@
 ;; (xdef new-thread thread)
 ;; (xdef kill-thread kill-thread)
 ;; (xdef break-thread break-thread)
-;; (xdef sleep (wrapnil sleep))
-;; (xdef system (wrapnil system))
+(defun wrapnil (f) 
+  (lambda (&rest args)
+    (cl:declare (dynamic-extent args))
+    (apply f args) 
+    'nil))
+
+
+(xdef sleep cl:sleep)
+
+
+(flet ((whitecp (c) 
+         (member c '(#\Space #\Newline #\Return #\Tab))))
+  (defun split-by-whitec (string)
+    (if (every #'whitecp string)
+        '()
+        (cl:let ((pos (position-if #'whitecp string)))
+          (cons (subseq string 0 pos) 
+                (and pos (split-by-whitec (subseq string (+ 1 pos)))))))))
+
+
+(defun system (string)
+  #+sbcl
+  (destructuring-bind (&optional (cmd :no-cmd) . args)
+                      (split-by-whitec string)
+    (unless (eq :no-cmd cmd)
+      (princ 
+       (cl:with-output-to-string (out)
+         (sb-ext:run-program cmd args :search t :output out))
+       (stdout))))
+  nil)
+
+
 ;; (xdef pipe-from (lambda (cmd)
 
 

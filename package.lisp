@@ -9,7 +9,7 @@
   (:import-from :cl
    :expt :truncate :quote :eval :some
    :sqrt :warn :push :abs :mod
-   :pop :sleep :round :car
+   :pop :round :car
    :nil :* :subseq :/ 
    :time :write
    :cdr :- :load :close :t)

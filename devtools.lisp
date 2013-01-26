@@ -7,10 +7,13 @@
   (cl:loop :for s :being :each :external-symbol :in :arc :collect s))
 
 
+(=* arc-keywords* '(index it self _ o))
+
 (def unimplements ()
   (let arcsyms (arc-compat-external-symbols)
     (let unimps (keep (fn (_) (and (not (cl:fboundp _))
-                                   (not (cl:boundp _))))
+                                   (not (cl:boundp _))
+                                   (not (mem _ arc-keywords*))))
                       arcsyms)
       (cl:values unimps (len arcsyms) (len unimps)))))
 
