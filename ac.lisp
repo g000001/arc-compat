@@ -56,11 +56,11 @@
 
 
 (define-compiler-macro x+y (&whole form x y)
-  (cond ((or (numberp x) (numberp y))
+  (cond ((cl:or (numberp x) (numberp y))
          `(cl:+ ,x ,y))
-        ((or (stringp x) (stringp y))
+        ((cl:or (stringp x) (stringp y))
          `(cl:concatenate 'cl:string ,x ,y))
-        ((or (typep x 
+        ((cl:or (typep x 
                     '(cons (eql cl:the) (cons (cl:member cl:number cl:fixnum))))
              (typep y '(cons (eql cl:the) (cons (cl:member cl:number cl:fixnum)))))
          `(cl:+ ,x ,y))
@@ -192,13 +192,13 @@
             (cl:otherwise (cl:coerce thing type))))
     (sym (coerce (cl:string thing) type))
     (int (cl:case type
-           (string (write-to-string thing :base (or type-opt 10.)))
+           (string (write-to-string thing :base (cl:or type-opt 10.)))
            (cl:otherwise (cl:coerce thing type))))
     ((string 0) (cl:case type
                   (cons nil)
                   (cl:otherwise (cl:coerce thing type))))
     (string (cl:case type
-              (int (values (parse-integer thing :radix (or type-opt 10.))))
+              (int (values (parse-integer thing :radix (cl:or type-opt 10.))))
               (cl:otherwise (cl:coerce thing type))))
     (t (cl:case type
          (sym (intern (cl:string thing)))
@@ -227,7 +227,7 @@
         '()
         (cl:let ((pos (position-if #'whitecp string)))
           (cons (subseq string 0 pos) 
-                (and pos (split-by-whitec (subseq string (+ 1 pos)))))))))
+                (and pos (split-by-whitec (subseq string (1+ pos)))))))))
 
 
 (defun system (string)
