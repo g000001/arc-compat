@@ -58,12 +58,15 @@
 
 (defmacro FN (args &body body)
   (cl:let ((g (gensym)))
-    (cond ((atom args)
+    (cond ((null args)
+           `(LAMBDA () ,@body))
+          ((atom args)
            `(LAMBDA (&rest ,args) ,@body))
           ((cl:and (cl:tailp () args)
                    (cl:every #'cl:atom args))
            `(LAMBDA (,@args) ,@body))
           (T `(LAMBDA (&rest ,g)
+                (CL:DECLARE (CL:DYNAMIC-EXTENT ,g))
                 (DESTRUCTURING-BIND ,args ,g
                   (cl:DECLARE 
                    (cl:IGNORABLE ,@(remove-if (lambda (x)
