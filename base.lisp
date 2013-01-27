@@ -57,20 +57,19 @@
 ;    ,@body))
 
 (defmacro FN (args &body body)
-  (cl:let ((g (gensym))
-           (args (cl:if (consp args)
-                        args
-                        `(&rest ,args))))
-    (if (cl:and (cl:tailp () args)
-                (cl:every #'cl:atom args))
-        `(LAMBDA (,@args) ,@body)
-        `(LAMBDA (&rest ,g)
-           (DESTRUCTURING-BIND ,args ,g
-             (cl:DECLARE 
-              (cl:IGNORABLE ,@(remove-if (lambda (x)
-                                           (member x cl:lambda-list-keywords))
-                                         (+internal-flatten args))))
-             ,@body)))))
+  (cl:let ((g (gensym)))
+    (cond ((atom args)
+           `(LAMBDA (&rest ,args) ,@body))
+          ((cl:and (cl:tailp () args)
+                   (cl:every #'cl:atom args))
+           `(LAMBDA (,@args) ,@body))
+          (T `(LAMBDA (&rest ,g)
+                (DESTRUCTURING-BIND ,args ,g
+                  (cl:DECLARE 
+                   (cl:IGNORABLE ,@(remove-if (lambda (x)
+                                                (member x cl:lambda-list-keywords))
+                                              (+internal-flatten args))))
+                  ,@body))))))
 
 
 (defmacro let (var val &body body)
