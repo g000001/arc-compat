@@ -232,10 +232,10 @@
 
 (defun system (string)
   #+sbcl
-  (destructuring-bind (&optional (cmd :no-cmd) . args)
-                      (split-by-whitec string)
-    (unless (eq :no-cmd cmd)
-      (princ 
+  (cl:destructuring-bind (&optional (cmd :no-cmd) . args)
+                         (split-by-whitec string)
+    (cl:unless (eq :no-cmd cmd)
+      (cl:princ 
        (cl:with-output-to-string (out)
          (sb-ext:run-program cmd args :search t :output out))
        (stdout))))
@@ -256,13 +256,16 @@
 
 ;; (xdef protect protect)
 ;; (xdef rand random)
-;; (xdef dir (lambda (name)
-
-(defun dir (name)
+(defun dir (name)                       ;FIXME
   (if (and (probe-file name))
-      (mapcar #'file-namestring (cl:directory "/etc/*"))))
+      (remove ""
+              (mapcar (lambda (_)
+                        (cl:let ((ns (file-namestring _)))
+                          (subseq ns 0 (position #\/ ns :from-end T))))
+                      (cl:directory (format nil "~A/*.*" name)))
+              :test #'string=)
+      (error "Error: directory-list: could not open \"~A\"" name)))
 
-(system "ls")
 
 ;; (xdef file-exists (lambda (name)
 ;; (xdef dir-exists (lambda (name)
