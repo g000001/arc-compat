@@ -226,8 +226,8 @@
     (if (every #'whitecp string)
         '()
         (cl:let ((pos (position-if #'whitecp string)))
-          (cons (subseq string 0 pos) 
-                (and pos (split-by-whitec (subseq string (1+ pos)))))))))
+          (cons (cl:subseq string 0 pos) 
+                (and pos (split-by-whitec (cl:subseq string (1+ pos)))))))))
 
 
 (defun system (string)
@@ -257,6 +257,13 @@
 ;; (xdef protect protect)
 ;; (xdef rand random)
 ;; (xdef dir (lambda (name)
+
+(defun dir (name)
+  (if (and (probe-file name))
+      (mapcar #'file-namestring (cl:directory "/etc/*"))))
+
+(system "ls")
+
 ;; (xdef file-exists (lambda (name)
 ;; (xdef dir-exists (lambda (name)
 ;; (xdef rmfile (wrapnil delete-file))
