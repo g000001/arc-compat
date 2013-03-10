@@ -1,6 +1,6 @@
 (in-package :arc-compat.internal)
 (in-readtable :common-lisp)
-
+(in-suite arc-compat)
 
 (defmacro defalias (alias orig &optional doc-string)
   `(progn
@@ -30,6 +30,13 @@
                           cl:&rest
                           ,(cdr last) ))))
     (cl:symbol `(cl:&rest ,list)) ))
+
+
+(5am:test to-proper-lambda-list
+  (5am:is (equal (to-proper-lambda-list () ) () ))
+  (5am:is (equal (to-proper-lambda-list (list 'a 'b 'c) ) (list 'a 'b 'c)))
+  (5am:is (equal (to-proper-lambda-list '(a b . c)) '(a b &rest c)))
+  (5am:is (equal (to-proper-lambda-list 'rest) '(&rest rest))))
 
 
 (defun reduce-&optional (args)
@@ -82,6 +89,15 @@
   (etypecase seq
     (cl:hash-table (setf (gethash index seq) val))
     (cl:sequence (setf (elt seq index) val))))
+
+
+(5am:test setf-ref
+  (cl:let ((a (list 1 2 3)))
+    (setf (ref a 1) :a)
+    (5am:is (equal a (list 1 :a 3))))
+  (cl:let ((h (make-hash-table)))
+    (setf (ref h 1) :a)
+    (5am:is (equal (ref h 1) :a))))
 
 
 (defmacro w/obcall ((&rest seqs) &body body)
