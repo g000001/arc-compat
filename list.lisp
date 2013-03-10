@@ -66,6 +66,13 @@
               xs))
 
 
+(tst nthcdr 
+  (== (nthcdr nil (list 1 2 3 4))
+      (list 1 2 3 4))
+  (== (nthcdr 2 (list 1 2 3 4))
+      (list 3 4)))
+
+
 (def last (seq)
   "Returns the last element of list."
   (if (no (cdr seq))
@@ -93,7 +100,11 @@
 
 (tst flat
   (== (flat '(1 2 () (3 4 (5))))
-      '(1 2 3 4 5)))
+      '(1 2 3 4 5))
+  (== (flat "" t)
+      nil)
+  (== (flat '(1 2 3 4 () ("") "") t)
+      (list 1 2 3 4)))
 
 
 (defalias rev cl:reverse
@@ -173,8 +184,8 @@
   list. If specified, function f is applied to each pair."
   (cl:cond ((no xs) nil)
 	   ((no (cdr xs)) (list (list (car xs))))
-	   ('T (cons (funcall f (car xs) (cadr xs))
-		     (pair (cddr xs) f)))))
+	   (T (cons (funcall f (car xs) (cadr xs))
+                    (pair (cddr xs) f)))))
 
 
 (tst pair
@@ -227,9 +238,9 @@
 
 (tst range
   (== (range 0 10)
-      '(0 1 2 3 4 5 6 7 8 9 10) )
+      (list 0 1 2 3 4 5 6 7 8 9 10) )
   (== (range 1.5 3.8)
-      '(1.5 2.5 3.5) ))
+      (list 1.5 2.5 3.5) ))
 
 
 (mac n-of (n expr)
@@ -347,7 +358,7 @@
 	    nil)
 	   ((funcall f (car xs))
 	    (cons (car xs) (firstn-that (- n 1) f (cdr xs))))
-	   ('T (firstn-that n f (cdr xs)))))
+	   (T (firstn-that n f (cdr xs)))))
 
 
 (tst firstn-that
@@ -374,7 +385,9 @@
   (== (most #'abs '(3 -10 5))
       -10 )
   (== (most #'abs '(-1 1 -1))
-      -1 ))
+      -1 )
+  (== (most #'abs nil)
+      nil ))
 
 
 (def map1 (f list)
@@ -477,6 +490,12 @@
 
 
 (tst merge
+  (== (merge #'< '() (list 2 4 6))
+      (list 2 4 6) )
+  (== (merge #'< (list 2) (list 1))
+      (list 1 2) )
+  (== (merge #'< (list 2 4 6) '())
+      (list 2 4 6) )
   (== (merge #'< (list 1 2 3 5) (list 2 4 6))
       (list 1 2 2 3 4 5 6) )
   (== (merge (fn (a b) (> (len a) (len b)))
@@ -524,8 +543,12 @@
 
 
 (tst mergesort
+  (== (mergesort #'< (list 1))
+      (list 1))
   (== (mergesort #'< (list 3 0 10 -7))
       (list -7 0 3 10))
+  (== (mergesort #'< (list 9 8 7 6 5 4 3 2 1))
+      (list 1 2 3 4 5 6 7 8 9))
   (== (mergesort (fn (a b) (< (len a) (len b)))
                  (list "horse" "dog" "elephant" "cat"))
       (list "dog" "cat" "horse" "elephant")))
@@ -543,6 +566,8 @@
 
 
 (tst insert-sorted
+  (== (insert-sorted #'> 5 '())
+      '(5) )
   (== (insert-sorted #'> 5 '(10 3 1))
       '(10 5 3 1) )
   (== (insert-sorted #'> 5 '(10 5 1))
@@ -573,6 +598,8 @@
 
 
 (tst reinsert-sorted
+  (== (reinsert-sorted #'> 5 '())
+      '(5))
   (== (reinsert-sorted #'> 5 '(10 3 1))
       '(10 5 3 1))
   (== (reinsert-sorted #'> 5 '(10 5 1))
@@ -600,6 +627,8 @@
 
 
 (tst best
+  (== (best #'> '() )
+      nil )
   (== (best #'> '(3 1 4 5 9 6))
       9)
   (== (best #'> '("3" "1" "4" "5" "9" "6"))
@@ -874,7 +903,9 @@
   (== (cut '(a b c d) 2)
       '(C D))
   (== (cut '(a b c d) 2 4)
-      '(C D)))
+      '(C D))
+  (== (cut '(a b c d) 0 -1)
+      '(a b c)))
 
 
 (def rem (test seq)

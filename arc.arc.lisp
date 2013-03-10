@@ -1608,16 +1608,18 @@
       sym    (sym (map upc (coerce x 'string)))
              (err "Can't upcase" x))))|#
 
-(def range (start end)
+;;; list.lisp
+#|(def range (start end)
   (if (> start end)
       nil
-      (cons start (range (+ start 1) end))))
+      (cons start (range (+ start 1) end))))|#
 
-(def mismatch (s1 s2)
+;;; list.lisp
+#|(def mismatch (s1 s2)
   (catch
     (on c s1
       (when (isnt c (ref s2 index))
-        (throw index)))))
+        (throw index)))))|#
 
 (def memtable (ks)
   (leto h (table)
@@ -1640,9 +1642,9 @@
                                  (pr ,out) )))))
                   body )))))
 
-(def len< (x n) (< (len x) n))
+#|(def len< (x n) (< (len x) n))|# ;; list.lisp
 
-(def len> (x n) (> (len x) n))
+#|(def len> (x n) (> (len x) n))|# ;; list.lisp
 
 (mac thread body 
   `(new-thread (fn () ,@body)))

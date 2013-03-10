@@ -1,5 +1,6 @@
 (in-package :arc-compat.internal)
 (in-readtable :common-lisp)
+(in-suite arc-compat)
 
 
 (defmacro mac (name args &body body)
@@ -51,6 +52,10 @@
                      (aif ,@(cddr args)))))))
 
 
+(tst aif
+  (== (macroexpand '(aif t)) T)
+  (== (aif t) t))
+
 ;(defmacro +INTERNAL-DEPARAM (param &body body)
 ;  (DESTRUCTURING-BIND ,param ,g
 ;    (DECLARE (IGNORABLE ,@(+internal-flatten args)))
@@ -75,6 +80,11 @@
                                                 (member x cl:lambda-list-keywords))
                                               (+internal-flatten args))))
                   ,@body))))))
+
+
+(5am:test fn
+  (== (macroexpand '(fn () foo))
+      '#'(lambda () foo)))
 
 
 (defmacro let (var val &body body)
@@ -147,11 +157,12 @@
                                        ,@body)
                      :from-end 'T)))
 
+(tst withs
+  (== (withs (a 1 b (+ a 1)) (+ a b))
+      3)
+  (== (withs (a 1 b 2 (c d) '(3 4)) (+ a b c d))
+      10))
 
-;>(withs (a 1 b (+ a 1)) (+ a b))
-;3
-
-;(withs (a 1 b 2 (c d) '(3 4)) (+ a b c d))
 
 (defmacro do (&body forms)
   `(progn ,@forms))
