@@ -57,14 +57,16 @@
 ;    ,@body))
 
 (defmacro FN (args &body body)
-  (cl:let ((g (gensym)))
+  (cl:let ((g (gensym "fn-")))
     (cond ((null args)
            `(LAMBDA () ,@body))
           ((atom args)
            `(LAMBDA (&rest ,args) ,@body))
           ((cl:and (cl:tailp () args)
                    (cl:every #'cl:atom args))
-           `(LAMBDA (,@args) ,@body))
+           `(LAMBDA (,@args) 
+              (cl:declare (cl:ignorable ,@args))
+              ,@body))
           (T `(LAMBDA (&rest ,g)
                 (CL:DECLARE (CL:DYNAMIC-EXTENT ,g))
                 (DESTRUCTURING-BIND ,args ,g
@@ -175,11 +177,11 @@
       '(147 258 369))
   (== (map (fn (_) (list _ (* _ 10))) '(1 2 3))
       '((1 10) (2 20) (3 30)))
-  (== (map cdr '((1) (2 3) (4 5)))
+  (== (map #'cdr '((1) (2 3) (4 5)))
     '(nil (3) (5)))
   (== (map (fn (c n) (coerce (+ n (coerce c 'int)) 'char)) "abc" '(0 2 4))
     "adg")
-  (== (map min "bird" "elephant")
+  (== (map #'min "bird" "elephant")
     "bied"))
 
 

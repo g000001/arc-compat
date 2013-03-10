@@ -193,16 +193,26 @@
     (sym (coerce (cl:string thing) type))
     (int (cl:case type
            (string (write-to-string thing :base (cl:or type-opt 10.)))
+           (char (cl:code-char thing))
            (cl:otherwise (cl:coerce thing type))))
     ((string 0) (cl:case type
                   (cons nil)
                   (cl:otherwise (cl:coerce thing type))))
     (string (cl:case type
               (int (values (parse-integer thing :radix (cl:or type-opt 10.))))
+              (sym (intern thing))
               (cl:otherwise (cl:coerce thing type))))
+    (cons (cl:case type
+            ((string) (apply #'concatenate 'cl:string
+                             (mapcar (lambda (y) (coerce y 'string))
+                                     thing)))
+            (cl:otherwise (cl:error "Can't coerce ~A > ~A" thing type))))
     (t (cl:case type
          (sym (intern (cl:string thing)))
          (cl:otherwise (cl:coerce thing type))))))
+
+
+
 
 
 ;; (xdef open-socket  (lambda (num) (tcp-listen num 50 #t))) 

@@ -101,7 +101,8 @@
   (== (<= #\a #\c #\e)
       t )
   (== (<= "foo" "bar")
-      nil ))
+      nil )
+  (>_< (cl:error) (<=)))
 
 
 (def >= args
@@ -124,7 +125,8 @@
   (== (>= #\a #\c #\e)
       nil )
   (== (>= "baz" "bar")
-      t ))
+      t )
+  (>_< (cl:error) (>=)))
 
 
 (defalias bound cl:boundp
@@ -184,6 +186,8 @@
   (== (dotted (cons 1 2))
       t)
   (== (dotted (list 1 2))
+      nil)
+  (== (dotted 'a)
       nil))
 
 
@@ -274,7 +278,16 @@
       t)
   (== (iso (list (list 1) 2 3 4)
            (list (list 1) 2 3 4))
-      t))
+      t)
+  (== (iso (list (list 1) 2 3 4)
+           'a)
+      nil)
+  (== (iso (list (list 1 :a :b :c :d) 2 3 4)
+           (list (list 1 :a :b :c :d) 2 3 4))
+      t)
+  (== (iso (list (list 1 :a :b :c :d) 2 3 4)
+           (list 1 2 3 4))
+      nil))
 
 
 (def atend (i s)

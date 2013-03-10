@@ -132,7 +132,7 @@
 
 
 
-(defun expand-compose (sym)
+(defun expand-compose (sym &optional fposp)
   (cl:let ((elts (mapcar (lambda (tok)
                            (if (eql (car tok) #\~)
                                (if (null (cdr tok))
@@ -152,15 +152,17 @@
         (cl:let ((fs (Make-compose-form elts)))
           (etypecase fs
             (symbol fs)
-            (cons (cl:let ((args (gensym)))
-                    ;; (print elts)
-                    `(lambda (&rest ,args)
-                       (cl:declare (cl:dynamic-extent ,args))
-                       (apply ,(Make-compose-form elts)
-                              ,args)
-                       #|(apply (arc::compose ,@(mapcar (lambda (e) `#',e) 
-                       elts))
-                       ,args)|# ))))))))
+            (cons (if fposp
+                      `(compose ,@elts)
+                      (cl:let ((args (gensym)))
+                        ;; (print elts)
+                        `(lambda (&rest ,args)
+                           (cl:declare (cl:dynamic-extent ,args))
+                           (apply ,(Make-compose-form elts)
+                                  ,args)
+                           #|(apply (arc::compose ,@(mapcar (lambda (e) `#',e) 
+                           elts))
+                           ,args)|# )))))))))
 
 
 (defun expand-ssyntax (sym)
@@ -224,9 +226,9 @@
                     (Expand-ssyntax OBJ)
                     OBJ
                     #|(cl:let ((FN (cl:get OBJ 'arc-lambda)))
-                      (if FN
-                          (funcall FN STREAM)
-                          OBJ))|# 
+                              (if FN
+(funcall FN STREAM)
+OBJ))|# 
                     ))
         (otherwise OBJ)))))
 
@@ -239,6 +241,13 @@
 (defun set-arc-lambda (name readfn)
   (setf (cl:get name 'arc-lambda) readfn)
   t)
+
+
+;;; compose
+(defun decompose (fns args)
+  (cl:cond ((cl:null fns) `((fn vals (car vals)) ,@args))
+           ((cl:null (cdr fns)) (cons (car fns) args))
+           (T (list (car fns) (decompose (cdr fns) args)))))
 
 
 ;;; eof
