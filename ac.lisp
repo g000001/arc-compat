@@ -212,9 +212,6 @@
          (cl:otherwise (cl:coerce thing type))))))
 
 
-
-
-
 ;; (xdef open-socket  (lambda (num) (tcp-listen num 50 #t))) 
 ;; (xdef socket-accept (lambda (s)
 ;; (xdef new-thread thread)
@@ -347,7 +344,7 @@
 
 (defun arc:timedate (&optional arg)
   (multiple-value-bind (s m h d mo y)
-                       (decode-universal-time (or arg (get-universal-time))
+                       (decode-universal-time (cl:or arg (get-universal-time))
                                               0)
     (list s m h d mo y)))
 

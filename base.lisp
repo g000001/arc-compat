@@ -87,13 +87,49 @@
       '#'(lambda () foo)))
 
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun _-to-gensym (list)
+    (cond ((atom list) list)
+          ((consp (car list))
+           (cons (_-to-gensym (car list))
+                 (_-to-gensym (cdr list))))
+          (T (cons (if (string= "_" (car list))
+                       (gensym)
+                       (car list))
+                   (_-to-gensym (cdr list)))))))
+(symbol-package (gensym))
+
+
+(5am:test _-to-gensym
+  (== (_-to-gensym '(x y z))
+      '(X Y Z))
+  (== (_-to-gensym 'x)
+      'X)
+  (== (subst-if-not '_ (lambda (x) 
+                         (cl:if (consp x)
+                                x
+                                (symbol-package x)))
+                    (_-to-gensym '(_ a b)))
+      '(_ A B))
+  (== (subst-if-not '_ (lambda (x) 
+                         (cl:if (consp x)
+                                x
+                                (symbol-package x)))
+                    (_-to-gensym '((_ . a)
+                                   (_ . b)
+                                   (_ . c))))
+      '((_ . A) (_ . B) (_ . C))))
+
+
+
 (defmacro let (var val &body body)
   "The let statement sets the variable var to the value within the
   scope of the body. Outside the let statement, any existing value
   of var is unaffected. Let is like with but with a single variable
   binding."
   (if (consp var)
-      (cl:let ((tem (gensym "let-")))
+      (cl:let ((tem (gensym "let-"))
+               (var (_-to-gensym var)))
         `((CL:LAMBDA (&REST ,tem)
             (cl:DECLARE (cl:DYNAMIC-EXTENT ,tem))
             (DESTRUCTURING-BIND (,var) ,tem

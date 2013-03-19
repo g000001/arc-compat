@@ -13,7 +13,7 @@
                #+:it :root.package.it
                :bordeaux-threads
                #+sbcl :sb-introspect
-               )
+               :ironclad)
   :serial T
   :components ((:file "package")
                (:file "type")

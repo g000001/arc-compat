@@ -864,7 +864,7 @@
 
 
 (def read ((o x (stdin)) (o eof nil))
-  (if (isa x 'string) (readstring1 x eof) (sread x eof)))
+  (cl:if (isa x 'string) (readstring1 x eof) (sread x eof)))
 
 
 (tst read

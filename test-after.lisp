@@ -79,5 +79,66 @@
   (== (len (obj a 1 b 2))
       2))
 
+;;; 
+;;; ar.lisp
+;;; 
+
+(tst sig
+  (== (sig #'len) '(SEQ))
+  (== (sig 'let) '(var val &body body)))
+
+
+(tst err
+  (>_< (cl:error) (err "foo")))
+
+
+(tst x+y
+  ;; compiler-macro
+  (== (x+y (cl:the cl:fixnum (values 8))
+           (cl:the cl:fixnum (values 8)))
+      16))
+
+
+(tst type
+  (== (type #'list) 'FN)
+  (== (type 1.0) 'NUM)
+  (== (type 1.0) 'NUM)
+  (== (type (stdout)) 'OUTPUT))
+
+
+(tst writeb
+  ;; FIXME
+  (== (cl:with-open-stream (*standard-output*
+                            (ironclad::make-octet-output-stream))
+        (writeb 8))
+      8))
+
+
+(tst coerce
+  (== (cl:map 'cl:string
+              (fn (_) (coerce (coerce _ 'int) 'char))
+              "abcdefg")
+      "abcdefg")
+  (== (coerce "" 'cons)
+      nil)
+  (== (coerce #\Z 'string) "Z")
+  (== (coerce "" 'cl:list)
+      nil)
+  (== (coerce "123" 'int)
+      123)
+  (== (coerce '(#\A #\b #\c) 'string)
+      "Abc")
+  (>_< (cl:error) (coerce '(#\a #\b #\c) 'int))
+  (== (coerce "foo" 'sym)
+      '|foo|)
+  (>_< (cl:error) (coerce "foo" (uniq))))
+
+
+(tst timedate
+  (== (cdr (timedate))
+      (cdr (timedate)))
+  (== (timedate 0)
+      (timedate 0)))
+
 
 ;;; eof
