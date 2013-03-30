@@ -230,8 +230,10 @@
 (flet ((whitecp (c) 
          (member c '(#\Space #\Newline #\Return #\Tab))))
   (defun split-by-whitec (string)
-    (if (every #'whitecp string)
-        '()
+    (if (notany #'whitecp string)
+         string
+        (every #'whitecp string)
+         '()
         (cl:let ((pos (position-if #'whitecp string)))
           (cons (cl:subseq string 0 pos) 
                 (and pos (split-by-whitec (cl:subseq string (1+ pos)))))))))
@@ -264,7 +266,7 @@
 ;; (xdef protect protect)
 ;; (xdef rand random)
 (defun dir (name)                       ;FIXME
-  (if (and (probe-file name))
+  (if (cl:and (probe-file name))
       (remove ""
               (mapcar (lambda (_)
                         (cl:let ((ns (file-namestring _)))
