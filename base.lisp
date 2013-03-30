@@ -94,10 +94,9 @@
            (cons (_-to-gensym (car list))
                  (_-to-gensym (cdr list))))
           (T (cons (if (string= "_" (car list))
-                       (gensym)
+                       (cl:gensym "_")
                        (car list))
                    (_-to-gensym (cdr list)))))))
-(symbol-package (gensym))
 
 
 (5am:test _-to-gensym
