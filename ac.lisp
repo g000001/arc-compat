@@ -231,7 +231,7 @@
          (member c '(#\Space #\Newline #\Return #\Tab))))
   (defun split-by-whitec (string)
     (if (notany #'whitecp string)
-         string
+         (list string)
         (every #'whitecp string)
          '()
         (cl:let ((pos (position-if #'whitecp string)))
