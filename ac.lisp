@@ -181,7 +181,7 @@
 
 (defun arc:sread (p eof)
   (cl:let ((expr (cl:read p nil eof)))
-    (if (eq eof expr) eof expr)))
+    (cl:if (eq eof expr) eof expr)))
 
 
 (defun coerce (thing type &optional type-opt)
