@@ -79,16 +79,27 @@
   `(5am:signals ,x ,y))
 
 
-(defun ref (seq index)
-  (etypecase seq
-    (cl:hash-table (gethash index seq))
-    (cl:sequence (elt seq index))))
+(defgeneric ref (seq index)
+  (:method (seq index)
+    (cl:error "REF: non-supported seq type: ~A" (type-of seq))))
+
+(defmethod ref ((seq cl:hash-table) index)
+  (gethash index seq))
+
+(defmethod (setf ref) (val (seq cl:hash-table) index)
+  (setf (gethash index seq) val))
+
+(defmethod ref ((seq cl:sequence) index)
+  (elt seq index))
+
+(defmethod (setf ref) (val (seq cl:sequence) index)
+  (setf (elt seq index) val))
 
 
-(defun (setf ref) (val seq index)
+#|(defun (setf ref) (val seq index)
   (etypecase seq
     (cl:hash-table (setf (gethash index seq) val))
-    (cl:sequence (setf (elt seq index) val))))
+    (cl:sequence (setf (elt seq index) val))))|#
 
 
 (5am:test setf-ref
