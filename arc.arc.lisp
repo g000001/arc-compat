@@ -701,8 +701,8 @@
 ;;;;   (do1 (apply pr args)
 ;;;;        (writec #\newline)))
 ;;;; 
-;;;; (mac wipe args
-;;;;   `(do ,@(map (fn (a) `(= ,a nil)) args)))
+(mac wipe args
+  `(do ,@(map (fn (a) `(= ,a nil)) args)))
 ;;;; 
 ;;;; (mac set args
 ;;;;   `(do ,@(map (fn (a) `(= ,a t)) args)))
@@ -1474,29 +1474,29 @@
 ;;;;       (f (car xs) (rreduce f (cdr xs)))
 ;;;;       (apply f xs)))
 ;;;; 
-;;;; (let argsym (uniq)
-;;;; 
-;;;;   (def parse-format (str)
-;;;;     (accum a
-;;;;       (with (chars nil  i -1)
-;;;;         (w/instring s str
-;;;;           (whilet c (readc s)
-;;;;             (case c 
-;;;;               #\# (do (a (coerce (rev chars) 'string))
-;;;;                       (wipe chars)
-;;;;                       (a (read s)))
-;;;;               #\~ (do (a (coerce (rev chars) 'string))
-;;;;                       (wipe chars)
-;;;;                       (readc s)
-;;;;                       (a (list argsym (++ i))))
-;;;;                   (push c chars))))
-;;;;          (when chars
-;;;;            (a (coerce (rev chars) 'string))))))
-;;;;   
-;;;;   (mac prf (str . args)
-;;;;     `(let ,argsym (list ,@args)
-;;;;        (pr ,@(parse-format str))))
-;;;; )
+(let argsym (uniq)
+
+  (def parse-format (str)
+    (accum a
+      (with (chars nil  i -1)
+        (w/instring s str
+          (whilet c (cl:read-char s nil)
+            (case c 
+              #\# (do (a (coerce (rev chars) 'string))
+                      (wipe chars)
+                      (a (read s)))
+              #\~ (do (a (coerce (rev chars) 'string))
+                      (wipe chars)
+                      (cl:read-char s nil)
+                      (a (list 'arc::ref argsym (++ i))))
+                  (push c chars))))
+         (when chars
+           (a (coerce (rev chars) 'string))))))
+  
+  (mac prf (str . args)
+    `(let ,argsym (list ,@args)
+       (pr ,@(parse-format str))))
+)
 ;;;; 
 ;;;; (def load (file)
 ;;;;   (w/infile f file
