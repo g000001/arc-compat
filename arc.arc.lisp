@@ -878,20 +878,20 @@
    (w/instring s ""
      (== (read s eof) eof))))
 
-;;;; 
-;;;; ; inconsistency between names of readfile[1] and writefile
-;;;; 
-;;;; (def readfile (name) (w/infile s name (drain (read s))))
-;;;; 
-;;;; (def readfile1 (name) (w/infile s name (read s)))
-;;;; 
-;;;; (def readall (src (o eof nil))
-;;;;   ((afn (i)
-;;;;     (let x (read i eof)
-;;;;       (if (is x eof)
-;;;;           nil
-;;;;           (cons x (self i)))))
-;;;;    (if (isa src 'string) (instring src) src)))
+
+; inconsistency between names of readfile[1] and writefile
+
+(def readfile (name) (w/infile s name (drain (read s))))
+
+(def readfile1 (name) (w/infile s name (read s)))
+
+(def readall (src (o eof nil))
+  ((afn (i)
+    (let x (read i eof)
+      (if (is x eof)
+          nil
+          (cons x (self i)))))
+   (if (isa src 'string) (instring src) src)))
 ;;;; 
 ;;;; (def writefile (val file)
 ;;;;   (let tmpfile (+ file ".tmp")
