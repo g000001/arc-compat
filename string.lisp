@@ -15,7 +15,7 @@
   (space, newline, tab, or return)."
   (in c #\space #\newline #\tab #\return))
 
-
+#|||
 (tst whitec
   (== (whitec #\tab)
       t)
@@ -36,7 +36,7 @@
       t))
 
 
-(def letter (c) (or (<= #\a c #\z) (<= #\A c #\Z)))
+(def letter (c) (cl:or (<= #\a c #\z) (<= #\A c #\Z)))
 
 
 (def digit (c) (<= #\0 c #\9))
@@ -113,9 +113,9 @@
 (def ellipsize (str (o limit 80))
   "If str is longer than the limit (default 80), truncate it and append 
   ellipses ('...')."
-  (if (<= (len str) limit)
-      str
-      (+ (cut str 0 limit) "...")))
+  (cl:if (<= (len str) limit)
+         str
+         (+ (cut str 0 limit) "...")))
 
 
 (tst ellipsize
@@ -138,8 +138,8 @@
 
 (tst rand-string 
   (== T (let str (rand-string 6) 
-          (and (is 6 (len str)) 
-               (all #'alphadig str)))))
+          (cl:and (is 6 (len str)) 
+                  (all #'alphadig str)))))
 
 
 (def string args
@@ -165,16 +165,16 @@
     n                                   ;ignore
     (funcall
      (afn (i)
-       (and (< i (len s))
-            (or (funcall test i)
-                (self (+ i 1)))))
+       (cl:and (< i (len s))
+               (cl:or (funcall test i)
+                      (self (+ i 1)))))
      start)))
 
 
 (tst recstring
   (== (let str "abcde"
            (recstring
-            (fn (idx) (if (is (cl:char str idx) #\c) (+ 10 idx)))
+            (fn (idx) (cl:if (is (cl:char str idx) #\c) (+ 10 idx)))
             str ))
       12 ))
 
@@ -189,10 +189,10 @@
        (do ,@(map (fn (e)
                     `(let ,out (tostring ,e)
                        (unless (is ,out "")
-                         (if ,needbars
-                             (pr bar* ,out)
-                             (do (set ,needbars t)
-                                 (pr ,out))))))
+                         (cl:if ,needbars
+                                (pr bar* ,out)
+                                (do (set ,needbars t)
+                                    (pr ,out))))))
                   body)))))
 
 
@@ -209,9 +209,9 @@
 (def headmatch (pat seq (o start 0))
   (let p (len pat) 
     (funcall (afn (i)      
-       (or (is i p) 
-           (and (is (ref pat i) (ref seq (+ i start)))
-                (self (+ i 1)))))
+       (cl:or (is i p) 
+              (cl:and (is (ref pat i) (ref seq (+ i start)))
+                      (self (+ i 1)))))
      0)))
 
 
@@ -219,10 +219,10 @@
   (let boundary (+ (- (len seq) (len old)) 1)
     (tostring 
       (forlen i seq
-        (if (and (< i boundary) (headmatch old seq i))
-            (do (++ i (- (len old) 1))
-                (pr new))
-            (pr (ref seq i)))))))
+        (cl:if (cl:and (< i boundary) (headmatch old seq i))
+               (do (++ i (- (len old) 1))
+                   (pr new))
+               (pr (ref seq i)))))))
 
 
 ;;;                      strings.arc library
@@ -231,3 +231,4 @@
 
 
 ;;; eof
+|||#

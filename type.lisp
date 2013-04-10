@@ -7,7 +7,10 @@
      `(,',orig ,@args)))
 
 
-(xdeftype arc:fn cl:function)
+(deftype arc:fn (&rest args)
+  (if (null args)
+      'function
+      `(cl:function ,@args)))
 
 
 (deftype arc:sym () 'cl:symbol)

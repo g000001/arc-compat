@@ -124,7 +124,7 @@
         ((null (cdr SYMS))
          SYMS)
         ((and (find-package (car SYMS)) (cdr SYMS))
-         (cons (intern (string (cadr SYMS)) (car SYMS))
+         (cons (intern (cl:string (cadr SYMS)) (car SYMS))
                (Recompose-symbols (cddr SYMS))))
         (T (cons (car SYMS)
                  (Recompose-symbols (cdr SYMS))))))

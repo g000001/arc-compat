@@ -18,7 +18,9 @@
 (defun arc:sig (name)
   #+sbcl
   (sb-introspect:function-lambda-list name)
-  #-sbcl nil)
+  #+excl
+  (excl:arglist name)
+  #-(or sbcl excl) nil)
 
 
 (xdef arc:apply cl:apply)
@@ -341,7 +343,9 @@
 
 ;; (xdef ssyntax (lambda (x) (tnil (ssyntax? x))))
 ;; (xdef ssexpand (lambda (x)
-(xdef arc:quit #+sbcl sb-ext:exit #-sbcl cl-user::quit)
+(xdef arc:quit #+sbcl sb-ext:exit 
+      #-(or sbcl excl) cl-user::quit 
+      #+excl excl:exit)
 ;; (xdef close ar-close)
 ;; (xdef force-close (lambda args
 ;; (xdef memory current-memory-use)

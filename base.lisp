@@ -27,10 +27,12 @@
                    (if ,@(cddr args))))))
 
 
-(defalias or cl:or)
+(defmacro or (&rest args)
+  `(cl:or ,@args))
 
 
-(defalias and cl:and)
+(defmacro and (&rest args)
+  `(cl:and ,@args))
 
 
 (defalias atom cl:atom)
@@ -126,17 +128,17 @@
   scope of the body. Outside the let statement, any existing value
   of var is unaffected. Let is like with but with a single variable
   binding."
-  (if (consp var)
-      (cl:let ((tem (gensym "let-"))
-               (var (_-to-gensym var)))
-        `((CL:LAMBDA (&REST ,tem)
-            (cl:DECLARE (cl:DYNAMIC-EXTENT ,tem))
-            (DESTRUCTURING-BIND (,var) ,tem
-              (cl:DECLARE (cl:IGNORABLE ,@(+internal-flatten `(,var))))
-              ,@body ))
-          ,val))
-      `(CL:LET ((,var ,val)) 
-         ,@body)))
+  (cl:if (consp var)
+         (cl:let ((tem (gensym "let-"))
+                  (var (_-to-gensym var)))
+           `((CL:LAMBDA (&REST ,tem)
+               (cl:DECLARE (cl:DYNAMIC-EXTENT ,tem))
+               (DESTRUCTURING-BIND (,var) ,tem
+                 (cl:DECLARE (cl:IGNORABLE ,@(+internal-flatten `(,var))))
+                 ,@body ))
+             ,val))
+         `(CL:LET ((,var ,val)) 
+            ,@body)))
 
 
 (defmacro leto (var val &body body)

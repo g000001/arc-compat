@@ -36,8 +36,8 @@
 
 (def positive (x)
   "Tests if x is a number and is positive (>= 0). This fails on complex numbers."
-  (and (number x)
-       (cl:plusp x)))
+  (cl:and (number x)
+          (cl:plusp x)))
 
 
 (tst positive

@@ -10,14 +10,14 @@
 (def x>y (x y)
   (etypecase x
     (cl:number (cl:> x y))
-    ((cl:or cl:string cl:symbol) (and (cl:string> x y) t))
+    ((cl:or cl:string cl:symbol) (cl:and (cl:string> x y) t))
     (cl:character (cl:char> x y))))
 
 
 (def x<y (x y)
   (etypecase x
     (cl:number (cl:< x y))
-    ((cl:or cl:string cl:symbol) (and (cl:string< x y) t))
+    ((cl:or cl:string cl:symbol) (cl:and (cl:string< x y) t))
     (cl:character (cl:char< x y))))
 
 
@@ -176,10 +176,11 @@
 
 (def dotted (x)
   "Returns true if x is a dotted list."
-  (if (atom x)
+  (if (cl:atom x)
       nil
-      (and (cdr x) (or (atom (cdr x))
-                       (dotted (cdr x))))))
+      (cl:and (cdr x)
+              (cl:or (cl:atom (cdr x))
+                     (dotted (cdr x))))))
 
 
 (tst dotted
@@ -265,11 +266,11 @@
 
 (def iso (x y)
   "Compares x and y. If they are lists, they are compared element-by-element."
-  (or (is x y)
-      (and (acons x) 
-           (acons y) 
-           (iso (car x) (car y)) 
-           (iso (cdr x) (cdr y)))))
+  (cl:or (is x y)
+         (cl:and (acons x) 
+                 (acons y) 
+                 (iso (car x) (car y)) 
+                 (iso (cdr x) (cdr y)))))
 
 
 (tst iso
@@ -304,8 +305,8 @@
 
 (def empty (seq)
   "Tests if seq is empty. Works on lists, strings, and tables."
-  (or (not seq)
-      (and (no (acons seq)) (is (len seq) 0))))
+  (cl:or (not seq)
+         (cl:and (no (acons seq)) (is (len seq) 0))))
 
 
 (tst empty
@@ -318,3 +319,4 @@
 
 
 ;;; eof
+
