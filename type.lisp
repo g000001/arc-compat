@@ -8,9 +8,9 @@
 
 
 (deftype arc:fn (&rest args)
-  (if (null args)
-      'function
-      `(cl:function ,@args)))
+  (cl:if (null args)
+         'function
+         `(cl:function ,@args)))
 
 
 (deftype arc:sym () 'cl:symbol)

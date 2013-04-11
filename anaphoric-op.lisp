@@ -116,7 +116,10 @@ encountering a false argument."
 the scope of the rfn macro. This allows recursive functions to be
 created without polluting the wider scope."
   `(labels ((,name ,parms ,@body))
-     (cl:declare (cl:optimize (cl:debug 1)))
+     (cl:declare 
+                (cl:optimize (cl:speed 3) (cl:debug 0) (cl:space 0)
+                             (cl:safety 1)))
+     #|(cl:declare (cl:optimize (cl:debug 1)))|#
      #',name))
 
 ;(funcall (rfn pow2 (x) (if (= x 0) 1 (* 2 (pow2 (- x 1))))) 5)

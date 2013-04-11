@@ -37,8 +37,8 @@
   "Tests equality with eqv?"
   (cl:flet ((eqfn (x y)
 	      (cl:or (cl:eql x y) (cl:and (cl:stringp x)
-				    (cl:stringp y)
-				    (cl:string= x y)))))
+                                          (cl:stringp y)
+                                          (cl:string= x y)))))
     (cl:every (lambda (_) (eqfn val _))
 	      vals)))
 
@@ -235,13 +235,13 @@
 (flet ((whitecp (c) 
          (member c '(#\Space #\Newline #\Return #\Tab))))
   (defun split-by-whitec (string)
-    (if (notany #'whitecp string)
-         (list string)
-        (every #'whitecp string)
-         '()
-        (cl:let ((pos (position-if #'whitecp string)))
-          (cons (cl:subseq string 0 pos) 
-                (and pos (split-by-whitec (cl:subseq string (1+ pos)))))))))
+    (cl:cond ((notany #'whitecp string)
+              (list string))
+             ((every #'whitecp string)
+              '())
+             (T (cl:let ((pos (position-if #'whitecp string)))
+                  (cons (cl:subseq string 0 pos) 
+                        (cl:and pos (split-by-whitec (cl:subseq string (1+ pos))))))))))
 
 
 (defun system (string)
@@ -271,14 +271,14 @@
 ;; (xdef protect protect)
 ;; (xdef rand random)
 (defun dir (name)                       ;FIXME
-  (if (cl:and (probe-file name))
-      (remove ""
-              (mapcar (lambda (_)
-                        (cl:let ((ns (file-namestring _)))
-                          (subseq ns 0 (position #\/ ns :from-end T))))
-                      (cl:directory (format nil "~A/*.*" name)))
-              :test #'string=)
-      (error "Error: directory-list: could not open \"~A\"" name)))
+  (cl:if (cl:and (probe-file name))
+         (remove ""
+                 (mapcar (lambda (_)
+                           (cl:let ((ns (file-namestring _)))
+                             (subseq ns 0 (position #\/ ns :from-end T))))
+                         (cl:directory (format nil "~A/*.*" name)))
+                 :test #'string=)
+         (error "Error: directory-list: could not open \"~A\"" name)))
 
 
 ;; (xdef file-exists (lambda (name)

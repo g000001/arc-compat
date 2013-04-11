@@ -488,18 +488,21 @@
   (w/uniq (gfn gparm)
     `(w/tco ()
        (do ,start
-         (funcall 
-          (rfn ,gfn (,gparm) 
+         ((rfn ,gfn (,gparm) 
             (if ,gparm
-                  (do ,@body ,update (,gfn ,test))))
+                (do ,@body ,update (,gfn ,test))))
           ,test)))))
 
 
 (tst loop
-  (== (let x 0
-        (loop (= x 0) (< x 300000) (++ x))
-        x)
+  (== (funcall
+       (compile nil                     ;tco
+                (fn ()
+                  (let x 0
+                    (loop (= x 0) (< x 300000) (++ x))
+                    x))))
       300000))
+
 
 ;;;; 
 ;;;; (mac for (v init max . body)

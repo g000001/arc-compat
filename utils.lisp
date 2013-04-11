@@ -127,7 +127,9 @@
 (defmacro w/tco (() cl:&body body)
   `(cl:locally 
         #+sbcl (cl:declare (cl:optimize (cl:debug 1)))
-        #-sbcl (cl:declare (cl:optimize (cl:debug 1)))
+        #+excl (cl:declare (cl:optimize (cl:speed 3) (cl:debug 0) (cl:space 0)
+                                        (cl:safety 1)))
+        #-(or sbcl excl) (cl:declare (cl:optimize (cl:debug 1)))
         ,@body))
 
 ;;; eof
