@@ -15,7 +15,7 @@
   (space, newline, tab, or return)."
   (in c #\space #\newline #\tab #\return))
 
-#|||
+
 (tst whitec
   (== (whitec #\tab)
       t)
@@ -229,6 +229,5 @@
 ;;;============================================================================
 
 
-
 ;;; eof
-|||#
+

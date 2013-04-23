@@ -64,7 +64,7 @@
    :o :obj :odd :on :on-err
    :only :ontable :ontree :open-socket :or :orf :outfile :outstring :pair :peekc
    :pipe-from :plural :point :pop :pos :positive :posmatch :ppr :ppr-call
-   :ppr-progn :pprest :pr :prall :prn :protect :prs :pull :punc :push :pushnew
+   :ppr-progn :pprest :pr :prall :prn :protect :prs :prf :pull :punc :push :pushnew
    :qlen :qlist :quasiquote :queue :quit :quote :rand :rand-choice :rand-string
    :random-elt :range :read :read-table :readall :readb :readc :readfile
    :readfile1 :readline :readstring1 :reclist :recstring :reduce :reinsert-sorted

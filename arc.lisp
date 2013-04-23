@@ -1509,7 +1509,7 @@
                      c)))
     (case (type x)
       string (map downc x)
-      char   (downc x)
+      char   (funcall downc x)
       sym    (sym (map downc (coerce x 'string)))
              (err "Can't downcase" x))))
 
@@ -1521,7 +1521,7 @@
                    c)))
     (case (type x)
       string (map upc x)
-      char   (upc x)
+      char   (funcall upc x)
       sym    (sym (map upc (coerce x 'string)))
              (err "Can't upcase" x))))
 
