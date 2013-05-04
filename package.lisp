@@ -11,7 +11,7 @@
    :sqrt :warn :push :abs :mod
    :pop :round :car
    :nil :* :subseq :/ 
-   :time :write
+   :write
    :cdr :- :load :close :t)
   ;; types
   (:export

@@ -323,10 +323,21 @@
   "Truncates to an integer. Was 'truncate' in arc0."
   (cl:values (cl:truncate num)))
 ;; (xdef exact (lambda (x) 
+
+
 ;; (xdef msec                         current-milliseconds)
+(defun msec ()
+  #+sbcl 
+  (* (sb-posix:time)
+     sb-unix::micro-seconds-per-internal-time-unit))
+
+
 ;; (xdef current-process-milliseconds current-process-milliseconds)
 ;; (xdef current-gc-milliseconds      current-gc-milliseconds)
 ;; (xdef seconds current-seconds)
+(defun seconds ()
+  #+sbcl (sb-posix:time))
+
 ;; (xdef client-ip (lambda (port) 
 (defun arc:atomic-invoke (f)
   (bt:with-recursive-lock-held (ar-the-lock)
@@ -350,6 +361,12 @@
 ;; (xdef force-close (lambda args
 ;; (xdef memory current-memory-use)
 ;; (xdef declare (lambda (key val)
+
+(defun ac-niltree (x)
+  (cond ((consp x) (cons (ac-niltree (car x)) (ac-niltree (cdr x))))
+        ((null x) 'nil)
+        (T x)))
+
 
 (defun arc:timedate (&optional arg)
   (multiple-value-bind (s m h d mo y)

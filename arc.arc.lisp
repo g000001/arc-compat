@@ -833,9 +833,9 @@
 ;;;; ; what happens to a file opened for append if arc is killed in
 ;;;; ; the middle of a write?
 ;;;; 
-;;;; (mac w/appendfile (var name . body)
-;;;;   `(let ,var (outfile ,name 'append)
-;;;;      (after (do ,@body) (close ,var))))
+(mac w/appendfile (var name . body)
+  `(let ,var (outfile ,name 'append)
+     (after (do ,@body) (close ,var))))
 ;;;; 
 ;;;; ; rename this simply "to"?  - prob not; rarely use
 ;;;; 
@@ -1068,28 +1068,30 @@
 ;;;; 
 ;;;; ; Could prob be generalized beyond printing.
 ;;;; 
-;;;; (def prall (elts (o init "") (o sep ", "))
-;;;;   (when elts
-;;;;     (pr init (car elts))
-;;;;     (map [pr sep _] (cdr elts))
-;;;;     elts))
-;;;;              
-;;;; (def prs args     
-;;;;   (prall args "" #\space))
-;;;; 
-;;;; (def tree-subst (old new tree)
-;;;;   (if (is tree old)
-;;;;        new
-;;;;       (atom tree)
-;;;;        tree
-;;;;       (cons (tree-subst old new (car tree))
-;;;;             (tree-subst old new (cdr tree)))))
-;;;; 
-;;;; (def ontree (f tree)
-;;;;   (f tree)
-;;;;   (unless (atom tree)
-;;;;     (ontree f (car tree))
-;;;;     (ontree f (cdr tree))))
+(def prall (elts (o init "") (o sep ", "))
+  (when elts
+    (pr init (car elts))
+    (map [pr sep _] (cdr elts))
+    elts))
+
+
+(def prs args     
+  (prall args "" #\space))
+
+(def tree-subst (old new tree)
+  (if (is tree old)
+       new
+      (atom tree)
+       tree
+      (cons (tree-subst old new (car tree))
+            (tree-subst old new (cdr tree)))))
+
+(def ontree (f tree)
+  (funcall f tree)
+  (unless (atom tree)
+    (ontree f (car tree))
+    (ontree f (cdr tree))))
+
 ;;;; 
 ;;;; (def dotted (x)
 ;;;;   (if (atom x)
@@ -1266,70 +1268,71 @@
 ;;;;         (wipe (cdr mid))
 ;;;;         (list seq s2))))
 ;;;; 
-;;;; (mac time (expr)
-;;;;   (w/uniq (t1 t2)
-;;;;     `(let ,t1 (msec)
-;;;;        (do1 ,expr
-;;;;             (let ,t2 (msec)
-;;;;               (prn "time: " (- ,t2 ,t1) " msec."))))))
-;;;; 
-;;;; (mac jtime (expr)
-;;;;   `(do1 'ok (time ,expr)))
-;;;; 
-;;;; (mac time10 (expr)
-;;;;   `(time (repeat 10 ,expr)))
+(mac time (expr)
+  (w/uniq (t1 t2)
+    `(let ,t1 (msec)
+       (do1 ,expr
+            (let ,t2 (msec)
+              (prn "time: " (- ,t2 ,t1) " msec."))))))
+
+(mac jtime (expr)
+  `(do1 'ok (time ,expr)))
+
+(mac time10 (expr)
+  `(time (repeat 10 ,expr)))
+
 ;;;; 
 ;;;; (def union (f xs ys)
 ;;;;   (+ xs (rem (fn (y) (some [f _ y] xs))
 ;;;;              ys)))
 ;;;; 
-;;;; (= templates* (table))
-;;;; 
-;;;; (mac deftem (tem . fields)
-;;;;   (withs (name (carif tem) includes (if (acons tem) (cdr tem)))
-;;;;     `(= (templates* ',name) 
-;;;;         (+ (mappend templates* ',(rev includes))
-;;;;            (list ,@(map (fn ((k v)) `(list ',k (fn () ,v)))
-;;;;                         (pair fields)))))))
-;;;; 
-;;;; (mac addtem (name . fields)
-;;;;   `(= (templates* ',name) 
-;;;;       (union (fn (x y) (is (car x) (car y)))
-;;;;              (list ,@(map (fn ((k v)) `(list ',k (fn () ,v)))
-;;;;                           (pair fields)))
-;;;;              (templates* ',name))))
-;;;; 
-;;;; (def inst (tem . args)
-;;;;   (let x (table)
-;;;;     (each (k v) (templates* tem)
-;;;;       (unless (no v) (= (x k) (v))))
-;;;;     (each (k v) (pair args)
-;;;;       (= (x k) v))
-;;;;     x))
-;;;; 
-;;;; ; To write something to be read by temread, (write (tablist x))
-;;;; 
-;;;; (def temread (tem (o str (stdin)))
-;;;;   (templatize tem (read str)))
-;;;; 
-;;;; ; Converts alist to inst; ugly; maybe should make this part of coerce.
-;;;; ; Note: discards fields not defined by the template.
-;;;; 
-;;;; (def templatize (tem raw)
-;;;;   (with (x (inst tem) fields (templates* tem))
-;;;;     (each (k v) raw
-;;;;       (when (assoc k fields)
-;;;;         (= (x k) v)))
-;;;;     x))
-;;;; 
-;;;; (def temload (tem file)
-;;;;   (w/infile i file (temread tem i)))
-;;;; 
-;;;; (def temloadall (tem file)
-;;;;   (map (fn (pairs) (templatize tem pairs))       
-;;;;        (w/infile in file (readall in))))
-;;;; 
-;;;; 
+(=* templates* (table))
+
+(mac deftem (tem . fields)
+  (withs (name (carif tem) includes (if (acons tem) (cdr tem)))
+    `(= (templates* ',name) 
+        (+ (mappend templates* ',(rev includes))
+           (list ,@(map (fn ((k v)) `(list ',k (fn () ,v)))
+                        (pair fields)))))))
+
+(mac addtem (name . fields)
+  `(= (templates* ',name) 
+      (union (fn (x y) (is (car x) (car y)))
+             (list ,@(map (fn ((k v)) `(list ',k (fn () ,v)))
+                          (pair fields)))
+             (templates* ',name))))
+
+(def inst (tem . args)
+  (let x (table)
+    (each (k v) (ref templates* tem)
+      (unless (no v) (= (ref x k) (cl:funcall v))))
+    (each (k v) (pair args)
+      (= (ref x k) v))
+    x))
+
+; To write something to be read by temread, (write (tablist x))
+
+(def temread (tem (o str (stdin)))
+  (templatize tem (read str)))
+
+; Converts alist to inst; ugly; maybe should make this part of coerce.
+; Note: discards fields not defined by the template.
+
+(def templatize (tem raw)
+  (witho (x (inst tem) fields (ref templates* tem))
+    (each (k v) raw
+      (when (assoc k fields)
+        (= (x k) v)))
+    x))
+
+(def temload (tem file)
+  (w/infile i file (temread tem i)))
+
+(def temloadall (tem file)
+  (map (fn (pairs) (templatize tem pairs))       
+       (w/infile in file (readall in))))
+
+
 ;;;; (def number (n) (in (type n) 'int 'num))
 ;;;; 
 ;;;; (def since (t1) (- (seconds) t1))
@@ -1355,9 +1358,10 @@
 (mac errsafe (expr)
   `(on-err (fn (c) nil)
            (fn () ,expr)))
-;;;; 
-;;;; (def saferead (arg) (errsafe:read arg))
-;;;; 
+
+;;; (def saferead (arg) (errsafe:read arg))
+(def saferead (arg) (errsafe (read arg)))
+
 ;;;; (def safe-load-table (filename) 
 ;;;;   (or (errsafe:load-table filename)
 ;;;;       (table)))
@@ -1366,8 +1370,10 @@
 ;;;;   (unless (dir-exists path)
 ;;;;     (system (string "mkdir -p " path))))
 ;;;; 
-;;;; (def date ((o s (seconds)))
-;;;;   (rev (nthcdr 3 (timedate s))))
+(def date ((o s (seconds)))
+  (let ut (+ s #.(encode-universal-time 0 0 0 1 1 1970 0))
+    (rev (nthcdr 3 (timedate ut)))))
+
 ;;;; 
 ;;;; (def datestring ((o s (seconds)))
 ;;;;   (let (y m d) (date s)
