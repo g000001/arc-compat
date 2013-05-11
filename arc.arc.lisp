@@ -898,7 +898,7 @@
 
 
 (def writefile (val file)
-  (let tmpfile (+ file ".tmp")
+  (let tmpfile (+ file "_tmp")
     (w/outfile o tmpfile (cl:write val :stream o))
     (mvfile tmpfile file))
   val)
