@@ -895,12 +895,15 @@
           nil
           (cons x (self i)))))
    (if (isa src 'string) (instring src) src)))
-;;;; 
-;;;; (def writefile (val file)
-;;;;   (let tmpfile (+ file ".tmp")
-;;;;     (w/outfile o tmpfile (write val o))
-;;;;     (mvfile tmpfile file))
-;;;;   val)
+
+
+(def writefile (val file)
+  (let tmpfile (+ file ".tmp")
+    (w/outfile o tmpfile (cl:write val :stream o))
+    (mvfile tmpfile file))
+  val)
+
+
 ;;;; 
 ;;;; (def sym (x) (coerce x 'sym))
 ;;;; 

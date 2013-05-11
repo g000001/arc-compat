@@ -281,10 +281,23 @@
          (error "Error: directory-list: could not open \"~A\"" name)))
 
 
-;; (xdef file-exists (lambda (name)
-;; (xdef dir-exists (lambda (name)
-;; (xdef rmfile (wrapnil delete-file))
-;; (xdef mvfile (lambda (old new)
+(defun file-exists (name)
+  (and (not (cl-fad:directory-exists-p name))
+       (cl-fad:file-exists-p name)))
+
+
+(defun dir-exists (name)
+  (cl-fad:directory-exists-p name))
+
+
+(defun rmfile (name)
+  (cl:delete-file name))
+
+
+(defun mvfile (old new)
+  (cl:rename-file old new))
+
+
 ;; (xdef macex (lambda (e) (ac-macex (ac-denil e))))
 ;; (xdef macex1 (lambda (e) (ac-macex (ac-denil e) 'once)))
 ;; (xdef eval (lambda (e)
@@ -327,16 +340,18 @@
 
 ;; (xdef msec                         current-milliseconds)
 (defun msec ()
-  #+sbcl 
-  (* (sb-posix:time)
-     sb-unix::micro-seconds-per-internal-time-unit))
+  (* #+sbcl (sb-posix:time)
+     #-sbcl (- (get-universal-time) #.(encode-universal-time 0 0 0 1 1 1970 0))
+     1000))
 
 
 ;; (xdef current-process-milliseconds current-process-milliseconds)
 ;; (xdef current-gc-milliseconds      current-gc-milliseconds)
 ;; (xdef seconds current-seconds)
 (defun seconds ()
-  #+sbcl (sb-posix:time))
+  #+sbcl (sb-posix:time)
+  #-sbcl (- (get-universal-time) #.(encode-universal-time 0 0 0 1 1 1970 0)))
+
 
 ;; (xdef client-ip (lambda (port) 
 (defun arc:atomic-invoke (f)

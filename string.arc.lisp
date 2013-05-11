@@ -169,8 +169,8 @@
            p1 (pos ~f s))
     (if p1
         (cut s 
-             (if (in where 'front 'both) p1 0)
-             (when (in where 'end 'both)
+             (if (string-equal-in where 'front 'both) p1 0)
+             (when (string-equal-in where 'end 'both)
                (let i (- (len s) 1)
                  (while (and (> i p1) (funcall f (ref s i)))
                    (-- i))

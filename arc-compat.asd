@@ -7,13 +7,14 @@
   :description "Arc compatible package for CL"
   :author "CHIBA Masaomi <chiba.masaomi@gmail.com>"
   :maintainer "CHIBA Masaomi <chiba.masaomi@gmail.com>"
-  :version "0.9.23"
+  :version "0.9.40"
   :depends-on (:fiveam
                :named-readtables
                #+:it :root.package.it
                :bordeaux-threads
                #+sbcl :sb-introspect
-               :ironclad)
+               :ironclad
+               :cl-fad)
   :serial T
   :components ((:file "package")
                (:file "type")
@@ -44,6 +45,7 @@
                (:file "ext")
                (:file "arc.arc")
                (:file "string.arc")
+               (:file "html.arc")
 	       ))
 
 

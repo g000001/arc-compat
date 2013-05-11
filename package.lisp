@@ -57,10 +57,10 @@
    :instring :intersperse :is :isa :isnt :iso :it :join :jtime :keep :keys
    :kill-thread :last :latin1-hack :len :len< :len>
    :let :list :listtab :litmatch :load
-   :load-table :load-tables :loop :lpar :mac :macex :macex1 :map :map1 :mappend
-   :maps :maptable :max :median :mem :memo :memtable :merge :mergesort :metafn
+   :load-table :load-tables :loop #|:lpar|# :mac :macex :macex1 :map :map1 :mappend
+   #|:maps|# :maptable :max :median :mem :memo :memtable :merge :mergesort :metafn
    :min :mismatch :mod :most :msec :multiple :multisubst :n-of :newstring :nil
-   :nil! :no :noisy-each :nonwhite :nor :nthcdr :num :number 
+   #|:nil!|# :no :noisy-each :nonwhite :nor :nthcdr :num :number 
    :o :obj :odd :on :on-err
    :only :ontable :ontree :open-socket :or :orf :outfile :outstring :pair :peekc
    :pipe-from :plural :point :pop :pos :positive :posmatch :ppr :ppr-call
@@ -68,12 +68,12 @@
    :qlen :qlist :quasiquote :queue :quit :quote :rand :rand-choice :rand-string
    :random-elt :range :read :read-table :readall :readb :readc :readfile
    :readfile1 :readline :readstring1 :reclist :recstring :reduce :reinsert-sorted
-   :rem :rep :repeat :rev :rfn :rmfile :rotate :round :roundup :rpar :rreduce
+   :rem :rep :repeat :rev :rfn :rmfile :rotate :round :roundup #|:rpar|# :rreduce
    :safe-load-table :saferead :safeset :save-table :scar :scdr :seconds :set
    :self
    :setforms :setter :sig :since :single :sleep :socket-accept :some :sort :sp
    :split :splitn :sqrt :sread :sref :ssexpand :ssyntax :stderr :stdin :stdout
-   :string :subseq :subst :summing :swap :sym :system :t :t! :table :tablist :td
+   :string :subseq :subst :summing :swap :sym :system :t #|:t!|# :table :tablist :td
    :temload :temloadall :templatize :temread :testify :thread :time :time10
    :to-nearest :tokens :tostring :trav :tree-subst :trim :trues :trunc
    :truncate :tuples
@@ -81,11 +81,10 @@
    :union
    :w/instring :w/outfile :w/outstring :w/stdin :w/stdout :w/table :w/uniq :warn
    :when :whenlet :while :whiler :whilet :whitec :with :withs :write
-   :write-spaced :write-table :writeb :writec :writefile1 :zap :* :+ :++ :- :--
+   :write-spaced :write-table :writeb :writec
+   :writefile :zap :* :+ :++ :- :--
    :/ :< :<= := :> :>=
-   :catch :throw)
-  (:export 
-   :front :both :end))
+   :catch :throw))
 
 
 (defpackage :arc-user

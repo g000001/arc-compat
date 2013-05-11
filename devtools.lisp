@@ -9,12 +9,21 @@
 
 (=* arc-keywords* '(index it self _ o))
 
+(def arc-types ()
+  (keep #'sb-ext:valid-type-specifier-p
+        (arc-compat-external-symbols)))
+
+
 (def unimplements ()
   (let arcsyms (arc-compat-external-symbols)
-    (let unimps (keep (fn (_) (and (not (cl:fboundp _))
-                                   (not (cl:boundp _))
-                                   (not (mem _ arc-keywords*))))
-                      arcsyms)
+    (let unimps (set-difference
+                 (keep (fn (_) (and (not (cl:fboundp _))
+                                    (not (cl:boundp _))
+                                    (not (mem _ arc-keywords*))))
+                       arcsyms)
+                 (rem (fn (_) (or (cl:fboundp _)
+                                  (cl:boundp _)))
+                      (arc-types)))
       (cl:values unimps (len arcsyms) (len unimps)))))
 
 
@@ -77,23 +86,27 @@
 
 
 (unimplements)
-(QUASIQUOTE SETTER SAFEREAD READLINE OPEN-SOCKET CALL-W/STDOUT EXPAND= PEEKC
- BREAK-THREAD PPR-CALL SETFORMS RMFILE READC READFILE1 SINCE FILE-EXISTS
- DIR-EXISTS LOAD-TABLE INPUT BLANK-URL DEFSET SAVE-TABLE TIME10 SREF READB
- WRITE-SPACED READFILE MSEC RPAR SPLITN ONTREE WRITE-TABLE PROTECT CLIENT-IP
- ENQ-LIMIT TD SAFE-LOAD-TABLE ENSURE-DIR FRONT DEQ SECONDS NEW-THREAD CCC PPR
- READALL LATIN1-HACK SOCKET MAPS T! CURRENT-GC-MILLISECONDS NIL! FORCE-CLOSE SP
- LPAR PPREST ANNOTATE SOCKET-ACCEPT INST JTIME REP KILL-THREAD
- CURRENT-PROCESS-MILLISECONDS CACHE PRS PRALL OUTPUT DATE CALL-W/STDIN SSEXPAND
- TEMLOAD DEFTEM SWAP ENQ READ-TABLE DEAD DETAILS LOAD-TABLES END CHAR DEFAULT
- TEMLOADALL THROW MEMORY BOTH TEMPLATIZE TEMREAD PPR-PROGN ALREF W/APPENDFILE
- EXCEPTION DECLARE TREE-SUBST PIPE-FROM EXPAND=LIST MVFILE FILL-TABLE
- WRITEFILE1)
-386
-97
-
+(PIPE-FROM EXPAND= SWAP DECLARE SSEXPAND SOCKET SPLITN PPR QUASIQUOTE REP
+ ENQ-LIMIT ANNOTATE NEW-THREAD TD FILL-TABLE CALL-W/STDOUT
+ CURRENT-GC-MILLISECONDS PROTECT READ-TABLE BREAK-THREAD OPEN-SOCKET
+ CURRENT-PROCESS-MILLISECONDS SAVE-TABLE LATIN1-HACK CCC LOAD-TABLES SP
+ CALL-W/STDIN PEEKC SETFORMS PPREST READB DEFAULT LOAD-TABLE READC FORCE-CLOSE
+ SOCKET-ACCEPT THROW KILL-THREAD EXPAND=LIST DEQ ENSURE-DIR MEMORY PPR-PROGN
+ PPR-CALL SETTER SREF CLIENT-IP SAFE-LOAD-TABLE READLINE ALREF ENQ EXCEPTION
+ CACHE WRITE-TABLE DETAILS SINCE WRITE-SPACED DEAD DEFSET)
+379
+60
 
 (*arc-version)
+940
+
+
+
+
+
+
+
+
 
 
 
