@@ -374,8 +374,13 @@
      1000))
 
 
-(xdef current-process-milliseconds cl:get-internal-run-time)
+(xdef arc:current-process-milliseconds cl:get-internal-run-time)
 ;; (xdef current-gc-milliseconds      current-gc-milliseconds)
+
+
+(defun arc:current-gc-milliseconds ()
+  #+sbcl sb-ext:*gc-run-time*
+  #-sbcl 0)
 
 
 (defun seconds ()
