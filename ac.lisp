@@ -161,17 +161,17 @@
   cl:*error-output*)
 
 
-(defun call-w/stdout (stream proc)
+(defun arc:call-w/stdout (stream proc)
   (with-open-stream (cl:*standard-output* stream)
     (cl:funcall proc)))
 
 
-(defun call-w/stdin (stream proc)
+(defun arc:call-w/stdin (stream proc)
   (with-open-stream (cl:*standard-input* stream)
     (cl:funcall proc)))
 
 
-(defun readc (&optional (stream cl:*standard-input*))
+(defun arc:readc (&optional (stream cl:*standard-input*))
   "Reads a character from the input-port (or default of stdin). 
    Returns nil on end-of-file."
   (cl:read-char stream nil nil nil))
@@ -180,7 +180,7 @@
 ;; (xdef readb (lambda (str)
 
 
-(defun peekc (&optional (stream cl:*standard-output*))
+(defun arc:peekc (&optional (stream cl:*standard-output*))
   "Peeks at the next character from the input port, but leaves the character
    for future reads. It uses stdin if the argument is nil. It returns the 
    character, or nil for end-of-file."
@@ -194,7 +194,9 @@
   (cl:write-byte int *standard-output*)) 
 
 
-;; (xdef write (lambda args (printwith write   args)))
+(defun arc:write (arg &optional (out (stdout)))
+  (cl:write arg :stream out)
+  nil)
 
 
 (xdef arc:disp cl:princ)
@@ -205,7 +207,7 @@
     (cl:if (eq eof expr) eof expr)))
 
 
-(defun coerce (thing type &optional type-opt)
+(defun arc:coerce (thing type &optional type-opt)
   (typecase thing
     (char (cl:case type
             (int (cl:char-code thing))
@@ -240,7 +242,7 @@
 ;; (xdef socket-accept (lambda (s)
 
 
-(defun new-thread (procedure)
+(defun arc:new-thread (procedure)
   (bt:make-thread procedure :name (string (gensym "arc-thread-"))))
 
 
@@ -268,7 +270,7 @@
                         (cl:and pos (split-by-whitec (cl:subseq string (1+ pos))))))))))
 
 
-(defun system (string)
+(defun arc:system (string)
   #+sbcl
   (cl:destructuring-bind (&optional (cmd :no-cmd) . args)
                          (split-by-whitec string)
@@ -280,7 +282,10 @@
   nil)
 
 
-;; (xdef pipe-from (lambda (cmd)
+(defun arc:pipe-from (cmd)
+  (make-string-input-stream
+   (cl:with-output-to-string (cl:*standard-output*)
+     (system cmd))))
 
 
 (defun arc:table ()
@@ -294,7 +299,7 @@
 
 ;; (xdef protect protect)
 ;; (xdef rand random)
-(defun dir (name)                       ;FIXME
+(defun arc:dir (name)                       ;FIXME
   (cl:if (cl:and (probe-file name))
          (remove ""
                  (mapcar (lambda (_)

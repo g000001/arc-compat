@@ -11,7 +11,6 @@
    :sqrt :warn :push :abs :mod
    :pop :round :car
    :nil :* :subseq :/ 
-   :write
    :cdr :- :load :close :t)
   ;; types
   (:export
@@ -72,8 +71,9 @@
    :safe-load-table :saferead :safeset :save-table :scar :scdr :seconds :set
    :self
    :setforms :setter :sig :since :single :sleep :socket-accept :some :sort :sp
-   :split :splitn :sqrt :sread :sref :ssexpand :ssyntax :stderr :stdin :stdout
-   :string :subseq :subst :summing :swap :sym :system :t #|:t!|# :table :tablist :td
+   :split #|:splitn|# :sqrt :sread :sref :ssexpand :ssyntax :stderr :stdin :stdout
+   :string :subseq :subst :summing :swap :sym :system :t #|:t!|# :table :tablist
+   #|:td|#
    :temload :temloadall :templatize :temread :testify :thread :time :time10
    :to-nearest :tokens :tostring :trav :tree-subst :trim :trues :trunc
    :truncate :tuples

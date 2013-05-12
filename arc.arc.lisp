@@ -755,14 +755,14 @@
 ;;;;                (push ,gres ,gacc))))
 ;;;;        (rev ,gacc))))
 ;;;; 
-;;;; ; For the common C idiom while x = snarfdata != stopval.
-;;;; ; Rename this if use it often.
-;;;; 
-;;;; (mac whiler (var expr endval . body)
-;;;;   (w/uniq gf
-;;;;     `(withs (,var nil ,gf (testify ,endval))
-;;;;        (while (no (,gf (= ,var ,expr)))
-;;;;          ,@body))))
+; For the common C idiom while x = snarfdata != stopval.
+; Rename this if use it often.
+
+(mac whiler (var expr endval . body)
+  (w/uniq gf
+    `(withs (,var nil ,gf (testify ,endval))
+       (while (no (cl:funcall ,gf (= ,var ,expr)))
+         ,@body))))
 ;;;;   
 ;;;; ;(def macex (e)
 ;;;; ;  (if (atom e)
@@ -1039,13 +1039,13 @@
 ;;;; 
 ;;;; (def punc (c)
 ;;;;   (in c #\. #\, #\; #\: #\! #\?))
-;;;; 
-;;;; (def readline ((o str (stdin)))
-;;;;   (awhen (readc str)
-;;;;     (tostring 
-;;;;       (writec it)
-;;;;       (whiler c (readc str) [in _ nil #\newline]
-;;;;         (writec c)))))
+;;;;
+(def readline ((o str (stdin)))
+  (awhen (readc str)
+    (tostring 
+      (writec it)
+      (whiler c (readc str) [in _ nil #\newline]
+        (writec c)))))
 ;;;; 
 ;;;; ; Don't currently use this but suspect some code could.
 ;;;; 
@@ -1102,10 +1102,10 @@
 ;;;;       (and (cdr x) (or (atom (cdr x))
 ;;;;                        (dotted (cdr x))))))
 ;;;; 
-;;;; (def fill-table (table data)
-;;;;   (each (k v) (pair data) (= (table k) v))
-;;;;   table)
-;;;; 
+(def fill-table (table data)
+  (each (k v) (pair data) (= (ref table k) v))
+  table)
+
 (def keys (h) 
   (accum a (ontable k v h (a k))))
 
@@ -1131,23 +1131,24 @@
 ;;;;                            `(list ',k ,v))
 ;;;;                          (pair args)))))
 ;;;; 
-;;;; (def load-table (file (o eof))
-;;;;   (w/infile i file (read-table i eof)))
-;;;; 
-;;;; (def read-table ((o i (stdin)) (o eof))
-;;;;   (let e (read i eof)
-;;;;     (if (alist e) (listtab e) e)))
-;;;; 
-;;;; (def load-tables (file)
-;;;;   (w/infile i file
-;;;;     (w/uniq eof
-;;;;       (drain (read-table i eof) eof))))
-;;;; 
-;;;; (def save-table (h file)
-;;;;   (writefile (tablist h) file))
-;;;; 
-;;;; (def write-table (h (o o (stdout)))
-;;;;   (write (tablist h) o))
+(def load-table (file (o eof))
+  (w/infile i file (read-table i eof)))
+
+(def read-table ((o i (stdin)) (o eof))
+  (let e (read i eof)
+    (if (alist e) (listtab e) e)))
+
+(def load-tables (file)
+  (w/infile i file
+    (w/uniq eof
+      (drain (read-table i eof) eof))))
+
+(def save-table (h file)
+  (writefile (tablist h) file))
+
+(def write-table (h (o o (stdout)))
+  (write (tablist h) o))
+
 ;;;; 
 ;;;; (def copy (x . args)
 ;;;;   (let x2 (case (type x)
@@ -1365,19 +1366,19 @@
 ;;; (def saferead (arg) (errsafe:read arg))
 (def saferead (arg) (errsafe (read arg)))
 
-;;;; (def safe-load-table (filename) 
-;;;;   (or (errsafe:load-table filename)
-;;;;       (table)))
-;;;; 
-;;;; (def ensure-dir (path)
-;;;;   (unless (dir-exists path)
-;;;;     (system (string "mkdir -p " path))))
-;;;; 
+(def safe-load-table (filename) 
+  ;;; errsafe:read
+  (or (errsafe (load-table filename))
+      (table)))
+
+(def ensure-dir (path)
+  (unless (dir-exists path)
+    (system (string "mkdir -p " path))))
+
 (def date ((o s (seconds)))
   (let ut (+ s #.(encode-universal-time 0 0 0 1 1 1970 0))
     (rev (nthcdr 3 (timedate ut)))))
 
-;;;; 
 ;;;; (def datestring ((o s (seconds)))
 ;;;;   (let (y m d) (date s)
 ;;;;     (string y "-" (if (< m 10) "0") m "-" (if (< d 10) "0") d)))

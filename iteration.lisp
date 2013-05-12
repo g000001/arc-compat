@@ -70,7 +70,8 @@ whilet is used to loop until nil is obtained."
 ;[code] [Macro] whiler var expr endval [body ...]
 ;Executes body repeatedly while expr is not endval. The value of expr is assigned to var on each iteration.
 
-(mac whiler (var expr endval &body body)
+#| arc.arc.lisp
+ (mac whiler (var expr endval &body body)
   (w/uniq =>
     `(block nil
        (let ,var nil
@@ -78,7 +79,7 @@ whilet is used to loop until nil is obtained."
 	,=> (setq ,var ,expr)
 	    (when (eql ,var ,endval) (return))
 	    ,@body
-	    (go ,=>))))))
+	    (go ,=>))))))|#
 
 #|(with-input-from-string (in "abcdef")
   (whiler c (read-char in nil nil) #\d
