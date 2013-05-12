@@ -39,8 +39,8 @@
 (defmacro awhen (test-form &body body)
   "Anaphoric when: if the expr is true, the body is executed. 
 Within the body, the variable it refers back to the value of expr."
-  `(if ,test-form
-       (progn ,@body)))
+  `(aif ,test-form
+        (progn ,@body)))
 
 ;>(awhen (* 2 3) (+ it 1))
 ;7
