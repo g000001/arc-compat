@@ -161,11 +161,30 @@
   cl:*error-output*)
 
 
-;; (xdef call-w/stdout
-;; (xdef call-w/stdin
-;; (xdef readc (lambda (str) 
+(defun call-w/stdout (stream proc)
+  (with-open-stream (cl:*standard-output* stream)
+    (cl:funcall proc)))
+
+
+(defun call-w/stdin (stream proc)
+  (with-open-stream (cl:*standard-input* stream)
+    (cl:funcall proc)))
+
+
+(defun readc (&optional (stream cl:*standard-input*))
+  "Reads a character from the input-port (or default of stdin). 
+   Returns nil on end-of-file."
+  (cl:read-char stream nil nil nil))
+
+
 ;; (xdef readb (lambda (str)
-;; (xdef peekc (lambda (str) 
+
+
+(defun peekc (&optional (stream cl:*standard-output*))
+  "Peeks at the next character from the input port, but leaves the character
+   for future reads. It uses stdin if the argument is nil. It returns the 
+   character, or nil for end-of-file."
+  (cl:peek-char nil stream nil nil nil))
 
 
 (xdef arc:writec cl:write-char)
@@ -219,7 +238,12 @@
 
 ;; (xdef open-socket  (lambda (num) (tcp-listen num 50 #t))) 
 ;; (xdef socket-accept (lambda (s)
-;; (xdef new-thread thread)
+
+
+(defun new-thread (procedure)
+  (bt:make-thread procedure :name (string (gensym "arc-thread-"))))
+
+
 ;; (xdef kill-thread kill-thread)
 ;; (xdef break-thread break-thread)
 (defun wrapnil (f) 
@@ -345,9 +369,10 @@
      1000))
 
 
-;; (xdef current-process-milliseconds current-process-milliseconds)
+(xdef current-process-milliseconds cl:get-internal-run-time)
 ;; (xdef current-gc-milliseconds      current-gc-milliseconds)
-;; (xdef seconds current-seconds)
+
+
 (defun seconds ()
   #+sbcl (sb-posix:time)
   #-sbcl (- (get-universal-time) #.(encode-universal-time 0 0 0 1 1 1970 0)))
@@ -359,7 +384,8 @@
     (funcall f)))
 
 
-;; (xdef dead (lambda (x) (tnil (thread-dead? x))))
+(defun dead (thread) 
+  (not (bt:thread-alive-p thread)))
 
 
 (defun arc:flushout ()
@@ -374,8 +400,15 @@
       #+excl excl:exit)
 ;; (xdef close ar-close)
 ;; (xdef force-close (lambda args
-;; (xdef memory current-memory-use)
+
+
+(defun memory ()
+  ;;--- FIXME
+  #+sbcl (sb-vm:memory-usage)
+  #-sbcl 0)
+
 ;; (xdef declare (lambda (key val)
+
 
 (defun ac-niltree (x)
   (cond ((consp x) (cons (ac-niltree (car x)) (ac-niltree (cdr x))))

@@ -1533,18 +1533,20 @@
 ; Despite call to atomic, once had some sign this wasn't thread-safe.
 ; Keep an eye on it.
 
-#|(def enq (obj q)
+(def enq (obj q)
   (atomic
-    (++ (q 2))
+    (++ (ref q 2))
     (if (no (car q))
         (= (cadr q) (= (car q) (list obj)))
         (= (cdr (cadr q)) (list obj)
            (cadr q)       (cdr (cadr q))))
-    (car q)))|#
+    (car q)))
 
-#|(def deq (q)
-  (atomic (unless (is (q 2) 0) (-- (q 2)))
-          (pop (car q))))|#
+
+(def deq (q)
+  (atomic (unless (is (ref q 2) 0) (-- (ref q 2)))
+          (pop (car q))))
+
 
 ; Should redef len to do this, and make queues lists annotated queue.
 
@@ -1552,11 +1554,11 @@
 
 (def qlist (q) (car q))
 
-#|(def enq-limit (val q (o limit 1000))
+(def enq-limit (val q (o limit 1000))
   (atomic
      (unless (< (qlen q) limit)
        (deq q))
-     (enq val q)))|#
+     (enq val q)))
 
 ;;; -> math.lisp
 #|(def median (ns)

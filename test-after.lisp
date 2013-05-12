@@ -141,4 +141,17 @@
       (timedate 0)))
 
 
+(tst call-w/stdout
+  (== (let sop (outstring)
+        (call-w/stdout sop (fn () (prn '(1 2))))
+        (inside sop))
+      "(1 2)
+"))
+
+
+(tst call-w/stdin
+  (== (call-w/stdin (instring "Hello") #'cl:read-line)
+      "Hello"))
+
+
 ;;; eof

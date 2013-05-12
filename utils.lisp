@@ -121,6 +121,7 @@
 
 (defun caar (xs) (car (car xs)))
 (defun cadr (xs) (car (cdr xs)))
+(defun (setf cadr) (val xs) (setf (car (cdr xs)) val))
 (defun cddr (xs) (cdr (cdr xs)))
 (defun list (&rest args) (cl:copy-list args))
 
