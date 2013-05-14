@@ -118,7 +118,9 @@
     ))
 
 
-;; (xdef rep ar-rep)
+(defun arc:rep (obj)
+  ;;--- FIXME
+  obj)
 
 
 (defalias arc:uniq cl:gensym
@@ -177,7 +179,10 @@
   (cl:read-char stream nil nil nil))
 
 
-;; (xdef readb (lambda (str)
+(defun arc:readb (stream)
+  "Reads a character from the input-port (or default of stdin). 
+   Returns nil on end-of-file."
+  (cl:read-byte stream nil nil))
 
 
 (defun arc:peekc (&optional (stream cl:*standard-output*))
@@ -239,7 +244,19 @@
 
 
 ;; (xdef open-socket  (lambda (num) (tcp-listen num 50 #t))) 
+
+
+#|(defun open-socket (num)
+  (usocket:socket-listen "localhost"
+                         num
+                         :reuseaddress t
+                         :element-type '(unsigned-byte 8)))|#
+
+
 ;; (xdef socket-accept (lambda (s)
+
+#|(defun socket-accept (socket)
+  (usocket:socket-accept socket))|#
 
 
 (defun arc:new-thread (procedure)
@@ -247,7 +264,19 @@
 
 
 ;; (xdef kill-thread kill-thread)
-;; (xdef break-thread break-thread)
+
+(defun arc:kill-thread (th)
+  "Terminates the specified thread immediately."
+  (prog1
+    (sb-thread:destroy-thread th) 
+    ;;--- FIXME
+    #+sbcl (sleep .0000000001)))
+
+
+(defun arc:break-thread (th)
+  (bt:interrupt-thread th #'break))
+
+
 (defun wrapnil (f) 
   (lambda (&rest args)
     (cl:declare (dynamic-extent args))
@@ -297,8 +326,15 @@
   nil)
 
 
-;; (xdef protect protect)
-;; (xdef rand random)
+(defun arc:protect (during-procedure after-procedure 
+                                     &aux (*debugger-hook* nil))
+  (unwind-protect (ignore-errors (funcall during-procedure))
+    (funcall after-procedure)))
+
+
+(xdef rand cl:random)
+
+
 (defun arc:dir (name)                       ;FIXME
   (cl:if (cl:and (probe-file name))
          (remove ""
@@ -327,16 +363,25 @@
   (cl:rename-file old new))
 
 
-;; (xdef macex (lambda (e) (ac-macex (ac-denil e))))
-;; (xdef macex1 (lambda (e) (ac-macex (ac-denil e) 'once)))
+(xdef macex cl:macroexpand)
+
+
+(xdef macex1 cl:macroexpand-1)
+
+
 ;; (xdef eval (lambda (e)
+
+
 (defun arc:on-err (errfn f)
   (cl:multiple-value-bind (ans cond)
                           (cl:ignore-errors (funcall f))
     (cl:or ans (funcall errfn cond))))
 
 
-;; (xdef details (lambda (c)
+(defun arc:details (condition)
+  (apply #'format nil
+         (simple-condition-format-control condition)
+         (simple-condition-format-arguments condition)))
 
 
 (defun arc:scar (list expr)

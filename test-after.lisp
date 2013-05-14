@@ -154,4 +154,17 @@
       "Hello"))
 
 
+(tst protect 
+  (== (tostring 
+       (protect (fn () (/ 1 0))
+                (fn () (pr "after"))))
+      "after"))
+
+
+(tst details
+  (== "foo 42"
+      (handler-case (error "foo ~A" 42)
+        (error (c) (details c)))))
+
+
 ;;; eof
