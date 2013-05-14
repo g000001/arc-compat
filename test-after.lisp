@@ -167,4 +167,14 @@
         (error (c) (details c)))))
 
 
+(tst sref
+  (== (let x "abc__"
+        (sref x #\d 1)
+        x)
+      (copy "adc__"))
+  (== (let x (list 1 2 3)
+        (sref x #\d 1)
+        x)
+      (list 1 #\d 3)))
+
 ;;; eof

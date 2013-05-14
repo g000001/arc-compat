@@ -89,10 +89,16 @@
 (defmethod (setf ref) (val (seq cl:hash-table) index)
   (setf (gethash index seq) val))
 
+(defmethod sref ((seq cl:hash-table) val index)
+  (setf (gethash index seq) val))
+
 (defmethod ref ((seq cl:sequence) index)
   (elt seq index))
 
 (defmethod (setf ref) (val (seq cl:sequence) index)
+  (setf (elt seq index) val))
+
+(defmethod sref ((seq cl:sequence) val index)
   (setf (elt seq index) val))
 
 

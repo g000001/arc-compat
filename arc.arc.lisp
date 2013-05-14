@@ -127,9 +127,18 @@
   (== (assoc 'z (rev (copy '((a . 1) (b . 2) (c . 3)))))
       NIL))
 
-;;;; 
-;;;; (def alref (al key) (cadr (assoc key al)))
-;;;; 
+
+
+(def alref (al key) (cadr (assoc key al)))
+
+
+(tst alref
+  (== (alref '((k1 v1) (k2 v2)) 'k1)
+      'v1)
+  (== (alref '((k1 v1) (k2 v2)) 'foo)
+      NIL))
+
+
 ;;;; (mac with (parms . body)
 ;;;;   `((fn ,(map1 car (pair parms))
 ;;;;      ,@body)

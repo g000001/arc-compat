@@ -399,7 +399,9 @@
   nil)
 
 
-;; (xdef sref 
+;; sref 
+;;; --> utils.lisp
+
 ;; (xdef bound (lambda (x) (tnil (bound? x))))
 (defun arc:newstring (length &optional (char #\Nul))
   "Creates a string of the given length."
