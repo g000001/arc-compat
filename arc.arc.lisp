@@ -375,15 +375,15 @@
 ;;;; ; seems meaningful to e.g. (push 1 (pop x)) if (car x) is a cons.
 ;;;; ; can't in cl though.  could I define a setter for push or pop?
 ;;;; 
-;;;; (assign setter (table))
-;;;; 
-;;;; (mac defset (name parms . body)
-;;;;   (w/uniq gexpr
-;;;;     `(sref setter 
-;;;;            (fn (,gexpr)
-;;;;              (let ,parms (cdr ,gexpr)
-;;;;                ,@body))
-;;;;            ',name)))
+(=* setter (table))
+
+(mac defset (name parms . body)
+  (w/uniq gexpr
+    `(sref setter 
+           (fn (,gexpr)
+             (let ,parms (cdr ,gexpr)
+               ,@body))
+           ',name)))
 ;;;; 
 ;;;; (defset car (x)
 ;;;;   (w/uniq g
@@ -628,6 +628,16 @@
          (funcall ,setter1 ,g2)
          (funcall ,setter2 ,g1)))))|#
 
+
+(defmacro swap (place1 place2)
+  `(cl:rotatef ,place1 ,place2))
+
+
+(tst swap
+  (== (with (x 'a y (list 1 2))
+        (swap x y)
+        (list x y))
+      (list (list 1 2) 'A)))
 
 
 ;;;; 
@@ -1348,21 +1358,25 @@
 
 ;;;; (def number (n) (in (type n) 'int 'num))
 ;;;; 
-;;;; (def since (t1) (- (seconds) t1))
+(def since (t1) (- (seconds) t1))
+
+(tst since
+  (== 1 (let t0 (seconds) (sleep 1) (since t0))))
+
 ;;;; 
 ;;;; (def minutes-since (t1) (/ (since t1) 60))
 ;;;; (def hours-since (t1)   (/ (since t1) 3600))
 ;;;; (def days-since (t1)    (/ (since t1) 86400))
 ;;;; 
-;;;; ; could use a version for fns of 1 arg at least
-;;;; 
-;;;; (def cache (timef valf)
-;;;;   (with (cached nil gentime nil)
-;;;;     (fn ()
-;;;;       (unless (and cached (< (since gentime) (timef)))
-;;;;         (= cached  (valf)
-;;;;            gentime (seconds)))
-;;;;       cached)))
+; could use a version for fns of 1 arg at least
+
+(def cache (timef valf)
+  (with (cached nil gentime nil)
+    (fn ()
+      (unless (and cached (< (since gentime) (cl:funcall timef)))
+        (= cached  (cl:funcall valf)
+           gentime (seconds)))
+      cached)))
 ;;;; 
 ;;;; (mac defcache (name lasts . body)
 ;;;;   `(safeset ,name (cache (fn () ,lasts)
@@ -1769,4 +1783,4 @@
 ;  (let bb (n-of 1000 (rand 50)) (time10 (bestn 100 > bb)))
 ;  time: 2237 msec.  -> now down to 850 msec
 
-
+;;; *EOF*

@@ -21,7 +21,8 @@
    :sig :apply :cons :car :cdr :is :err 
    ;; :nil :t
    :+ :- :* :/ :mod :expt :sqrt :>
-   :< :len :annotate :type :rep :uniq :ccc :infile :outfile :instring :outstring
+   :< :len #|:annotate|# :type :rep :uniq :ccc :infile :outfile :instring
+   :outstring
    :inside :stdout :stdin :stderr :call-w/stdout :call-w/stdin :readc :readb
    :peekc :writec :writeb :write :disp :sread :coerce :open-socket :socket-accept
    :new-thread :kill-thread :break-thread :sleep :system :pipe-from :table
@@ -29,7 +30,7 @@
    :macex1 :eval :on-err :details :scar :scdr :sref :bound :newstring :trunc
    :exact :msec :current-process-milliseconds :current-gc-milliseconds :seconds
    :client-ip :atomic-invoke :dead :flushout :ssyntax :ssexpand :quit :close
-   :force-close :memory :declare :timedate :sin :cos :tan :log)
+   :force-close :memory #|:declare|# :timedate :sin :cos :tan :log)
   (:export
    ;; ext
    :=* :*let :w/obcall :ref :leto :witho :withos
@@ -37,7 +38,8 @@
    :_
    :assert
    :aand :abs :accum :acons :adjoin :afn :after :aif :alist :all :alphadig :alref
-   :and :andf :annotate :apply :assoc :atend :atlet :atom :atomic :atomic-invoke
+   :and :andf #|:annotate|#
+   :apply :assoc :atend :atlet :atom :atomic :atomic-invoke
    :atwith :atwiths :avg :awhen :before :begins :best :bestn :blank :blank-url
    :bound :break-thread :caar :cddr :cache :cadr :call-w/stdin :call-w/stdout :car
    :carif :caris :case :caselet :catch :ccc :cdr :client-ip :close :coerce
@@ -45,7 +47,7 @@
    :commonest :compare :complement :compose :cons :consif :conswhen :copy :count
    :counts :current-gc-milliseconds :current-process-milliseconds :cut
    :date :dead
-   :dedup :def :default :defmemo :defset :deftem :deq :details :dir :dir-exists
+   :dedup :def #|:default|# :defmemo :defset :deftem :deq :details :dir :dir-exists
    :disp :do :do1 :dotted :downcase :drain :each :ellipsize :empty :endmatch :enq
    :enq-limit :ensure-dir :ero :err :errsafe :eval :even :exact
    :expand-metafn-call :expand= :expand=list :expt :file-exists :fill-table :find
@@ -54,7 +56,7 @@
    :idfn :if :iflet :in :infile :insert-sorted :inside :insort :insortnew 
    :index :inst
    :instring :intersperse :is :isa :isnt :iso :it :join :jtime :keep :keys
-   :kill-thread :last :latin1-hack :len :len< :len>
+   :kill-thread :last #|:latin1-hack|# :len :len< :len>
    :let :list :listtab :litmatch :load
    :load-table :load-tables :loop #|:lpar|# :mac :macex :macex1 :map :map1 :mappend
    #|:maps|# :maptable :max :median :mem :memo :memtable :merge :mergesort :metafn
@@ -64,7 +66,7 @@
    :only :ontable :ontree :open-socket :or :orf :outfile :outstring :pair :peekc
    :pipe-from :plural :point :pop :pos :positive :posmatch :ppr :ppr-call
    :ppr-progn :pprest :pr :prall :prn :protect :prs :prf :pull :punc :push :pushnew
-   :qlen :qlist :quasiquote :queue :quit :quote :rand :rand-choice :rand-string
+   :qlen :qlist #|:quasiquote|# :queue :quit :quote :rand :rand-choice :rand-string
    :random-elt :range :read :read-table :readall :readb :readc :readfile
    :readfile1 :readline :readstring1 :reclist :recstring :reduce :reinsert-sorted
    :rem :rep :repeat :rev :rfn :rmfile :rotate :round :roundup #|:rpar|# :rreduce
@@ -110,7 +112,7 @@
    :reduce :abs :cddr :when :complement :acons :or :tan :cons :mod :list :push
    :sqrt :char :let :caar :/ :coerce :log :cadr :round :- :pushnew :assoc :loop
    :pop :do :read :unless :min :nil :some :nthcdr :<= :and :merge :car :++ :write
-   :declare :truncate :close :type :>=)
+   #|:declare|# :truncate :close :type :>=)
   (:import-from :fiveam :def-suite :in-suite))
 
 

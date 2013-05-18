@@ -45,6 +45,7 @@
                (:file "ext")
                (:file "arc.arc")
                (:file "string.arc")
+               (:file "pprint.arc")
                (:file "html.arc")
 	       ))
 

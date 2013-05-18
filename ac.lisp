@@ -456,7 +456,9 @@
       #-(or sbcl excl) cl-user::quit 
       #+excl excl:exit)
 ;; (xdef close ar-close)
-;; (xdef force-close (lambda args
+
+(defun arc:force-close (stream)
+  (cl:close stream :abort))
 
 
 (defun memory ()

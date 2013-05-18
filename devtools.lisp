@@ -16,15 +16,16 @@
 
 (def unimplements ()
   (let arcsyms (arc-compat-external-symbols)
-    (let unimps (set-difference
-                 (keep (fn (_) (and (not (cl:fboundp _))
-                                    (not (cl:boundp _))
-                                    (not (mem _ arc-keywords*))))
-                       arcsyms)
-                 (rem (fn (_) (or (cl:fboundp _)
-                                  (cl:boundp _)))
-                      (arc-types)))
-      (cl:values unimps (len arcsyms) (len unimps)))))
+    (let unimps (rem 'throw
+                     (set-difference
+                      (keep (fn (_) (and (not (cl:fboundp _))
+                                         (not (cl:boundp _))
+                                         (not (mem _ arc-keywords*))))
+                            arcsyms)
+                      (rem (fn (_) (or (cl:fboundp _)
+                                       (cl:boundp _)))
+                           (arc-types))))
+         (cl:values unimps (len arcsyms) (len unimps)))))
 
 
 (def *arc-version ()
@@ -86,33 +87,12 @@
 
 
 (unimplements)
-(SETTER EXPAND=LIST CACHE PPR-PROGN SETFORMS PPREST PPR CLIENT-IP PPR-CALL
- THROW SP SOCKET-ACCEPT QUASIQUOTE SOCKET WRITE-SPACED SSEXPAND DEFAULT
- ANNOTATE LATIN1-HACK OPEN-SOCKET SINCE SWAP DECLARE CCC EXPAND= EXCEPTION
- FORCE-CLOSE DEFSET)
-377
-28
-
+(EXPAND=LIST SETFORMS CLIENT-IP SOCKET-ACCEPT SOCKET SSEXPAND OPEN-SOCKET CCC
+ EXPAND= EXCEPTION)
+372
+10
 
 (*arc-version)
-972
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+990
 
 
