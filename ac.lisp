@@ -127,7 +127,12 @@
   "Generates a unique symbol.")
 
 
-;; (xdef ccc call-with-current-continuation)
+(defmacro ccc (f)
+  (cl:let ((name (gensym "block-"))
+           (arg (gensym "arg-")))
+    `(cl:block ,name
+       (cl:funcall ,f (lambda (,arg)
+                        (return-from ,name ,arg))))))
 
 
 (defun arc:infile (name)

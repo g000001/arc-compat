@@ -13,6 +13,8 @@
          `(cl:function ,@args)))
 
 
+(deftype arc:exception () 'cl:condition)
+
 (deftype arc:sym () 'cl:symbol)
 
 

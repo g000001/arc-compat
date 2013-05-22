@@ -177,4 +177,12 @@
         x)
       (list 1 #\d 3)))
 
+
+(tst ccc
+  (== (ccc (fn (ep) (funcall ep "bailout value") 42))
+      "bailout value")
+  (== (ccc (fn (ep) (list ep "bailout value") 42))
+      42))
+
+
 ;;; eof
