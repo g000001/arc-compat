@@ -440,7 +440,7 @@
          (setforms (list (cadr expr) (cadr (car expr))))
          (let f (setter (car expr))
            (if f
-               (funcall f expr)
+               (_f expr)
                ; assumed to be data structure in fn position
                (do (when (caris (car expr) 'fn)
                      (warn "Inverting what looks like a function call"
@@ -467,7 +467,7 @@
 
 (def expand-metafn-call (f args)
   (if (is (car f) 'compose)
-       (funcall (afn (fs)
+       (_(afn (fs)
           (if (caris (car fs) 'compose)            ; nested compose
                (self (join (cdr (car fs)) (cdr fs)))
               (cdr fs)
@@ -625,8 +625,8 @@
     (with ((binds1 val1 setter1) (setforms place1)
            (binds2 val2 setter2) (setforms place2))
       `(atwiths ,(+ binds1 (list g1 val1) binds2 (list g2 val2))
-         (funcall ,setter1 ,g2)
-         (funcall ,setter2 ,g1)))))|#
+         (_,setter1 ,g2)
+         (_,setter2 ,g1)))))|#
 
 
 (defmacro swap (place1 place2)
@@ -780,7 +780,7 @@
 (mac whiler (var expr endval . body)
   (w/uniq gf
     `(withs (,var nil ,gf (testify ,endval))
-       (while (no (cl:funcall ,gf (= ,var ,expr)))
+       (while (no (_,gf (= ,var ,expr)))
          ,@body))))
 ;;;;   
 ;;;; ;(def macex (e)
@@ -1075,16 +1075,17 @@
 ;;;;          ,@body)
 ;;;;        ,gc)))
 ;;;; 
-;;;; (def sum (f xs)
-;;;;   (let n 0
-;;;;     (each x xs (++ n (f x)))
-;;;;     n))
-;;;; 
-;;;; (def treewise (f base tree)
-;;;;   (if (atom tree)
-;;;;       (base tree)
-;;;;       (f (treewise f base (car tree)) 
-;;;;          (treewise f base (cdr tree)))))
+(def sum (f xs)
+  (let n 0
+    (each x xs (++ n (_f x)))
+    n))
+
+
+(def treewise (f base tree)
+  (if (atom tree)
+      (_base tree)
+      (_f (treewise f base (car tree)) 
+         (treewise f base (cdr tree)))))
 ;;;; 
 ;;;; (def carif (x) (if (atom x) x (car x)))
 ;;;; 
@@ -1328,7 +1329,7 @@
 (def inst (tem . args)
   (let x (table)
     (each (k v) (ref templates* tem)
-      (unless (no v) (= (ref x k) (cl:funcall v))))
+      (unless (no v) (= (ref x k) (_v))))
     (each (k v) (pair args)
       (= (ref x k) v))
     x))
@@ -1373,8 +1374,8 @@
 (def cache (timef valf)
   (with (cached nil gentime nil)
     (fn ()
-      (unless (and cached (< (since gentime) (cl:funcall timef)))
-        (= cached  (cl:funcall valf)
+      (unless (and cached (< (since gentime) (_timef)))
+        (= cached  (_valf)
            gentime (seconds)))
       cached)))
 ;;;; 
@@ -1586,7 +1587,7 @@
 
 ;;; -> math.lisp
 #|(def median (ns)
-  (funcall (sort #'> ns) (trunc (/ (len ns) 2))))|#
+  (_(sort #'> ns) (trunc (/ (len ns) 2))))|#
 
 (mac noisy-each (n var val . body)
   (w/uniq (gn gc)
@@ -1629,7 +1630,7 @@
                      c)))
     (case (type x)
       string (map downc x)
-      char   (funcall downc x)
+      char   (_downc x)
       sym    (sym (map downc (coerce x 'string)))
              (err "Can't downcase" x))))|#
 
@@ -1642,7 +1643,7 @@
                    c)))
     (case (type x)
       string (map upc x)
-      char   (funcall upc x)                    
+      char   (_upc x)                    
       sym    (sym (map upc (coerce x 'string)))
              (err "Can't upcase" x))))|#
 
@@ -1689,7 +1690,7 @@
 
 #|(mac trav (x . fs)
   (w/uniq g
-    `(funcall (afn (,g)
+    `(_(afn (,g)
         (when ,g
           ,@(map [list _ g] fs)))
       ,x)))|#
@@ -1711,7 +1712,7 @@
 
 ; if renamed this would be more natural for (map [_ user] pagefns*)
 
-(def get (index) (w/obcall (_) [_ index]))
+(def get (index) [ref _ index])
 
 
 (defvar savers* (table))
@@ -1731,7 +1732,7 @@
   `(fromdisk ,var ,file (table) load-table save-table) )
 
 (mac todisk (var (o expr var))
-  `(funcall (savers* ',var) 
+  `(_(savers* ',var) 
     ,(if (is var expr) var `(= ,var ,expr)) ))
 
 

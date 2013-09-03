@@ -61,5 +61,7 @@
       (error "test-op failed") ))
 
 
+(pushnew :arc-compat cl:*features*)
+
 ;;; eof
 

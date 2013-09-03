@@ -22,9 +22,17 @@
 
 
 ;[code] [Macro] [Destructive] = [place expr] ... [place]
-(defalias = cl:setf
+(defmacro = (&rest args &environment env)
   "Sets each place to the associated expression.  If the last place
-has no associated expression, it is set to nil.")
+has no associated expression, it is set to nil."
+  (cl:let ((args (if (oddp (length args))
+                     (append args (list t))
+                     args)))
+          (if (null-lexenv-p env)
+              `(eval-when (:compile-toplevel :load-toplevel :execute)
+                 (cl:setf (symbol-value ',(elt args 0))
+                          ,(elt args 1)))
+              `(cl:setf ,@args))))
 
 ;>(= x 1)
 ;1

@@ -74,10 +74,11 @@
    :self
    :setforms :setter :sig :since :single :sleep :socket-accept :some :sort :sp
    :split #|:splitn|# :sqrt :sread :sref :ssexpand :ssyntax :stderr :stdin :stdout
-   :string :subseq :subst :summing :swap :sym :system :t #|:t!|# :table :tablist
+   :string :subseq :subst :sum :summing :swap :sym :system :t #|:t!|# :table :tablist
    #|:td|#
    :temload :temloadall :templatize :temread :testify :thread :time :time10
-   :to-nearest :tokens :tostring :trav :tree-subst :trim :trues :trunc
+   :to-nearest :tokens :tostring :trav :tree-subst :treewise
+   :trim :trues :trunc
    :truncate :tuples
    :type :uniq :unless :until :upcase :urldecode :vals :w/appendfile :w/infile
    :union

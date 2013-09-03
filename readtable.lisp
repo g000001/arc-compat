@@ -1,41 +1,44 @@
 (in-package :arc-user)
 
-(cl:typep '((compose a b) 8) '(cl:cons (cl:cons (cl:eql arc:compose) *) *))
 
 (defreadtable :arc
   (:merge :standard)
   (:macro-char #\( (let read-list (cl:get-macro-character #\( (find-readtable :standard))
                      (fn (srm char)
-                       (let expr (cl:funcall read-list srm char)
-                         (if (cl:typep expr '(cl:cons 
-                                              (cl:cons (cl:eql arc:compose) *)
-                                              *))
-                             ;; ((compose ...) ...)
-                             (arc-compat.internal::decompose (cl:cdar expr)
-                                                             (cdr expr))
-                             #|(and (cl:typep expr '(cl:cons cl:symbol *))
-                                  (or (arc-compat.internal::insym? 
-                                       arc-compat.internal::compose-marker 
-                                       (car expr))
-                                      (arc-compat.internal::insym? 
-                                       arc-compat.internal::compose-marker2 
-                                       (car expr))))|#
-                             #|(do (cl:print expr)
-                                 `(,(arc-compat.internal::expand-compose (car expr)
-                                                                         :fpos)
-                                    ,@(cdr expr)))|#
-                             ;; afn
-                             (cl:typep expr '(cl:cons 
-                                              (cl:cons 
-                                               (cl:or
-                                                (cl:eql arc:afn)
-                                                (cl:eql arc:rfn)
-                                                (cl:eql arc:fn))
-                                               *)
-                                              *))
-                             (cons 'cl:funcall expr)
-                             :else
-                             expr)))))
+                       (cl:case (cl:peek-char t srm)
+                         ((#\_) (cl:read-char srm)
+                          `(cl:funcall ,@(cl:funcall read-list srm char)))
+                         (cl:otherwise 
+                          (let expr (cl:funcall read-list srm char)
+                            (if (cl:typep expr '(cl:cons 
+                                                 (cl:cons (cl:eql arc:compose) *)
+                                                 *))
+                                ;; ((compose ...) ...)
+                                (arc-compat.internal::decompose (cl:cdar expr)
+                                                                (cdr expr))
+                                #|(and (cl:typep expr '(cl:cons cl:symbol *))
+                                (or (arc-compat.internal::insym? 
+                                arc-compat.internal::compose-marker 
+                                (car expr))
+                                (arc-compat.internal::insym? 
+                                arc-compat.internal::compose-marker2 
+                                (car expr))))|#
+                                #|(do (cl:print expr)
+                                `(,(arc-compat.internal::expand-compose (car expr)
+                                :fpos)
+                                ,@(cdr expr)))|#
+                                ;; afn
+                                (cl:typep expr '(cl:cons 
+                                                 (cl:cons 
+                                                  (cl:or
+                                                   (cl:eql arc:afn)
+                                                   (cl:eql arc:rfn)
+                                                   (cl:eql arc:fn))
+                                                  *)
+                                                 *))
+                                (cons 'cl:funcall expr)
+                                :else
+                                expr)))))))
   (:macro-char #\[ (fn (srm char)
                      (cl:declare (cl:ignore char))
                      `(fn (arc:_)

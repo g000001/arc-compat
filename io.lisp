@@ -50,7 +50,7 @@
   `(let *standard-input* ,str ,@body))
 
 
-(mac tostring body
+(mac tostring body 
   (w/uniq gv
    `(w/outstring ,gv
       (w/stdout ,gv ,@body)

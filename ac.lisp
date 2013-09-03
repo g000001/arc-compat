@@ -18,9 +18,10 @@
 (defun arc:sig (name)
   #+sbcl
   (sb-introspect:function-lambda-list name)
+  #+scl (ext:function-arglist name)
   #+excl
   (excl:arglist name)
-  #-(or sbcl excl) nil)
+  #-(or scl sbcl excl) nil)
 
 
 (xdef arc:apply cl:apply)
@@ -112,9 +113,11 @@
     (arc:num    'arc:num)
     (arc:table  'arc:table)
     (arc:output 'arc:output)
-    ;((tcp-listener? x)  'socket)
-    ;;((exn? x)           'exception)
-    ;;((thread? x)        'thread)
+    #||
+    ((tcp-listener? x)  'socket)
+    ((exn? x)           'exception)
+    ((thread? x)        'thread)
+    ||#
     ))
 
 
@@ -265,7 +268,7 @@
 
 
 (defun arc:new-thread (procedure)
-  (bt:make-thread procedure :name (string (gensym "arc-thread-"))))
+  (bt:make-thread procedure :name (cl:string (gensym "arc-thread-"))))
 
 
 ;; (xdef kill-thread kill-thread)
@@ -273,9 +276,9 @@
 (defun arc:kill-thread (th)
   "Terminates the specified thread immediately."
   (prog1
-    (sb-thread:destroy-thread th) 
+    (bt:destroy-thread th)
     ;;--- FIXME
-    #+sbcl (sleep .0000000001)))
+    #+(or sbcl scl) (sleep .0000000001)))
 
 
 (defun arc:break-thread (th)
@@ -312,6 +315,14 @@
       (cl:princ 
        (cl:with-output-to-string (out)
          (sb-ext:run-program cmd args :search t :output out))
+       (stdout))))
+  #+scl
+  (cl:destructuring-bind (&optional (cmd :no-cmd) . args)
+                         (split-by-whitec string)
+    (cl:unless (eq :no-cmd cmd)
+      (cl:princ 
+       (cl:with-output-to-string (out)
+         (ext:run-program cmd args :output out))
        (stdout))))
   nil)
 
@@ -352,8 +363,8 @@
 
 
 (defun file-exists (name)
-  (and (not (cl-fad:directory-exists-p name))
-       (cl-fad:file-exists-p name)))
+  (cl:and (not (cl-fad:directory-exists-p name))
+          (cl-fad:file-exists-p name)))
 
 
 (defun dir-exists (name)
@@ -463,7 +474,7 @@
 ;; (xdef close ar-close)
 
 (defun arc:force-close (stream)
-  (cl:close stream :abort))
+  (cl:close stream :abort t))
 
 
 (defun memory ()
