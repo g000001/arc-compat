@@ -6,6 +6,13 @@
   (:macro-char #\( (let read-list (cl:get-macro-character #\( (find-readtable :standard))
                      (fn (srm char)
                        (cl:case (cl:peek-char t srm)
+                         ((#\~)
+                          (cl:read-char srm t nil t)
+                          (cl:case (cl:peek-char nil srm)
+                            ((#\Space #\Tab #\Newline) 
+                             `(arc:no ,@(cl:funcall read-list srm char)))
+                            (cl:otherwise 
+                             `(arc:no ,(cl:funcall read-list srm char)))))
                          ((#\_) (cl:read-char srm)
                           `(cl:funcall ,@(cl:funcall read-list srm char)))
                          (cl:otherwise 
