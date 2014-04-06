@@ -57,7 +57,7 @@
     (cl:list (cl:append x y))
     (cl:string (cl:concatenate 'cl:string x y))))
 
-
+#-sbcl
 (define-compiler-macro x+y (&whole form x y)
   (cond ((cl:or (numberp x) (numberp y))
          `(cl:+ ,x ,y))
@@ -68,6 +68,19 @@
              (typep y '(cons (eql cl:the) (cons (cl:member cl:number cl:fixnum)))))
          `(cl:+ ,x ,y))
         (T form)))
+
+#+sbcl
+(progn
+  (sb-c:defknown x+y (t t) t)
+  
+  (sb-c:deftransform x+y ((x y) (cl:number cl:number))
+    '(cl:+ x y))
+  
+  (sb-c:deftransform x+y ((x y) (cl:list cl:list))
+    '(cl:append x y))
+
+  (sb-c:deftransform x+y ((x y) (cl:string cl:string))
+    '(cl:concatenate 'cl:string x y)))
 
 
 (defun arc:+ (&rest obj)
