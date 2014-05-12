@@ -51,6 +51,7 @@
 ;; (xdef nil 'nil)
 ;; (xdef t   't)
 
+
 (defun x+y (x y)
   (etypecase x
     (cl:number (cl:+ x y))
@@ -71,7 +72,7 @@
 
 #+sbcl
 (progn
-  (sb-c:defknown x+y (t t) t)
+  (sb-c:defknown x+y (t t) t () :overwrite-fndb-silently t)
   
   (sb-c:deftransform x+y ((x y) (cl:number cl:number))
     '(cl:+ x y))
