@@ -111,11 +111,18 @@
             ('t (push `#',PKG ANS)
                 (pop ARGS))))))|#
 
+#|(defun Make-compose-form (ARGS)
+  (cl:let ((FS (Recompose-symbols ARGS)))
+    (cond ((null (cdr FS))
+           (car FS))
+          (t `(arc:compose ,@(mapcar (lambda (f) `#',f) FS))))))|#
+
+
 (defun Make-compose-form (ARGS)
   (cl:let ((FS (Recompose-symbols ARGS)))
     (cond ((null (cdr FS))
            (car FS))
-          (t `(arc:compose ,@(mapcar (lambda (f) `#',f) FS))))))
+          (t `(arc:compose ,@FS)))))
 
 
 (defun Recompose-symbols (SYMS)
@@ -130,6 +137,10 @@
                  (Recompose-symbols (cdr SYMS))))))
 
 
+(defun Decompose (FNS ARGS)
+  (cond ((null FNS) `((lambda (&rest VALS) (car VALS)) ,@ARGS))
+        ((null (cdr FNS)) (cons (car FNS) ARGS))
+        (T (list (car FNS) (Decompose (cdr FNS) ARGS)))))
 
 
 (defun expand-compose (sym &optional fposp)
