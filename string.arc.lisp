@@ -105,8 +105,8 @@
        (unless (> ,(len pat) (len ,gstring))
          (and ,@(let acc nil
                   (forlen i pat
-                    (push `(is ,(funcall pat (- (len pat) 1 i)) 
-                               (,gstring (- ,glen 1 ,i)))
+                    (push `(is ,(ref pat (- (len pat) 1 i)) 
+                               (ref ,gstring (- ,glen 1 ,i)))
                            acc))
                   (rev acc)))))))
 
