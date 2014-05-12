@@ -52,19 +52,21 @@
    :enq-limit :ensure-dir :ero :err :errsafe :eval :even :exact
    :expand-metafn-call :expand= :expand=list :expt :file-exists :fill-table :find
    :findsubseq :firstn :firstn-that :flat :fn :for :forlen :fromstring :headmatch
+   :halve
    :get
    :idfn :if :iflet :in :infile :insert-sorted :inside :insort :insortnew 
    :index :inst
    :instring :intersperse :is :isa :isnt :iso :it :join :jtime :keep :keys
    :kill-thread :last #|:latin1-hack|# :len :len< :len>
-   :let :list :listtab :litmatch :load
+   :let :list :listtab :lines :litmatch :load
    :load-table :load-tables :loop #|:lpar|# :mac :macex :macex1 :map :map1 :mappend
    #|:maps|# :maptable :max :median :mem :memo :memtable :merge :mergesort :metafn
    :min :mismatch :mod :most :msec :multiple :multisubst :n-of :newstring :nil
    #|:nil!|# :no :noisy-each :nonwhite :nor :nthcdr :num :number 
    :o :obj :odd :on :on-err
    :only :ontable :ontree :open-socket :or :orf :outfile :outstring :pair :peekc
-   :pipe-from :plural :point :pop :pos :positive :posmatch :ppr :ppr-call
+   :pipe-from :plural :pluralize :point :pop :pos :positive :posmatch :positions
+   :ppr :ppr-call
    :ppr-progn :pprest :pr :prall :prn :protect :prs :prf :pull :punc :push :pushnew
    :qlen :qlist #|:quasiquote|# :queue :quit :quote :rand :rand-choice :rand-string
    :random-elt :range :read :read-table :readall :readb :readc :readfile
@@ -72,7 +74,8 @@
    :rem :rep :repeat :rev :rfn :rmfile :rotate :round :roundup #|:rpar|# :rreduce
    :safe-load-table :saferead :safeset :save-table :scar :scdr :seconds :set
    :self
-   :setforms :setter :sig :since :single :sleep :socket-accept :some :sort :sp
+   :setforms :setter :sig :since :single :sleep :slices 
+   :socket-accept :some :sort :sp
    :split #|:splitn|# :sqrt :sread :sref :ssexpand :ssyntax :stderr :stdin :stdout
    :string :subseq :subst :sum :summing :swap :sym :system :t #|:t!|# :table :tablist
    #|:td|#
@@ -80,7 +83,8 @@
    :to-nearest :tokens :tostring :trav :tree-subst :treewise
    :trim :trues :trunc
    :truncate :tuples
-   :type :uniq :unless :until :upcase :urldecode :vals :w/appendfile :w/infile
+   :type :uniq :unless :until :upcase :urlencode 
+   :urldecode :vals :w/appendfile :w/infile
    :union
    :w/instring :w/outfile :w/outstring :w/stdin :w/stdout :w/table :w/uniq :warn
    :when :whenlet :while :whiler :whilet :whitec :with :withs :write
