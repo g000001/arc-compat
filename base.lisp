@@ -240,7 +240,7 @@
        ,g)))|#
 
 
-(defmacro compose (&rest args)
+#|(defmacro compose (&rest args)
   (let g (uniq "compose-arg-")
     `(cl:lambda (&rest ,g)
        (cl:declare (cl:dynamic-extent ,g))
@@ -250,7 +250,39 @@
                            (list 'cl:funcall (car fs) (self (cdr fs)))
                            `(apply ,(if (car fs) (car fs) 'idfn) ,g))))
            #'self)
+         args))))|#
+
+
+(defmacro compose (&rest args)
+  (cl:let ((g (uniq "compose-arg-")))
+    `(cl:lambda (&rest ,g)
+       (cl:declare (cl:dynamic-extent ,g))
+       ,(funcall
+         (labels ((self (fs)
+                    (cl:if (cdr fs)
+                           (typecase (car fs)
+                             ((cons (eql :local) (cons * null))
+                              (list 'cl:funcall (cadar fs) (self (cdr fs))))
+                             (T (list (car fs) (self (cdr fs)))))
+
+                           (typecase (car fs)
+                             ((cons (eql :local) (cons * null))
+                              `(apply ,(if (cadar fs) (cadar fs) 'idfn) ,g))
+                             (T `(cl:let ((,(car fs) #',(car fs)))
+                                   (apply ,(if (car fs) (car fs) 'idfn) ,g)))))))
+           #'self)
          args))))
+
+
+#|(defmacro compose (&rest args)
+  (let ((g (gensym)))
+    `(fn ,g
+       ,((afn (fs)
+           (if (cdr fs)
+               (list (car fs) (self (cdr fs)))
+               `(apply ,(if (car fs) (car fs) 'idfn) ,g)))
+         args))))|#
+
 
 
 (defalias do1 cl:prog1
