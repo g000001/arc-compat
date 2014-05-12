@@ -56,6 +56,17 @@
            (a (cut s (+ p 1)))))
      (cons -1 (positions #\newline s)))))
 
+
+(def slices (s test)
+  (accum a
+    ((afn ((p . ps))
+       (if ps
+           (do (a (cut s (+ p 1) (car ps)))
+               (self ps))
+           (a (cut s (+ p 1)))))
+     (cons -1 (positions test s)))))
+
+
 ; > (require (lib "uri-codec.ss" "net"))
 ;> (form-urlencoded-decode "x%ce%bbx")
 ;"x
@@ -147,7 +158,7 @@
       (iflet (old new) (find [begins seq (car _) i] pairs)
         (do (++ i (- (len old) 1))
             (pr new))
-        (pr (funcall seq i))))))
+        (pr (ref seq i))))))
 
 ; not a good name
 
