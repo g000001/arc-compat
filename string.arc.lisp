@@ -76,22 +76,27 @@
 ; Fixed for utf8 by pc.
 
 (def urldecode (s)
- (tostring
-  (forlen i s
-    (caselet c (ref s i)
-      #\+ (writec #\space)
-      #\% (do (when (> (- (len s) i) 2)
-                (writec (cl:code-char (int (cut s (+ i 1) (+ i 3)) 16))))
-              (++ i 2))
-          (writec c)))))
+  (babel:octets-to-string 
+   (cl:coerce
+    (accum acc
+      (forlen i s
+        (caselet c (ref s i)
+          #\+ (acc #.(cl:char-code #\space))
+          #\% (do (when (> (- (len s) i) 2)
+                    (acc (int (cut s (+ i 1) (+ i 3)) 16)))
+                  (++ i 2))
+          (acc c))))
+    '(cl:vector (cl:unsigned-byte 8)))))
+
 
 (def urlencode (s)
   (tostring 
-    (each c s 
-      (writec #\%)
-      (let i (int c)
-        (if (< i 16) (writec #\0))
-        (pr (coerce i 'string 16))))))
+   (each c (babel:string-to-octets s) 
+     (writec #\%)
+     (let i (int c)
+       (if (< i 16) (writec #\0))
+       (pr (coerce i 'string 16))))))
+
 
 (mac litmatch (pat string (o start 0))
   (w/uniq (gstring gstart)
