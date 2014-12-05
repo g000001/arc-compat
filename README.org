@@ -1,10 +1,12 @@
 * arc-compat
 
-----
+Arc compatible package for CL
+
+-----
 
 Licence: Perl Foundations's Artistic License 2.0.
 
-----
+-----
 
 Example:
 
