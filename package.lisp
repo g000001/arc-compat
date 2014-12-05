@@ -1,8 +1,7 @@
 (in-package #:cl-user)
-;; (g1:delete-package* :arc-compat.setagaya.mc)
 
 
-(defpackage :arc-compat.setagaya.mc
+(defpackage :arc-compat
   (:use)
   (:nicknames #:arc)
   #+:it (:import-from :it :it :self)
