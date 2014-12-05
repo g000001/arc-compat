@@ -14,7 +14,8 @@
                :bordeaux-threads
                #+sbcl :sb-introspect
                :ironclad
-               :cl-fad)
+               :cl-fad
+               :babel)
   :serial T
   :components ((:file "package")
                (:file "type")
