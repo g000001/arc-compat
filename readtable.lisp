@@ -23,17 +23,6 @@
                                 ;; ((compose ...) ...)
                                 (arc-compat.internal::decompose (cl:cdar expr)
                                                                 (cdr expr))
-                                #|(and (cl:typep expr '(cl:cons cl:symbol *))
-                                (or (arc-compat.internal::insym? 
-                                arc-compat.internal::compose-marker 
-                                (car expr))
-                                (arc-compat.internal::insym? 
-                                arc-compat.internal::compose-marker2 
-                                (car expr))))|#
-                                #|(do (cl:print expr)
-                                `(,(arc-compat.internal::expand-compose (car expr)
-                                :fpos)
-                                ,@(cdr expr)))|#
                                 ;; afn
                                 (cl:typep expr '(cl:cons 
                                                  (cl:cons 
