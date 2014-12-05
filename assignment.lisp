@@ -13,7 +13,6 @@
 ;>(set x 10)
 ;10
 
-(defalias = set)
 
 ;[code] [Foundation] [Destructive] scar list expr -> ac.lisp
 

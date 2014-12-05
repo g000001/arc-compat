@@ -86,8 +86,18 @@
 (defmethod ref ((seq cl:hash-table) index)
   (gethash index seq))
 
+(defgeneric (setf ref) (val seq index)
+  (:method (val seq index)
+    (declare (ignore val index))
+    (cl:error "(SETF REF): non-supported seq type: ~A" (type-of seq))))
+
 (defmethod (setf ref) (val (seq cl:hash-table) index)
   (setf (gethash index seq) val))
+
+(defgeneric sref (seq val index)
+  (:method (seq val index)
+    (declare (ignore val index))
+    (cl:error "SREF: non-supported seq type: ~A" (type-of seq))))
 
 (defmethod sref ((seq cl:hash-table) val index)
   (setf (gethash index seq) val))

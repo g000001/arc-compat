@@ -616,25 +616,6 @@
       (list 2 3 4 6)))
 
 
-(def best (f seq)
-  "Returns the 'best' element of list as determined by function compare."
-  (if (no seq)
-      nil
-      (let wins (car seq)
-        (each elt (cdr seq)
-          (if (funcall f elt wins) (= wins elt)))
-        wins)))
-
-
-(tst best
-  (== (best #'> '() )
-      nil )
-  (== (best #'> '(3 1 4 5 9 6))
-      9)
-  (== (best #'> '("3" "1" "4" "5" "9" "6"))
-      "9"))
-
-
 (def bestn (n f seq)
   "Returns the first n elements of list when sorted according to comparison 
   function compare."

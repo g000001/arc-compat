@@ -135,27 +135,29 @@
           (when (headmatch pat seq i) (throw i))))
     nil))
 
-(def headmatch (pat seq (o start 0))
+;;; -> string.lisp
+#|(def headmatch (pat seq (o start 0))
   (let p (len pat) 
     (funcall
      (afn (i)      
        (or (is i p) 
            (and (is (ref pat i) (ref seq (+ i start)))
                 (self (+ i 1)))))
-     0)))
+     0)))|#
 
 (def begins (seq pat (o start 0))
   (unless (len> pat (- (len seq) start))
     (headmatch pat seq start)))
 
-(def subst (new old seq)
+;;; -> string.lisp
+#|(def subst (new old seq)
   (let boundary (+ (- (len seq) (len old)) 1)
     (tostring 
       (forlen i seq
         (if (and (< i boundary) (headmatch old seq i))
             (do (++ i (- (len old) 1))
                 (pr new))
-            (pr (ref seq i)))))))
+            (pr (ref seq i)))))))|#
 
 (def multisubst (pairs seq)
   (tostring 

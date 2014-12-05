@@ -36,13 +36,14 @@
 ;;;; 
 ;;;; (assign do (annotate 'mac
 ;;;;              (fn args `((fn () ,@args)))))
-;;;; 
-(cl:defmacro safeset (var val)
+;;;;
+;;; -> variables.lisp
+#|(cl:defmacro safeset (var val)
   `(do (if (cl:boundp ',var)
            (do (disp "*** redefining " (stderr))
                (disp ',var (stderr))
              (disp #\newline (stderr))))
-       (cl:setf ,var ,val)))
+       (cl:setf ,var ,val)))|#
 
 
 ;;; ext
@@ -722,9 +723,10 @@
 ;;;; (def prn args
 ;;;;   (do1 (apply pr args)
 ;;;;        (writec #\newline)))
-;;;; 
-(mac wipe args
-  `(do ,@(map (fn (a) `(= ,a nil)) args)))
+;;;;
+;;; -> assignment.lisp
+#|(mac wipe args
+  `(do ,@(map (fn (a) `(= ,a nil)) args)))|#
 ;;;; 
 ;;;; (mac set args
 ;;;;   `(do ,@(map (fn (a) `(= ,a t)) args)))
@@ -1669,7 +1671,8 @@
 #|(eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar bar* " | "))|#
 
-(mac w/bars body
+;;; --> string.lisp
+#|(mac w/bars body
   (w/uniq (out needbars)
     `(let ,needbars nil
        (do ,@(map (fn (e)
@@ -1679,7 +1682,7 @@
                              (pr bar* ,out)
                              (do (set ,needbars)
                                  (pr ,out) )))))
-                  body )))))
+                  body )))))|#
 
 #|(def len< (x n) (< (len x) n))|# ;; list.lisp
 

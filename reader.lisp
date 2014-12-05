@@ -1,8 +1,14 @@
 (cl:in-package :arc-compat.internal)
+
+
 (in-readtable :common-lisp)
 
+
 (defconstant compose-marker #\:)
+
+
 (defconstant compose-marker2 #\∘)
+
 
 ;;; https://groups.google.com/forum/?hl=ja&fromgroups=#!topic/comp.lang.lisp/kmyEWDT0QGY
 ;;; kmp
@@ -38,19 +44,19 @@
                             more-args)))))
          (apply #'read-from-string (prescan text-to-read) 
                 ;; :preserve-whitespace T 
-                more-args))))
+                more-args)))) 
 
 
 (defun chars->value (chars) 
-  (read-from-string (cl:coerce chars 'cl:string)))
+  (read-from-string (cl:coerce chars 'cl:string))) 
 
 
 (defun symbol->chars (x) 
-  (cl:coerce (cl:string x) 'cl:list))
+  (cl:coerce (cl:string x) 'cl:list)) 
 
 
 (defun insym? (char sym)
-  (member char (symbol->chars sym)))
+  (member char (symbol->chars sym))) 
 
 
 (defun ac-tokens (test source token acc keepsep?)
@@ -73,7 +79,7 @@
                    (cdr source)
                    (cons (car source) token)
                    acc
-                   keepsep?))))
+                   keepsep?)))) 
 
 
 (defun has-ssyntax-char? (string i)
@@ -83,46 +89,21 @@
                  (eql c compose-marker2)
                  (eql c #\~) ;(eqv? c #\_) 
                  (eql c #\.)  (eql c #\!)))
-           (has-ssyntax-char? string (- i 1)))))
+           (has-ssyntax-char? string (- i 1))))) 
 
 
 (defun ssyntax? (x)
   (and (symbolp x)
        (not (or (eql x 'arc:+) (eql x 'arc:++) (eql x 'arc::_)))
        (cl:let ((name (cl:string x)))
-         (has-ssyntax-char? name (- (length name) 1)))))
-
-
-#|(defun Make-compose-form (ARGS)
-  (cl:do ((ARGS ARGS)
-          (ANS '() ))
-       ((endp ARGS) `(arc::compose ,@(nreverse ANS)))
-    (cl:let ((PKG (elt ARGS 0))
-             (SYM (elt ARGS 1)))
-      (cond ((find-package PKG)
-             (or (find-symbol (cl:string SYM) PKG)
-                 (error "find-symbol ~A ~A => NIL in ~A" 
-                        SYM
-                        PKG
-                        'Make-compose-form))
-             (push `#',(intern (cl:string SYM) PKG)
-                   ANS)
-             (setq ARGS (cddr ARGS)))
-            ('t (push `#',PKG ANS)
-                (pop ARGS))))))|#
-
-#|(defun Make-compose-form (ARGS)
-  (cl:let ((FS (Recompose-symbols ARGS)))
-    (cond ((null (cdr FS))
-           (car FS))
-          (t `(arc:compose ,@(mapcar (lambda (f) `#',f) FS))))))|#
+         (has-ssyntax-char? name (- (length name) 1))))) 
 
 
 (defun Make-compose-form (ARGS)
   (cl:let ((FS (Recompose-symbols ARGS)))
     (cond ((null (cdr FS))
            (car FS))
-          (t `(arc:compose ,@FS)))))
+          (t `(arc:compose ,@FS))))) 
 
 
 (defun Recompose-symbols (SYMS)
@@ -134,13 +115,13 @@
          (cons (intern (cl:string (cadr SYMS)) (car SYMS))
                (Recompose-symbols (cddr SYMS))))
         (T (cons (car SYMS)
-                 (Recompose-symbols (cdr SYMS))))))
+                 (Recompose-symbols (cdr SYMS)))))) 
 
 
 (defun Decompose (FNS ARGS)
   (cond ((null FNS) `((lambda (&rest VALS) (car VALS)) ,@ARGS))
         ((null (cdr FNS)) (cons (car FNS) ARGS))
-        (T (list (car FNS) (Decompose (cdr FNS) ARGS)))))
+        (T (list (car FNS) (Decompose (cdr FNS) ARGS))))) 
 
 
 (defun expand-compose (sym &optional fposp)
@@ -166,14 +147,10 @@
             (cons (if fposp
                       `(compose ,@elts)
                       (cl:let ((args (gensym)))
-                        ;; (print elts)
                         `(lambda (&rest ,args)
                            (cl:declare (cl:dynamic-extent ,args))
                            (apply ,(Make-compose-form elts)
-                                  ,args)
-                           #|(apply (arc::compose ,@(mapcar (lambda (e) `#',e) 
-                           elts))
-                           ,args)|# )))))))))
+                                  ,args)))))))))) 
 
 
 (defun expand-ssyntax (sym)
@@ -187,7 +164,7 @@
               (insym? #\! sym))
           #'expand-sexpr)
          (T (error "~A Unknown ssyntax" sym)))
-   sym))
+   sym)) 
 
 
 (defun build-sexpr (toks orig)
@@ -204,7 +181,7 @@
                    (error "~A Bad ssyntax" orig)
                    (list 
                     (build-sexpr (cddr toks) orig)
-                    (chars->value (car toks))))))))
+                    (chars->value (car toks)))))))) 
 
 
 (defun expand-sexpr (sym)
@@ -215,7 +192,7 @@
              '()
              '()
              'T))
-   sym))
+   sym)) 
 
 
 (cl:let ((R (copy-readtable nil)))
@@ -229,36 +206,24 @@
   (cl:set-syntax-from-char #\] #\) r)
   (defun Read-symbol (STREAM)
     (cl:let* ((*readtable* R)
-              (OBJ (read-tolerant-preserving-whitespace STREAM))
-              #|(OBJ (read-preserving-whitespace STREAM))|#
-              )
+              (OBJ (read-tolerant-preserving-whitespace STREAM)))
       (typecase OBJ
         (symbol (cl:if (Ssyntax? OBJ)
                     (Expand-ssyntax OBJ)
-                    OBJ
-                    #|(cl:let ((FN (cl:get OBJ 'arc-lambda)))
-                              (if FN
-(funcall FN STREAM)
-OBJ))|# 
-                    ))
-        (otherwise OBJ)))))
+                    OBJ))
+        (otherwise OBJ))))) 
 
 
 (defun compose-reader-macro-reader (stream char)
   (unread-char char stream)
-  (read-symbol stream))
+  (read-symbol stream)) 
 
 
 (defun set-arc-lambda (name readfn)
   (setf (cl:get name 'arc-lambda) readfn)
-  t)
+  t) 
 
 
-;;; compose
-(defun decompose (fns args)
-  (cl:cond ((cl:null fns) `((fn vals (car vals)) ,@args))
-           ((cl:null (cdr fns)) (cons (car fns) args))
-           (T (list (car fns) (decompose (cdr fns) args)))))
+;;; *EOF* 
 
 
-;;; eof
