@@ -108,15 +108,7 @@
    :apply :coerce :car :/ :t :merge :catch :mod :quote :acons :< :+ :expt :nthcdr
    :round :assoc :load :unless :min :abs :map := :time :string :caar :cdr :pop
    :loop :<= :warn :adjoin :read :reduce :close :pushnew :eval :union
-   :char :log)
-  (:shadowing-import-from :arc
-   :subst :sort :assert :last :adjoin :eval :* :rem :union :time :case :get
-   :mismatch :set := :count :catch :< :string :sin :+ :t :if :number :cos :find
-   :cdr :warn :throw :sleep :map :quote :expt :apply :load :subseq :atom :> :max
-   :reduce :abs :cddr :when :complement :acons :or :tan :cons :mod :list :push
-   :sqrt :char :let :caar :/ :coerce :log :cadr :round :- :pushnew :assoc :loop
-   :pop :do :read :unless :min :nil :some :nthcdr :<= :and :merge :car :++ :write
-   #|:declare|# :truncate :close :type :>=)
+   :char :log :tan :cos :sin)
   (:import-from :fiveam :def-suite :in-suite))
 
 
