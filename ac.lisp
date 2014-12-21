@@ -446,8 +446,10 @@
 
 ;; (xdef msec                         current-milliseconds)
 (defun msec ()
-  (* #+sbcl (sb-posix:time)
-     #-sbcl (- (get-universal-time) #.(encode-universal-time 0 0 0 1 1 1970 0))
+  (* #+(:and :sbcl (:not :win32))
+     (sb-posix:time)
+     #-(:and :sbcl (:not :win32))
+     (- (get-universal-time) #.(encode-universal-time 0 0 0 1 1 1970 0))
      1000))
 
 
@@ -461,8 +463,10 @@
 
 
 (defun seconds ()
-  #+sbcl (sb-posix:time)
-  #-sbcl (- (get-universal-time) #.(encode-universal-time 0 0 0 1 1 1970 0)))
+  #+(:and :sbcl (:not :win32))
+  (sb-posix:time)
+  #-(:and :sbcl (:not :win32))
+  (- (get-universal-time) #.(encode-universal-time 0 0 0 1 1 1970 0)))
 
 
 ;; (xdef client-ip (lambda (port) 
