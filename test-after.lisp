@@ -39,7 +39,7 @@
 
 (tst scar
   (== (let x nil
-        (= x "abc")
+        (= x (copy "abc"))
         (scar x #\d)
         x)
       "dbc")

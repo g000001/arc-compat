@@ -149,9 +149,11 @@
         #-(or sbcl excl) (cl:declare (cl:optimize (cl:debug 1)))
         ,@body))
 
-
 (defun null-lexenv-p (env)
-  #+sbcl (sb-c::null-lexenv-p env))
-
+  #+sbcl (typecase env
+           #+sb-fasteval
+           (sb-interpreter::basic-env 'NIL)
+           (T (sb-c::null-lexenv-p env)))
+  #-sbcl nil)
 
 ;;; eof
