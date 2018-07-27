@@ -257,12 +257,12 @@
                              (mapcar (lambda (y) (coerce y 'string))
                                      thing)))
             (cl:otherwise (cl:error "Can't coerce ~A > ~A" thing type))))
-    (t (cl:cond ((cl:and (cl:typep thing (cl:find-symbol "NODE" :stp))
-                         (eq type 'string))
+    (t (cl:cond ((cl:let ((stp-node (cl:find-symbol "NODE" :stp)))
+                   (cl:and stp-node
+                           (cl:typep thing stp-node)
+                           (eq type 'string)))
                  (funcall (cl:find-symbol "STRING-VALUE" :stp) thing))
-                (T (cl:case type
-                     (sym (intern (cl:string thing)))
-                     (cl:otherwise (cl:coerce thing type))))))))
+                (T (cl:coerce thing type))))))
 
 
 ;; (xdef open-socket  (lambda (num) (tcp-listen num 50 #t))) 

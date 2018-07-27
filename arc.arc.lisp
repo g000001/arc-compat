@@ -503,16 +503,15 @@
                 (do ,@body ,update (,gfn ,test))))
           ,test)))))
 
+(def loop-tester ()
+  (let x 0
+    (loop (= x 0) (< x 300000) (++ x))
+    x))
 
 (tst loop
   (== (funcall
-       (compile nil                     ;tco
-                (fn ()
-                  (let x 0
-                    (loop (= x 0) (< x 300000) (++ x))
-                    x))))
+       (compile 'loop-tester)) ;tco
       300000))
-
 
 ;;;; 
 ;;;; (mac for (v init max . body)
