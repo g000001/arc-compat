@@ -152,7 +152,10 @@
 
 (defun null-lexenv-p (env)
   #+allegro (sys::empty-lexical-environment-p env)
-  #+sbcl (sb-c::null-lexenv-p env)
+  #+sbcl (typecase env
+           (null T)
+           (sb-kernel::lexenv (sb-c::null-lexenv-p env))
+           (T nil))
   #+ccl (cl:let ((env (ccl::lexenv.parent-env env)))
           (cl:or (cl:eq env (ccl::lexenv.parent-env nil))
                  (cl:let ((env (ccl::lexenv.parent-env env)))
