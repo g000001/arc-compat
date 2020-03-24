@@ -186,12 +186,12 @@
 
 
 (defun arc:call-w/stdout (stream proc)
-  (with-open-stream (cl:*standard-output* stream)
+  (cl:let ((cl:*standard-output* stream))
     (cl:funcall proc)))
 
 
 (defun arc:call-w/stdin (stream proc)
-  (with-open-stream (cl:*standard-input* stream)
+  (cl:let ((cl:*standard-input* stream))
     (cl:funcall proc)))
 
 
