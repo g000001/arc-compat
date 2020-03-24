@@ -16,12 +16,13 @@
 
 
 (defun arc:sig (name)
+  #+lispworks (lw:function-lambda-list name)
   #+sbcl
   (sb-introspect:function-lambda-list name)
   #+scl (ext:function-arglist name)
   #+excl
   (excl:arglist name)
-  #-(or scl sbcl excl) nil)
+  #-(or scl sbcl excl lispworks) nil)
 
 
 (xdef arc:apply cl:apply)

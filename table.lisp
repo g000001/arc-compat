@@ -25,10 +25,8 @@
 
 
 (tst tablist
-  (5am:is (null 
-           (set-difference (tablist (obj key1 42 key2 "hello"))
-                           (copy-list '((KEY1 42) (KEY2 "hello")))
-                           :test #'equal))))
+  (5am:is (set== (tablist (obj key1 42 key2 "hello"))
+                 (copy-list '((KEY1 42) (KEY2 "hello"))))))
 
 
 (def listtab (al)
@@ -40,7 +38,7 @@
 
 (tst listtab
   (let x (copy-list '((key1 val1) (key2 val2)))
-    (5am:is (null (set-difference x (tablist (listtab x)) :test #'equal)))))
+    (5am:is (set== x (tablist (listtab x))))))
 
 
 #|(defun read-table (&optional (i (stdin)) eof)
@@ -66,9 +64,9 @@
 
 
 (tst obj
-  (== (accum a (maptable (fn args (a args) )
-                         (obj key1 42 key2 "hello")))
-      (copy-list '((KEY1 42) (KEY2 "hello"))) ))
-
+  (5am:is (set== (accum a 
+                   (maptable (fn args (a args) )
+                             (obj key1 42 key2 "hello")))
+                 (copy-list '((KEY1 42) (KEY2 "hello"))))))
 
 ;;; eof

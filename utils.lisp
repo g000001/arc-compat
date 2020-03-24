@@ -10,6 +10,15 @@
             (setf (macro-function ',alias) (macro-function ',orig))
             (setf (symbol-function ',alias) (symbol-function ',orig)))))
 
+
+#|(defmacro def (name args &body body)
+  `(defun ,name (,@(if (consp args)
+                       args
+                         `(&rest ,args)))
+     (arnesi:with-lisp1
+       ,@body)))|#
+
+
 (defun to-proper-lambda-list (list)
   (cl:typecase list
     (cl:null () )
@@ -62,7 +71,6 @@
 (defmacro tst (name &body body)
   `(5am:test ,name ,@body))
 
-
 (defmacro == (x y)
   `(5am:is (cl:equal ,x ,y)))
 
@@ -75,10 +83,8 @@
   (:method (seq index)
     (cl:error "REF: non-supported seq type: ~A" (type-of seq))))
 
-
 (defmethod ref ((seq cl:hash-table) index)
   (gethash index seq))
-
 
 (defgeneric (setf ref) (val seq index)
   (:method (val seq index)
@@ -88,24 +94,19 @@
 (defmethod (setf ref) (val (seq cl:hash-table) index)
   (setf (gethash index seq) val))
 
-
 (defgeneric sref (seq val index)
   (:method (seq val index)
     (declare (ignore val index))
     (cl:error "SREF: non-supported seq type: ~A" (type-of seq))))
 
-
 (defmethod sref ((seq cl:hash-table) val index)
   (setf (gethash index seq) val))
-
 
 (defmethod ref ((seq cl:sequence) index)
   (elt seq index))
 
-
 (defmethod (setf ref) (val (seq cl:sequence) index)
   (setf (elt seq index) val))
-
 
 (defmethod sref ((seq cl:sequence) val index)
   (setf (elt seq index) val))
@@ -151,10 +152,7 @@
 
 (defun null-lexenv-p (env)
   #+allegro (sys::empty-lexical-environment-p env)
-  #+sbcl (typecase env
-           (sb-kernel:lexenv
-            (sb-c::null-lexenv-p env))
-           (T (null env)))
+  #+sbcl (sb-c::null-lexenv-p env)
   #+ccl (cl:let ((env (ccl::lexenv.parent-env env)))
           (cl:or (cl:eq env (ccl::lexenv.parent-env nil))
                  (cl:let ((env (ccl::lexenv.parent-env env)))
@@ -162,5 +160,9 @@
                            (cl:eq 'cl:compile-file (cl:car env))))))
   #+abcl (sys::empty-environment-p env)
   #+lispworks7 (cl:not (system::non-null-environment-p env)))
+
+
+(defun set== (x y)
+  (null (set-difference x y :test #'equalp)))
 
 ;;; eof

@@ -510,7 +510,9 @@
 
 (tst loop
   (== (funcall
-       (compile 'loop-tester)) ;tco
+       (if (compiled-function-p #'loop-tester)
+           #'loop-tester
+           (compile 'loop-tester))) ;tco
       300000))
 
 ;;;; 

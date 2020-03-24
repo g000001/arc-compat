@@ -195,9 +195,10 @@ A list of the expr values is returned."
 1 b
 2 c
 ")
-  (== (with-output-to-string (*standard-output*)
-        (let seq (obj 0 'val0 1 'val1) 
-             (forlen x seq (prn x " " (gethash x seq)))))
+  (== (with-standard-io-syntax
+        (with-output-to-string (*standard-output*)
+          (let seq (obj 0 'val0 1 'val1) 
+            (forlen x seq (prn x " " (gethash x seq))))))
       "0 VAL0
 1 VAL1
 "))
@@ -281,8 +282,9 @@ A list of the expr values is returned."
 1 b
 2 c
 ")
-  (== (with-output-to-string (*standard-output*)
-        (on x (obj key1 'val1 key2 'val2) (prn index " " x)))
+  (== (with-standard-io-syntax
+        (with-output-to-string (*standard-output*)
+          (on x (obj key1 'val1 key2 'val2) (prn index " " x))))
       "0 NIL
 1 NIL
 "))

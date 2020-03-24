@@ -736,12 +736,12 @@
 
 
 (tst dedup
-  (== (dedup '(1 2 3 2 1))
-      '(1 2 3))
-  (== (dedup "abcba")
-      '(#\a #\b #\c))
-  (== (dedup (obj a 1 b 2 c 1))
-      '(1 2)))
+  (5am:is (set== (dedup '(1 2 3 2 1))
+                 '(1 2 3)))
+  (5am:is (set== (dedup "abcba")
+                 '(#\a #\b #\c)))
+  (5am:is (set== (dedup (obj a 1 b 2 c 1))
+                 '(1 2))))
 
 
 (def single (x)
