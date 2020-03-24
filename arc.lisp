@@ -855,14 +855,14 @@
 ; rejects bytes >= 248 lest digits be overrepresented
 
 (def rand-string (n)
+  "Generates a random string of alphanumerics of length n."
   (let c "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    (with (nc 62 s (newstring n) i 0)
-      (w/infile str "/dev/urandom"
-        (while (< i n)
-          (let x (readb str)
-             (unless (> x 247)
-               (= (s i) (c (mod x nc)))
-               (++ i)))))
+    (with (nc 62 s (newstring n) i 0 salt (get-internal-real-time))
+      (while (< i n)
+        (let x (mod (+ salt (cl:random 256)) 256)
+          (unless (> x 247)
+            (setf (elt s i) (elt c (mod x nc)))
+            (++ i))))
       s)))
 
 (mac forlen (var s . body)
