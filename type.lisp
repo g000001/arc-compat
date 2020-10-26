@@ -41,7 +41,7 @@
   `(satisfies cl:input-stream-p))
 
 
-(xdeftype arc:cons cl:cons)
+(xdeftype arc:cons #-allegro cl:cons #+allegro cl:list)
 
 
 ;;; eof

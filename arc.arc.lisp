@@ -1365,7 +1365,13 @@
 (def since (t1) (- (seconds) t1))
 
 (tst since
-  (== 1 (let t0 (seconds) (sleep 1) (since t0))))
+   (== t (let t0 (seconds) 
+           (sleep 990/1000)
+           (cl:let ((s1 (since t0)))
+             (or (cl:= s1 1)
+                 (and (cl:= s1 0)
+                      (progn  (sleep 10/1000)
+                        (cl:= (since t0) 1))))))))
 
 ;;;; 
 ;;;; (def minutes-since (t1) (/ (since t1) 60))

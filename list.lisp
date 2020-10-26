@@ -634,7 +634,10 @@
   The original sequence is unmodified."
   (if (alist seq)
       (mergesort test (copy seq))
-      (cl:coerce (mergesort test (cl:coerce seq 'cons)) (type seq))))
+      (cl:coerce (mergesort test (cl:coerce seq
+                                            #-allegro 'cons
+                                            #+allegro 'cl:list)) ;allegro bug?
+                 (type seq))))
 
 
 (tst sort

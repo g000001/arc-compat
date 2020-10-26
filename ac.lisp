@@ -445,13 +445,21 @@
 ;; (xdef exact (lambda (x) 
 
 
+(defun get-time-of-day ()
+  (declare (optimize (speed 3) (safety 0) (debug 0)))
+  #+:lispworks
+  (cl:let ((tv (sys::unix-gettimeofday (load-time-value (sys::make-timeval-array)))))
+    (declare (cl:type (simple-array (unsigned-byte 64) (2)) tv))
+    (values (aref tv 0) (aref tv 1)))
+  #+(:and :sbcl (:not :win32))
+  (sb-ext:get-time-of-day)
+  #-(:or (:and :sbcl (:not :win32)) :lispworks)
+  (values (- (get-universal-time) #.(encode-universal-time 0 0 0 1 1 1970 0)) 0))
+
+
 ;; (xdef msec                         current-milliseconds)
 (defun msec ()
-  (* #+(:and :sbcl (:not :win32))
-     (sb-posix:time)
-     #-(:and :sbcl (:not :win32))
-     (- (get-universal-time) #.(encode-universal-time 0 0 0 1 1 1970 0))
-     1000))
+  (* (get-time-of-day) 1000))
 
 
 (xdef arc:current-process-milliseconds cl:get-internal-run-time)
@@ -464,10 +472,7 @@
 
 
 (defun seconds ()
-  #+(:and :sbcl (:not :win32))
-  (sb-posix:time)
-  #-(:and :sbcl (:not :win32))
-  (- (get-universal-time) #.(encode-universal-time 0 0 0 1 1 1970 0)))
+  (values (get-time-of-day)))
 
 
 ;; (xdef client-ip (lambda (port) 

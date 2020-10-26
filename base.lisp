@@ -93,12 +93,12 @@
   (defun _-to-gensym (list)
     (cond ((atom list) list)
           ((consp (car list))
-           (cons (_-to-gensym (car list))
-                 (_-to-gensym (cdr list))))
+           (cons (\_-to-gensym (car list))
+                 (\_-to-gensym (cdr list))))
           (T (cons (if (string= "_" (car list))
                        (cl:gensym "_")
                        (car list))
-                   (_-to-gensym (cdr list)))))))
+                   (\_-to-gensym (cdr list)))))))
 
 
 (5am:test _-to-gensym
