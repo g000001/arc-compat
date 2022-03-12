@@ -41,7 +41,9 @@
   `(satisfies cl:input-stream-p))
 
 
-(xdeftype arc:cons #-allegro cl:cons #+allegro cl:list)
+(xdeftype arc:cons
+          #-(:and :allegro-version< (:version>= 10 1)) cl:cons
+          #+(:and :allegro-version< (:version>= 10 1)) cl:list)
 
 
 ;;; eof
