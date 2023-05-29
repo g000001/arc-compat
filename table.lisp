@@ -59,7 +59,7 @@
   (w/uniq g
     `(let ,g (table)
        ,@(map (fn ((k v)) `(setf (gethash ',k ,g) ,v))
-              (pair args))
+              (%pair args))
        ,g)))
 
 

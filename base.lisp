@@ -297,6 +297,13 @@
 (defun sym (x) (coerce x 'sym))
 
 
+(defun %pair (xs &optional (f #'list))
+  (cl:cond ((null xs) nil)
+	   ((null (cdr xs)) (list (list (car xs))))
+	   (T (cons (funcall f (car xs) (cadr xs))
+                    (%pair (cddr xs) f)))))
+
+
 ;;; eof
 
 
