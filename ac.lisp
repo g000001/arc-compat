@@ -447,13 +447,17 @@
 
 (defun get-time-of-day ()
   (declare (optimize (speed 3) (safety 0) (debug 0)))
-  #+:lispworks
+  #+(:and :lispworks (:not :win32))
   (cl:let ((tv (sys::unix-gettimeofday (load-time-value (sys::make-timeval-array)))))
-    (declare (cl:type (simple-array (unsigned-byte 64) (2)) tv))
+    (declare (cl:type (simple-array #+:lispworks-64bit (unsigned-byte 64)
+                                    #+:lispworks-32bit (unsigned-byte 32)
+                                    (2))
+                      tv))
     (values (aref tv 0) (aref tv 1)))
   #+(:and :sbcl (:not :win32))
   (sb-ext:get-time-of-day)
-  #-(:or (:and :sbcl (:not :win32)) :lispworks)
+  #-(:or (:and :sbcl (:not :win32))
+         (:and :lispworks (:not :win32)))
   (values (- (get-universal-time) #.(encode-universal-time 0 0 0 1 1 1970 0)) 0))
 
 
